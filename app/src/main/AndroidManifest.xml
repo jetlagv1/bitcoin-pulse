@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Widgets use short regular WorkManager jobs, never foreground workers. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+    <application android:name=".PulseApplication" android:allowBackup="false"
+        android:label="@string/app_name" android:icon="@drawable/ic_bitcoin"
+        android:roundIcon="@drawable/ic_bitcoin" android:supportsRtl="true"
+        android:usesCleartextTraffic="false" android:theme="@style/Theme.BitcoinPulse">
+        <service android:name="androidx.work.impl.foreground.SystemForegroundService" tools:node="remove" />
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <receiver android:name=".widget.PulseWidget" android:exported="false" android:label="@string/widget_expanded">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_expanded" />
+        </receiver>
+        <receiver android:name=".widget.CompactWidget" android:exported="false" android:label="@string/widget_compact">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_compact" />
+        </receiver>
+    </application>
+</manifest>

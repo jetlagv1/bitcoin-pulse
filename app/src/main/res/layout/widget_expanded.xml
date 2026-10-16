@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical"
+    android:padding="12dp" android:background="@drawable/widget_background" android:contentDescription="@string/open_app">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:text="Bitcoin · EUR" />
+        <TextView android:id="@+id/widget_change" style="@style/WidgetLabel" android:text="— vandaag UTC" />
+    </LinearLayout>
+    <TextView android:id="@+id/widget_price" style="@style/WidgetNumber" android:textSize="30sp" android:text="—" />
+    <LinearLayout android:id="@+id/widget_periods" android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal">
+        <TextView android:id="@+id/period_4h" style="@style/PeriodButton" android:text="4 uur" />
+        <TextView android:id="@+id/period_1d" style="@style/PeriodButton" android:text="1 dag" />
+        <TextView android:id="@+id/period_1w" style="@style/PeriodButton" android:text="1 week" />
+        <TextView android:id="@+id/period_combi" style="@style/PeriodButton" android:text="Combi" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/chart_label_1" style="@style/WidgetLabel" android:text="4 uur · laatste candle in opbouw ●" android:textSize="11sp" />
+        <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:contentDescription="Candlestickgrafiek · open stijging, gevuld daling; tik voor de app" />
+        <TextView android:id="@+id/chart_label_2" style="@style/WidgetLabel" android:textSize="11sp" android:visibility="gone" />
+        <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:visibility="gone" android:contentDescription="Tweede candle-interval" />
+        <TextView android:id="@+id/chart_label_3" style="@style/WidgetLabel" android:textSize="11sp" android:visibility="gone" />
+        <ImageView android:id="@+id/chart_image_3" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:visibility="gone" android:contentDescription="Derde candle-interval" />
+        <TextView android:id="@+id/chart_hint" style="@style/WidgetLabel" android:layout_width="match_parent" android:maxLines="3" android:text="Vergroot de widget voor Combi, of open de app." android:visibility="gone" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="6dp">
+        <TextView android:id="@+id/widget_block" style="@style/WidgetNumber" android:textSize="14sp" android:textColor="#49CFFF" android:layout_width="0dp" android:layout_weight="1" android:text="Blok —" />
+        <TextView android:id="@+id/widget_age" style="@style/WidgetLabel" android:textColor="#FF8A1F" android:text="— geleden" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="5dp">
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Transacties"/><TextView android:id="@+id/widget_tx" style="@style/WidgetNumber" android:textSize="13sp" android:text="—"/></LinearLayout>
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Minerpool"/><TextView android:id="@+id/widget_pool" style="@style/WidgetNumber" android:textSize="13sp" android:text="Onbekend"/></LinearLayout>
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Mediaan fee"/><TextView android:id="@+id/widget_median" style="@style/WidgetNumber" android:textSize="13sp" android:text="— sat/vB"/></LinearLayout>
+    </LinearLayout>
+    <TextView style="@style/WidgetLabel" android:text="FEE-ADVIES · sat/vB" android:textSize="11sp" android:layout_marginTop="8dp" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="3dp">
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Volgend blok"/><TextView android:id="@+id/widget_next" style="@style/WidgetNumber" android:textSize="17sp" android:textColor="#FF8A1F" android:text="—"/></LinearLayout>
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="~30 min"/><TextView android:id="@+id/widget_half" style="@style/WidgetNumber" android:textSize="17sp" android:text="—"/></LinearLayout>
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="~1 uur"/><TextView android:id="@+id/widget_hour" style="@style/WidgetNumber" android:textSize="17sp" android:text="—"/></LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:textSize="11sp" android:text="Vernieuw om te laden" />
+            <TextView style="@style/WidgetLabel" android:text="mempool.space · Kraken" android:textSize="11sp" />
+        </LinearLayout>
+        <ImageButton android:id="@+id/widget_refresh" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp"
+            android:background="@drawable/widget_inner" android:src="@drawable/ic_refresh" android:contentDescription="@string/refresh" />
+    </LinearLayout>
+</LinearLayout>

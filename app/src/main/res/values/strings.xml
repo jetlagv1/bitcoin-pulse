@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Bitcoin Pulse</string>
+    <string name="widget_expanded">Bitcoin Pulse · Network</string>
+    <string name="widget_compact">Bitcoin Pulse · Compact</string>
+    <string name="widget_description">Bitcoin price, recommended fees, and mainnet activity. Tap refresh for the latest data.</string>
+    <string name="refresh">Refresh data</string>
+    <string name="open_app">Open Bitcoin Pulse</string>
+</resources>

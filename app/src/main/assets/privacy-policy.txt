@@ -1,0 +1,19 @@
+Privacyverklaring — Bitcoin Pulse
+Bijgewerkt: 16 oktober 2026
+
+Bitcoin Pulse toont openbare Bitcoin-koers- en blockchaingegevens. De app heeft geen account, wallet, betaalfunctie, advertenties of ingebouwde gebruiksanalyse.
+
+Netwerkverkeer
+De app vraagt koers- en candlegegevens op bij api.kraken.com en netwerkgegevens bij mempool.space via HTTPS. Die diensten ontvangen daarbij je openbare IP-adres en technische verzoekgegevens, zoals de aangevraagde markt, het tijdsinterval en de User-Agent. Bitcoin Pulse stuurt geen naam, e-mailadres, walletadres, locatie of advertentie-ID mee. De diensten kunnen hun eigen serverlogboeken bijhouden; hun verwerking en bewaartermijnen vallen onder hun eigen voorwaarden en privacybeleid. De ontwikkelaar beheert geen centrale Bitcoin Pulse-database met gebruikersgegevens.
+
+Opslag op je apparaat
+De app bewaart gekozen valuta, grafiek- en widgetinstellingen, opgehaalde openbare gegevens, tijdstempels en verversstatus lokaal in de appopslag. Nieuwe antwoorden vervangen de vorige cache. Gegevens blijven lokaal aanwezig totdat ze worden vervangen of je de appgegevens wist of de app verwijdert. Er is geen eigen cloudsynchronisatie of accountback-up.
+
+Beveiliging en machtigingen
+Verzoeken gebruiken versleutelde HTTPS-verbindingen. De app gebruikt internettoegang en netwerkstatus om gegevens op te halen. Android kan achtergrondtaken plannen voor widgetverversing. De app vraagt geen toegang tot contacten, camera, microfoon, precieze locatie of bestanden van andere apps.
+
+Je keuzes
+Je kunt het netwerkverkeer stoppen door de app niet te gebruiken en de widgets te verwijderen, of door de app te verwijderen. Je kunt opgeslagen instellingen en cache wissen via Android-instellingen > Apps > Bitcoin Pulse > Opslag > Gegevens wissen. Er is geen account dat apart verwijderd moet worden.
+
+Contact en wijzigingen
+Voor privacyvragen kun je de ontwikkelaar bereiken via de ontwikkelaarscontactgegevens bij de officiële Google Play-vermelding van Bitcoin Pulse. Wijzigingen in de werking van de app kunnen aanleiding geven tot een bijgewerkte verklaring.

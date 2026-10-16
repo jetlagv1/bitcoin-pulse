@@ -1,0 +1,24 @@
+const fs=require('fs');
+const path=require('path');
+const {chromium}=require('./node-runtime.cjs')('playwright');
+const sharp=require('./node-runtime.cjs')('sharp');
+(async()=>{
+ const root=path.resolve(__dirname,'..');
+ const html=fs.readFileSync(path.join(root,'.superdesign/feature-preview.html'),'utf8');
+ const browser=await chromium.launch({headless:true,channel:'chrome'});
+ const page=await browser.newPage({viewport:{width:1024,height:500},deviceScaleFactor:1});
+ await page.setContent(html,{waitUntil:'networkidle',timeout:60000});
+ await page.evaluate(()=>document.fonts.ready);
+ const images=await page.locator('img').evaluateAll(imgs=>imgs.map(i=>({loaded:i.complete&&i.naturalWidth>0,src:i.src})));
+ if(!images.length||images.some(i=>!i.loaded))throw Error('Screenshot asset did not load');
+ const overflow=await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}));
+ if(overflow.width>1024||overflow.height>500)throw Error('Graphic overflows: '+JSON.stringify(overflow));
+ const copy=await page.locator('body').innerText();
+ for(const text of ['Bitcoin Pulse','Bitcoin in één oogopslag.','Koers · Blockchain · Widgets'])if(!copy.includes(text))throw Error('Missing expected copy: '+text);
+ const target=path.join(root,'deliverables/store-assets/bitcoin-pulse-functieafbeelding-1024x500.png');
+ await sharp(await page.screenshot({type:'png'})).removeAlpha().png().toFile(target);
+ const metadata=await sharp(target).metadata();
+ if(metadata.width!==1024||metadata.height!==500||metadata.channels!==3)throw Error('Invalid feature graphic format');
+ await browser.close();
+ console.log('Feature graphic exported: 1024×500 RGB PNG; source image loaded, copy present, no canvas overflow.');
+})();

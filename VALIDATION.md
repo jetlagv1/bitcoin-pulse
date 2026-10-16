@@ -97,3 +97,10 @@ With an Android test device connected:
 ```
 
 Test reports are generated under `app/build/reports/`. The separate `SHA256SUMS.txt` records the hashes of the packaged APK and source archive.
+# Omalauncher update — 1.2.3 / versionCode 6 (17 October 2026)
+
+- `:app:assembleDebug`, `:app:testDebugUnitTest`, `:app:lintDebug`, and the upload-signed `:app:bundleRelease` / `:app:lintRelease` completed successfully. All 32 JVM/Robolectric tests passed, including the raw-DEFLATE/base64url Unicode import-link round trip.
+- The official Omalauncher OWL compiler accepted `app/src/main/assets/bitcoin-pulse.owl` without warnings or Linux dependencies. Its evaluator was exercised with public Kraken and mempool.space responses for EUR/USD × 240/1440/10080-minute candles: all six produced 36 candles and valid price ranges. Initial loading, cached values after unsuccessful responses and period isolation were checked.
+- Bundletool 1.18.3 validated the AAB. Its upload certificate remains SHA-256 `A7:65:3C:69:26:4A:67:F9:35:64:8B:5C:12:48:F9:09:74:47:BB:4B:39:B0:33:EB:6F:8C:C5:E8:3E:F6:57:F7`.
+- Both final APK and AAB contain an exact copy of the checked OWL source.
+- No physical Omalauncher device test was available. Import confirmation, theme appearance and scrolling still need checking on the user's phone. See `OMALAUNCHER.md` for the conservative timestamp semantics and independent widget storage.

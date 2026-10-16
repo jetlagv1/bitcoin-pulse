@@ -4,13 +4,19 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.2.2**, versionCode **5**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.2.3**, versionCode **6**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## Omalauncher support (1.2.3)
+
+The Widgets tab can import a separate OWL widget into Omalauncher (`dev.omalauncher`). It fetches public Kraken and mempool.space data directly using Android HTTP, without Linux, shell commands, accounts or API keys. EUR/USD and 4-hour/daily/weekly candles are selected within that widget. Last values survive failed requests; timestamps refer to observed value changes, not every successful HTTP check. Repeated unchanged responses may therefore show an older-value warning. Sources run while the widget page or a neighbouring page is visible; the launcher controls scheduling and storage. Its settings are independent of this app's standard Android widgets.
+
+The source is [bitcoin-pulse.owl](app/src/main/assets/bitcoin-pulse.owl). The app creates Omalauncher's documented `owl1` raw-DEFLATE/base64url import link locally and opens it explicitly in Omalauncher; the user confirms the launcher's import review. See [OMALAUNCHER.md](OMALAUNCHER.md) for installation and validation limits.
 
 ## Google Play bundle 1.2.1
 

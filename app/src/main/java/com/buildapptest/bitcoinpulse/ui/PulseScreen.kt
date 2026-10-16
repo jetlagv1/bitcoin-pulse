@@ -222,7 +222,16 @@ private fun <T> SourceStatus(label: String, source: Source<T>, now: Long) {
 
 @Composable
 private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRefresh: () -> Unit, onPin: (Boolean) -> Unit) {
+    val context = LocalContext.current
     Text("Your home screen, at a glance", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+    Panel {
+        Text("Omalauncher", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = Cyan)
+        Text("Voeg de speciale OWL-widget toe met koers, candles en blokgegevens. Werkt zonder Linux. Kies EUR/USD en de candleperiode in de widget zelf.", color = Muted, fontSize = 14.sp)
+        Button(onClick = { com.buildapptest.bitcoinpulse.widget.Omalauncher.install(context) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text("Toevoegen aan Omalauncher")
+        }
+        Text("Omalauncher toont eerst een importcontrole. Bevestig daar om de widget toe te voegen. Deze widget haalt zelf openbare gegevens op bij Kraken en mempool.space; instellingen staan los van de Android-widgets.", color = Muted, fontSize = 12.sp)
+    }
     Text("Widgets use your selected ${s.currency} currency. Change it on the Dashboard.", color = Muted, fontSize = 14.sp)
     Panel {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

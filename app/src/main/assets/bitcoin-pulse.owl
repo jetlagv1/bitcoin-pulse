@@ -1,0 +1,110 @@
+widget "Bitcoin Pulse" {
+  meta { owl: 8; version: "1.0"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  size: 6x10
+  minSize: 4x9
+  padding: 12
+  state currency = "EUR" persist
+  state interval = 240 persist
+  source now = clock every 1s
+  source ticker = http("https://api.kraken.com/0/public/Ticker?pair=XBTEUR,XBTUSD") every 1m json status
+  source blocks = http("https://mempool.space/api/v1/blocks") every 1m json status
+  source fees = http("https://mempool.space/api/v1/fees/recommended") every 1m json status
+  source pool = http("https://mempool.space/api/mempool") every 1m json status
+  source eur4h = http(currency == "EUR" && interval == 240 ? "https://api.kraken.com/0/public/OHLC?pair=XBTEUR&interval=240" : null) every 5m json status
+  source eurDay = http(currency == "EUR" && interval == 1440 ? "https://api.kraken.com/0/public/OHLC?pair=XBTEUR&interval=1440" : null) every 5m json status
+  source eurWeek = http(currency == "EUR" && interval == 10080 ? "https://api.kraken.com/0/public/OHLC?pair=XBTEUR&interval=10080" : null) every 5m json status
+  source usd4h = http(currency == "USD" && interval == 240 ? "https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=240" : null) every 5m json status
+  source usdDay = http(currency == "USD" && interval == 1440 ? "https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440" : null) every 5m json status
+  source usdWeek = http(currency == "USD" && interval == 10080 ? "https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=10080" : null) every 5m json status
+  let ohlc = currency == "EUR" ? (interval == 240 ? eur4h : interval == 1440 ? eurDay : eurWeek) : (interval == 240 ? usd4h : interval == 1440 ? usdDay : usdWeek)
+  state quotes = null persist
+  state priceAt = null persist
+  state block = null persist
+  state blockAt = null persist
+  state advice = null persist
+  state feesAt = null persist
+  state mem = null persist
+  state memAt = null persist
+  state candles = null persist
+  state candleAt = null persist
+  state candleCurrency = "" persist
+  state candleInterval = 0 persist
+  on (ticker ?? false) { quotes = ticker.ok && ticker.out.result != null && len(ticker.out.error) == 0 ? ticker.out.result : quotes; priceAt = ticker.ok && ticker.out.result != null && len(ticker.out.error) == 0 ? now : priceAt }
+  on (blocks ?? false) { block = blocks.ok && blocks.out[0].height != null ? blocks.out[0] : block; blockAt = blocks.ok && blocks.out[0].height != null ? now : blockAt }
+  on (fees ?? false) { advice = fees.ok && fees.out.fastestFee != null ? fees.out : advice; feesAt = fees.ok && fees.out.fastestFee != null ? now : feesAt }
+  on (pool ?? false) { mem = pool.ok && pool.out.count != null ? pool.out : mem; memAt = pool.ok && pool.out.count != null ? now : memAt }
+  let key = currency == "EUR" ? "XXBTZEUR" : "XXBTZUSD"
+  let incoming = get(ohlc.out.result, key)
+  on (ohlc ?? false) {
+    candles = ohlc.ok && len(incoming) > 0 ? reverse(take(reverse(incoming), 36)) : candles
+    candleAt = ohlc.ok && len(incoming) > 0 ? now : candleAt
+    candleCurrency = ohlc.ok && len(incoming) > 0 ? currency : candleCurrency
+    candleInterval = ohlc.ok && len(incoming) > 0 ? interval : candleInterval
+  }
+  let quote = get(quotes, key)
+  let price = num(quote.c[0])
+  let opening = num(quote.o)
+  let change = opening > 0 ? (price - opening) / opening * 100 : null
+  let symbol = currency == "EUR" ? "€" : "$"
+  let chart = candleCurrency == currency && candleInterval == interval ? candles ?? [] : []
+  let low = min(map(chart, c => num(c[3])))
+  let high = max(map(chart, c => num(c[2])))
+  let span = max(high - low, 1)
+  let stale = priceAt == null || blockAt == null || feesAt == null || memAt == null || now - priceAt > 180 || now - blockAt > 180 || now - feesAt > 180 || now - memAt > 180
+  let failed = ticker.ok == false || len(ticker.out.error) > 0 || blocks.ok == false || fees.ok == false || pool.ok == false
+  onTap: androidApp("com.buildapptest.bitcoinpulse")
+  Column {
+    gap: 6
+    scroll: true
+    Row {
+      Text { text: "BITCOIN PULSE"; color: orange; bold: true; weight: 1 }
+      Button { text: currency; onTap: currency = currency == "EUR" ? "USD" : "EUR" }
+    }
+    Text { text: price == null ? "Koers laden…" : "${symbol} ${fixed(price, 2)}"; fontSize: 30; bold: true; maxLines: 1 }
+    Text { text: change == null ? "Kraken · wacht op koers" : "${fixed(change, 2)}% vandaag (UTC) · Kraken"; style: small; color: change < 0 ? red : green }
+    Row {
+      for p in [240, 1440, 10080] {
+        Button { text: p == 240 ? "4 uur" : p == 1440 ? "1 dag" : "1 week"; color: interval == p ? orange : muted; weight: 1; onTap: interval = p }
+      }
+    }
+    if len(chart) > 0 {
+      Row {
+        Text { text: "${symbol} ${fixed(high, 0)}"; style: small; weight: 1 }
+        Text { text: "${symbol} ${fixed(low, 0)}"; style: small; color: muted }
+      }
+      Canvas {
+        fill: width
+        height: 100
+        let plotHeight = max(height - 8, 1)
+        let step = width / max(len(chart), 1)
+        for c, i in chart {
+          let x = (i + 0.5) * step
+          let openY = 4 + (high - num(c[1])) / span * plotHeight
+          let closeY = 4 + (high - num(c[4])) / span * plotHeight
+          let tint = num(c[4]) >= num(c[1]) ? green : red
+          line(x, 4 + (high - num(c[2])) / span * plotHeight, x, 4 + (high - num(c[3])) / span * plotHeight, stroke: tint, width: 1)
+          rect(x - step * 0.28, min(openY, closeY), step * 0.56, max(abs(openY - closeY), 1.5), fill: tint)
+        }
+      }
+      Text { text: "Candles ${fmtTime(candleAt, 'HH:mm')} · laatste loopt nog"; style: small; color: ohlc.ok == false || now - candleAt > 660 ? yellow : muted }
+    } else {
+      Text { text: ohlc.ok == false || len(ohlc.out.error) > 0 ? "Candles niet beschikbaar · tik op Vernieuwen" : "Candles laden…"; style: small; color: yellow }
+    }
+    Row {
+      Text { text: block == null ? "Blok laden…" : "Blok ${int(block.height)}"; bold: true; color: cyan; weight: 1 }
+      Text { text: block == null ? "…" : "${fmtDuration(max(now - block.timestamp, 0))} geleden"; style: small }
+    }
+    Text { text: block == null ? "Wacht op mempool.space" : "${int(block.tx_count)} tx · ${block.extras.pool.name ?? 'Onbekende pool'}"; style: small; maxLines: 2 }
+    Text { text: block.extras.medianFee == null ? "Mediaan blokfee: —" : "Mediaan blokfee: ${fixed(block.extras.medianFee, 1)} sat/vB"; style: small; color: muted }
+    Row {
+      Text { text: advice == null ? "Fee-advies: —" : "Volgend: ${fixed(advice.fastestFee, 1)} sat/vB"; color: orange; weight: 1; style: small }
+      Text { text: advice == null ? "" : "~1u: ${fixed(advice.hourFee, 1)}"; style: small }
+    }
+    if rows >= 8 {
+      Text { text: mem == null ? "Mempool laden…" : "Mempool: ${int(mem.count)} tx · ${fixed(mem.vsize / 1000000, 1)} vMB"; style: small; color: muted }
+    }
+    Text { text: failed ? "Bron niet bereikbaar · laatste waarden" : stale ? "Wachten / oudere gegevens" : "Bronnen beschikbaar · mempool.space"; color: failed || stale ? yellow : green; style: small }
+    Text { text: "Gewijzigd: koers ${fmtTime(priceAt, 'HH:mm:ss')} · blok ${fmtTime(blockAt, 'HH:mm:ss')}"; style: small; color: muted }
+    Button { text: "Vernieuwen"; onTap: refresh() }
+  }
+}

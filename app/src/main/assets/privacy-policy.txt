@@ -1,5 +1,5 @@
 Privacyverklaring — Bitcoin Pulse
-Bijgewerkt: 16 oktober 2026
+Bijgewerkt: 17 oktober 2026
 
 Bitcoin Pulse toont openbare Bitcoin-koers- en blockchaingegevens. De app heeft geen account, wallet, betaalfunctie, advertenties of ingebouwde gebruiksanalyse.
 
@@ -11,6 +11,9 @@ De app bewaart gekozen valuta, grafiek- en widgetinstellingen, opgehaalde openba
 
 Beveiliging en machtigingen
 Verzoeken gebruiken versleutelde HTTPS-verbindingen. De app gebruikt internettoegang en netwerkstatus om gegevens op te halen. Android kan achtergrondtaken plannen voor widgetverversing. De app vraagt geen toegang tot contacten, camera, microfoon, precieze locatie of bestanden van andere apps.
+
+Omalauncher-widget
+De optionele OWL-widget wordt pas toegevoegd nadat je de import in Omalauncher bevestigt. De importlink bevat de widgetcode in het fragment na het #-teken; Bitcoin Pulse uploadt hiervoor geen gegevens naar een eigen server. De widget haalt vervolgens zelf openbare gegevens op bij Kraken en mempool.space. Omalauncher beheert de widgetinstellingen en de lokale cache. Deze widget werkt onafhankelijk van Bitcoin Pulse en blijft na verwijdering van Bitcoin Pulse werken totdat je hem ook uit Omalauncher verwijdert. Het openen van Bitcoin Pulse vanuit de widget vereist wel dat de app is geïnstalleerd.
 
 Je keuzes
 Je kunt het netwerkverkeer stoppen door de app niet te gebruiken en de widgets te verwijderen, of door de app te verwijderen. Je kunt opgeslagen instellingen en cache wissen via Android-instellingen > Apps > Bitcoin Pulse > Opslag > Gegevens wissen. Er is geen account dat apart verwijderd moet worden.

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bitcoin Pulse · Omalauncher voorstel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0C1018;font-family:Roboto,Arial,sans-serif;color:#F7FAFF;-webkit-font-smoothing:antialiased}button{font:inherit;cursor:pointer}button:focus-visible{outline:2px solid #FF8A1F;outline-offset:3px}.nums{font-variant-numeric:tabular-nums}.canvas{max-width:430px;margin:auto;padding:28px 16px 24px}.widget{background:#182230;border:1px solid #38485F;border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:10px}.heading{font-size:16px;font-weight:600;margin:0}.eyebrow{color:#BAC7DB;font-size:12px;margin:6px 0 20px}.pricehead{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:8px;align-items:start}.brand{font-size:13px;color:#BAC7DB;margin-bottom:3px}.price{font-size:33px;line-height:40px;letter-spacing:-1.1px;font-weight:600;white-space:nowrap;margin:0}.daily{font-size:12px;line-height:18px;margin:2px 0 0;color:#FF647C}.currency{height:48px;border:1px solid #38485F;border-radius:12px;background:#243246;font-size:13px;color:#F7FAFF}.periods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:3px;background:#0C1018;border-radius:12px}.period{border:0;border-radius:9px;min-height:48px;background:transparent;color:#BAC7DB;font-size:13px;font-weight:600}.period[aria-pressed=true]{background:#FF8A1F;color:#17120D}.chart{width:100%;height:114px;display:block;overflow:visible}.chartnote{font-size:11px;line-height:15px;color:#BAC7DB;margin:1px 0 0}.block{background:#243246;border-radius:14px;padding:10px 11px;display:flex;flex-direction:column;gap:5px}.blocktop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:baseline}.blockheight{font-size:16px;font-weight:600;white-space:nowrap;color:#49CFFF}.age{font-size:13px;white-space:nowrap}.detail{font-size:12px;line-height:16px;margin:0;color:#BAC7DB}.feeheading{font-size:11px;color:#BAC7DB;margin:0 0 6px}.feerow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.fee{padding:0 8px;border-right:1px solid #38485F}.fee:first-child{padding-left:0}.fee:last-child{border-right:0}.feenumber{font-size:20px;line-height:24px;font-weight:600}.feeunit{font-size:11px;color:#BAC7DB;font-weight:400}.feelabel{font-size:11px;line-height:16px;color:#BAC7DB;white-space:nowrap}.mempool{margin:0;font-size:12px;color:#BAC7DB;border-top:1px solid #38485F;padding-top:9px;line-height:16px}.foot{display:grid;grid-template-columns:minmax(0,1fr) 48px;align-items:center;gap:8px}.timestamp{font-size:12px;line-height:18px;color:#BAC7DB}.sources{font-size:11px;line-height:16px;color:#BAC7DB}.refresh{width:48px;height:48px;border:1px solid #38485F;border-radius:14px;background:#243246;color:#FF8A1F;display:flex;align-items:center;justify-content:center;font-size:22px}.summary{font-size:12px;line-height:19px;color:#BAC7DB;margin:16px 5px 0}.summary strong{color:#F7FAFF;font-weight:500}.notice{min-height:20px;margin-top:8px;font-size:12px;color:#FFD166}.statusdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#35E89A;margin-right:5px}
+@media(max-width:370px){.canvas{padding-left:12px;padding-right:12px}.widget{padding:12px}.price{font-size:31px}.pricehead{grid-template-columns:minmax(0,1fr) 56px}.age{font-size:12px}.blockheight{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="canvas w-full">
+ <h1 class="heading">Omalauncher · Nieuw voorstel</h1>
+ <p class="eyebrow">Ontwerpvoorstel · Voorbeelddata</p>
+ <section class="widget" id="widget" aria-label="Voorstel Bitcoin Pulse-widget">
+  <div class="pricehead">
+   <div class="min-w-0"><div class="brand">Bitcoin Pulse</div><p class="price nums" id="price">€ 72.521,90</p><p class="daily nums">−0,04% vandaag (UTC) <span style="color:#BAC7DB">· Kraken</span></p></div>
+   <button id="currency" class="currency" aria-label="Wissel tussen euro en dollar" onclick="toggleCurrency()">EUR ▾</button>
+  </div>
+  <div class="periods" role="group" aria-label="Candleperiode">
+   <button class="period" data-period="240" aria-pressed="true" onclick="setPeriod(240)">4 uur</button>
+   <button class="period" data-period="1440" aria-pressed="false" onclick="setPeriod(1440)">1 dag</button>
+   <button class="period" data-period="10080" aria-pressed="false" onclick="setPeriod(10080)">1 week</button>
+  </div>
+  <div><svg id="chart" class="chart" viewBox="0 0 330 114" role="img" aria-label="Voorbeeld candlegrafiek van de Bitcoin-prijs"></svg><p class="chartnote" id="chartnote">4-uurscandles · laatste candle loopt nog · UTC</p></div>
+  <div class="block">
+   <div class="blocktop"><span class="blockheight nums">Blok #971.890</span><span class="age nums">9 min 27 sec geleden</span></div>
+   <p class="detail">3.550 transacties · Foundry USA</p>
+   <p class="detail">Mediaan blokfee <span style="color:#F7FAFF">2,6 sat/vB</span></p>
+  </div>
+  <div><p class="feeheading">Fee-advies · schatting</p><div class="feerow">
+   <div class="fee"><div class="feenumber nums" style="color:#FF8A1F">3 <span class="feeunit">sat/vB</span></div><div class="feelabel">Volgend blok</div></div>
+   <div class="fee"><div class="feenumber nums">2 <span class="feeunit">sat/vB</span></div><div class="feelabel">~30 min</div></div>
+   <div class="fee"><div class="feenumber nums">1 <span class="feeunit">sat/vB</span></div><div class="feelabel">~1 uur</div></div>
+  </div></div>
+  <p class="mempool nums">Mempool <span style="color:#F7FAFF">18.420 tx</span> · 12,8 vMB</p>
+  <div class="foot"><div><div class="timestamp nums"><span class="statusdot"></span>Bijgewerkt 20:57 <span style="font-size:10px">· voorbeeld</span></div><div class="sources">mempool.space · Kraken</div></div><button class="refresh" aria-label="Vernieuwen, alleen een ontwerpvoorbeeld" onclick="document.getElementById('notice').textContent='Voorbeeld: geen live gegevens opgehaald.'"><iconify-icon icon="lucide:refresh-cw" aria-hidden="true"></iconify-icon></button></div>
+ </section>
+ <p class="summary"><strong>Vaste achtergrond. Alle kerngegevens zichtbaar.</strong><br>Brede grafiek, vaste tekstvelden en kleuren die leesbaar blijven bij een ander launcher-thema.</p>
+ <p class="notice" id="notice" role="status" aria-live="polite"></p>
+</div>
+<script>
+let currency='EUR',period=240;
+const ns='http://www.w3.org/2000/svg';
+function svgNode(tag,attrs,text){const n=document.createElementNS(ns,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(text!==undefined)n.textContent=text;return n}
+function renderChart(){const svg=document.getElementById('chart');svg.replaceChildren();const count=28,factor=currency==='EUR'?1:1.08;let close=period===240?72800:period===1440?69000:59000;const candles=[];for(let i=0;i<count;i++){const open=close;close=open+(Math.sin(i*1.7+1)*0.7+Math.cos(i*.61)*.32-.1)*(period===240?210:period===1440?950:2600);const high=Math.max(open,close)+(70+i%3*45)*(period===240?1:period===1440?3:7);const low=Math.min(open,close)-(60+i%4*33)*(period===240?1:period===1440?3:7);candles.push([open,high,low,close].map(v=>v*factor))}const offset=72521.9*factor-candles[count-1][3];candles.forEach(c=>c.forEach((v,i)=>c[i]=v+offset));const lo=Math.min(...candles.map(c=>c[2])),hi=Math.max(...candles.map(c=>c[1])),pad=(hi-lo)*.08,min=lo-pad,max=hi+pad,left=0,plot=274,top=5,height=86;const y=v=>top+(max-v)/(max-min)*height;const fmt=v=>new Intl.NumberFormat('nl-NL',{maximumFractionDigits:0}).format(v);for(let i=0;i<3;i++){const val=max-(max-min)*i/2,py=y(val);svg.append(svgNode('line',{x1:0,y1:py,x2:plot,y2:py,stroke:'#38485F','stroke-width':.6}));svg.append(svgNode('text',{x:330,y:py+4,fill:'#BAC7DB','font-size':10,'font-family':'Arial,sans-serif','text-anchor':'end'},fmt(val)))}const step=plot/count;candles.forEach((c,i)=>{const up=c[3]>=c[0],color=up?'#35E89A':'#FF647C',x=left+(i+.5)*step;svg.append(svgNode('line',{x1:x,x2:x,y1:y(c[1]),y2:y(c[2]),stroke:color,'stroke-width':1}));svg.append(svgNode('rect',{x:x-step*.27,y:Math.min(y(c[0]),y(c[3])),width:step*.54,height:Math.max(Math.abs(y(c[0])-y(c[3])),1.4),fill:up?'#182230':color,stroke:color,'stroke-width':1}))});const dates=period===240?['12 okt','14 okt','16 okt']:period===1440?['19 sep','3 okt','17 okt']:['apr','jul','okt'];dates.forEach((d,i)=>svg.append(svgNode('text',{x:i*plot/2,y:110,fill:'#BAC7DB','font-size':10,'font-family':'Arial,sans-serif','text-anchor':i===0?'start':i===2?'end':'middle'},d)));svg.setAttribute('aria-label',`Voorbeeldcandles ${currency}, ${period} minuten, groene stijgingen en rode dalingen`);document.getElementById('chartnote').textContent=(period===240?'4-uurscandles':period===1440?'Dagcandles':'Weekcandles')+' · laatste candle loopt nog · UTC'}
+function toggleCurrency(){currency=currency==='EUR'?'USD':'EUR';document.getElementById('currency').textContent=currency+' ▾';document.getElementById('price').textContent=new Intl.NumberFormat('nl-NL',{style:'currency',currency}).format(72521.9*(currency==='EUR'?1:1.08));renderChart()}
+function setPeriod(value){period=value;document.querySelectorAll('[data-period]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.period)===period?'true':'false'));renderChart()}
+renderChart();
+</script>
+</body>
+</html>

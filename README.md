@@ -4,7 +4,7 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.2.4**, versionCode **7**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.2.5**, versionCode **8**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -13,6 +13,8 @@ Current version: **1.2.4**, versionCode **7**. Open this repository in Android S
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
 
 ## Omalauncher support (1.2.3)
+
+In 1.2.5, OWL widget version 2.0 implements the approved compact design: opaque blue-charcoal background, sans-serif text, explicit colors, stable row widths, hollow green/filled red candles with reserved axes, grouped block details and three fee estimates. Import the new copy from the Widgets tab; updating the Android app does not update a previously imported OWL file. The native renderer check in `tools/verify-omalauncher.ps1` validates text bounds, candle colors and controls at three phone widths using upstream rendering code and recorded public responses.
 
 In 1.2.4 the Omalauncher panel appears at the bottom of the Widgets tab, after both standard Android widget previews and their instructions.
 

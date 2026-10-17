@@ -1,8 +1,8 @@
 widget "Bitcoin Pulse" {
-  meta { owl: 8; version: "1.0"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
-  size: 6x10
-  minSize: 4x9
-  padding: 12
+  meta { owl: 8; version: "2.0"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  size: 6x9
+  minSize: 6x9
+  padding: 14
   state currency = "EUR" persist
   state interval = 240 persist
   source now = clock every 1s
@@ -53,58 +53,150 @@ widget "Bitcoin Pulse" {
   let stale = priceAt == null || blockAt == null || feesAt == null || memAt == null || now - priceAt > 180 || now - blockAt > 180 || now - feesAt > 180 || now - memAt > 180
   let failed = ticker.ok == false || len(ticker.out.error) > 0 || blocks.ok == false || fees.ok == false || pool.ok == false
   onTap: androidApp("com.buildapptest.bitcoinpulse")
+  background: #182230
+  let whole = price == null ? "" : first(split(fixed(price, 2), "."))
+  let grouped = join(reverse(map(range(ceil(len(whole) / 3)), i => sub(whole, max(0, len(whole) - (i + 1) * 3), len(whole) - i * 3))), ".")
+  let priceText = price == null ? "Koers laden…" : "${symbol} ${grouped},${last(split(fixed(price, 2), '.'))}"
+  let heightDigits = block == null ? "" : str(int(block.height))
+  let heightText = block == null ? "—" : join(reverse(map(range(ceil(len(heightDigits) / 3)), i => sub(heightDigits, max(0, len(heightDigits) - (i + 1) * 3), len(heightDigits) - i * 3))), ".")
+  let txDigits = block == null ? "" : str(int(block.tx_count))
+  let txText = block == null ? "—" : join(reverse(map(range(ceil(len(txDigits) / 3)), i => sub(txDigits, max(0, len(txDigits) - (i + 1) * 3), len(txDigits) - i * 3))), ".")
+  let lastChange = priceAt != null && blockAt != null ? min(priceAt, blockAt) : null
   Column {
+    fill: width
     gap: 6
     scroll: true
     Row {
-      Text { text: "BITCOIN PULSE"; color: orange; bold: true; weight: 1 }
-      Button { text: currency; onTap: currency = currency == "EUR" ? "USD" : "EUR" }
+      fill: width
+      gap: 8
+      Column {
+        weight: 1
+        gap: 2
+        Text { text: "Bitcoin Pulse"; font: sans; fontSize: 13; color: #BAC7DB; maxLines: 1 }
+        Text { text: priceText; font: sans; fontSize: tileWidth < 340 ? 28 : 32; bold: true; color: #F7FAFF; maxLines: 1 }
+      }
+      Box {
+        width: 60
+        height: 48
+        align: center
+        background: #243246
+        border: 1
+        borderColor: #38485F
+        radius: 12
+        onTap: currency = currency == "EUR" ? "USD" : "EUR"
+        Text { text: "${currency} ▾"; font: sans; fontSize: 13; color: #F7FAFF; align: center; maxLines: 1 }
+      }
     }
-    Text { text: price == null ? "Koers laden…" : "${symbol} ${fixed(price, 2)}"; fontSize: 30; bold: true; maxLines: 1 }
-    Text { text: change == null ? "Kraken · wacht op koers" : "${fixed(change, 2)}% vandaag (UTC) · Kraken"; style: small; color: change < 0 ? red : green }
+    Text { text: change == null ? "Kraken · wacht op koers" : "${replace(fixed(change, 2), '.', ',')}% vandaag (UTC) · Kraken"; font: sans; fontSize: 12; color: change < 0 ? #FF647C : #35E89A; maxLines: 1 }
     Row {
+      fill: width
+      gap: 4
+      padding: 3
+      background: #0C1018
+      radius: 12
       for p in [240, 1440, 10080] {
-        Button { text: p == 240 ? "4 uur" : p == 1440 ? "1 dag" : "1 week"; color: interval == p ? orange : muted; weight: 1; onTap: interval = p }
+        Box {
+          weight: 1
+          height: 48
+          align: center
+          background: interval == p ? #FF8A1F : #0C1018
+          radius: 9
+          onTap: interval = p
+          Text { text: p == 240 ? "4 uur" : p == 1440 ? "1 dag" : "1 week"; font: sans; fontSize: 13; bold: true; color: interval == p ? #17120D : #BAC7DB; align: center; maxLines: 1 }
+        }
       }
     }
     if len(chart) > 0 {
-      Row {
-        Text { text: "${symbol} ${fixed(high, 0)}"; style: small; weight: 1 }
-        Text { text: "${symbol} ${fixed(low, 0)}"; style: small; color: muted }
-      }
       Canvas {
         fill: width
-        height: 100
-        let plotHeight = max(height - 8, 1)
-        let step = width / max(len(chart), 1)
+        height: 116
+        let plotWidth = max(width - 58, 1)
+        let plotHeight = 82
+        let top = 7
+        let step = plotWidth / max(len(chart), 1)
+        for j in [0, 1, 2] {
+          let axisValue = high - span * j / 2
+          let axisDigits = str(int(round(axisValue)))
+          let axisText = join(reverse(map(range(ceil(len(axisDigits) / 3)), k => sub(axisDigits, max(0, len(axisDigits) - (k + 1) * 3), len(axisDigits) - k * 3))), ".")
+          line(0, top + j * plotHeight / 2, plotWidth, top + j * plotHeight / 2, stroke: #38485F, width: 0.6)
+          text(axisText, width, top + j * plotHeight / 2, size: 10, align: end, color: #BAC7DB)
+        }
         for c, i in chart {
           let x = (i + 0.5) * step
-          let openY = 4 + (high - num(c[1])) / span * plotHeight
-          let closeY = 4 + (high - num(c[4])) / span * plotHeight
-          let tint = num(c[4]) >= num(c[1]) ? green : red
-          line(x, 4 + (high - num(c[2])) / span * plotHeight, x, 4 + (high - num(c[3])) / span * plotHeight, stroke: tint, width: 1)
-          rect(x - step * 0.28, min(openY, closeY), step * 0.56, max(abs(openY - closeY), 1.5), fill: tint)
+          let openY = top + (high - num(c[1])) / span * plotHeight
+          let closeY = top + (high - num(c[4])) / span * plotHeight
+          let rising = num(c[4]) >= num(c[1])
+          line(x, top + (high - num(c[2])) / span * plotHeight, x, top + (high - num(c[3])) / span * plotHeight, stroke: rising ? #35E89A : #FF647C, width: 1)
+          rect(x - step * 0.27, min(openY, closeY), step * 0.54, max(abs(openY - closeY), 1.5), fill: rising ? #182230 : #FF647C, stroke: rising ? #35E89A : #FF647C, width: 1)
+        }
+        text(fmtTime(num(first(chart)[0]), "d MMM"), 0, 107, size: 10, color: #BAC7DB)
+        text(fmtTime(num(chart[floor(len(chart) / 2)][0]), "d MMM"), plotWidth / 2, 107, size: 10, align: center, color: #BAC7DB)
+        text(fmtTime(num(last(chart)[0]), "d MMM"), plotWidth, 107, size: 10, align: end, color: #BAC7DB)
+      }
+      Text { text: "Laatste candle loopt nog · lokaal · ${fmtTime(candleAt, 'HH:mm')}"; font: sans; fontSize: 11; color: ohlc.ok == false || now - candleAt > 660 ? #FFD166 : #BAC7DB; maxLines: 1 }
+    } else {
+      Box {
+        fill: width
+        height: 137
+        align: center
+        Text { text: ohlc.ok == false || len(ohlc.out.error) > 0 ? "Candles niet beschikbaar · tik op ↻" : "Candles laden…"; font: sans; fontSize: 12; color: #FFD166; align: center; maxLines: 2 }
+      }
+    }
+    Column {
+      fill: width
+      gap: 4
+      padding: 10
+      background: #243246
+      radius: 14
+      Row {
+        fill: width
+        gap: 6
+        Text { text: "Blok #${heightText}"; weight: 1; font: sans; fontSize: 15; bold: true; color: #49CFFF; maxLines: 1 }
+        Text { text: block == null ? "—" : "${fmtDuration(max(now - block.timestamp, 0))} geleden"; weight: 1; font: sans; fontSize: 12; color: #F7FAFF; align: end; maxLines: 1 }
+      }
+      Text { text: "${txText} transacties · ${block.extras.pool.name ?? 'Onbekende pool'}"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
+      Text { text: block.extras.medianFee == null ? "Mediaan blokfee —" : "Mediaan blokfee ${replace(fixed(block.extras.medianFee, 1), '.', ',')} sat/vB"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
+    }
+    Column {
+      fill: width
+      gap: 4
+      Text { text: "Fee-advies · schatting"; font: sans; fontSize: 11; color: #BAC7DB; maxLines: 1 }
+      Row {
+        fill: width
+        gap: 6
+        for f, i in [advice.fastestFee, advice.halfHourFee, advice.hourFee] {
+          Column {
+            weight: 1
+            gap: 1
+            Text { text: f == null ? "— sat/vB" : "${replace(str(num(f)), '.', ',')} sat/vB"; font: sans; fontSize: 16; bold: true; color: i == 0 ? #FF8A1F : #F7FAFF; maxLines: 1 }
+            Text { text: i == 0 ? "Volgend blok" : i == 1 ? "~30 min" : "~1 uur"; font: sans; fontSize: 11; color: #BAC7DB; maxLines: 1 }
+          }
         }
       }
-      Text { text: "Candles ${fmtTime(candleAt, 'HH:mm')} · laatste loopt nog"; style: small; color: ohlc.ok == false || now - candleAt > 660 ? yellow : muted }
-    } else {
-      Text { text: ohlc.ok == false || len(ohlc.out.error) > 0 ? "Candles niet beschikbaar · tik op Vernieuwen" : "Candles laden…"; style: small; color: yellow }
     }
+    Box { fill: width; height: 1; background: #38485F }
+    Text { text: mem == null ? "Mempool laden…" : "Mempool ${int(mem.count)} tx · ${replace(fixed(mem.vsize / 1000000, 1), '.', ',')} vMB"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
     Row {
-      Text { text: block == null ? "Blok laden…" : "Blok ${int(block.height)}"; bold: true; color: cyan; weight: 1 }
-      Text { text: block == null ? "…" : "${fmtDuration(max(now - block.timestamp, 0))} geleden"; style: small }
+      fill: width
+      gap: 8
+      align: center
+      Column {
+        weight: 1
+        gap: 2
+        Text { text: failed ? "Bron niet bereikbaar · vorige waarden" : stale ? "Oudere waarden · controleer met ↻" : "Gewijzigd ${fmtTime(lastChange, 'HH:mm')}"; font: sans; fontSize: 12; color: failed || stale ? #FFD166 : #BAC7DB; maxLines: 1 }
+        Text { text: "mempool.space · Kraken"; font: sans; fontSize: 11; color: #BAC7DB; maxLines: 1 }
+      }
+      Box {
+        width: 48
+        height: 48
+        align: center
+        background: #243246
+        border: 1
+        borderColor: #38485F
+        radius: 14
+        onTap: refresh()
+        Text { text: "↻"; font: sans; fontSize: 30; color: #FF8A1F; align: center; maxLines: 1 }
+      }
     }
-    Text { text: block == null ? "Wacht op mempool.space" : "${int(block.tx_count)} tx · ${block.extras.pool.name ?? 'Onbekende pool'}"; style: small; maxLines: 2 }
-    Text { text: block.extras.medianFee == null ? "Mediaan blokfee: —" : "Mediaan blokfee: ${fixed(block.extras.medianFee, 1)} sat/vB"; style: small; color: muted }
-    Row {
-      Text { text: advice == null ? "Fee-advies: —" : "Volgend: ${fixed(advice.fastestFee, 1)} sat/vB"; color: orange; weight: 1; style: small }
-      Text { text: advice == null ? "" : "~1u: ${fixed(advice.hourFee, 1)}"; style: small }
-    }
-    if rows >= 8 {
-      Text { text: mem == null ? "Mempool laden…" : "Mempool: ${int(mem.count)} tx · ${fixed(mem.vsize / 1000000, 1)} vMB"; style: small; color: muted }
-    }
-    Text { text: failed ? "Bron niet bereikbaar · laatste waarden" : stale ? "Wachten / oudere gegevens" : "Bronnen beschikbaar · mempool.space"; color: failed || stale ? yellow : green; style: small }
-    Text { text: "Gewijzigd: koers ${fmtTime(priceAt, 'HH:mm:ss')} · blok ${fmtTime(blockAt, 'HH:mm:ss')}"; style: small; color: muted }
-    Button { text: "Vernieuwen"; onTap: refresh() }
   }
 }

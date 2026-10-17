@@ -1,6 +1,8 @@
 # Omalauncher v2 — ontwerpvoorstel
 
-Dit is een ontwerpvoorstel met fictieve voorbeeldgegevens. De productie-app en OWL-widget zijn hiervoor niet aangepast; de app blijft versie 1.2.4.
+Dit is het goedgekeurde ontwerpvoorstel met fictieve voorbeeldgegevens. Het ontwerp is uitgewerkt in Bitcoin Pulse 1.2.5 / OWL-widget 2.0. De HTML en PNG blijven het oorspronkelijke voorstel, geen live gegevensbron. Zie `OMALAUNCHER.md` voor de implementatie en native rendercontrole.
+
+De daadwerkelijke native rendercontrole met opgenomen openbare API-antwoorden staat in `omalauncher-v2-native.png`. De launcher-buitenrand is niet onderdeel van die controle.
 
 - [Interactief voorstel](https://p.superdesign.dev/draft/3151a48b-17ba-48a2-a05a-7be317a26936).
 - `omalauncher-v2-proposal.html`: zelfstandig HTML-ontwerp met voorbeeldknoppen voor EUR/USD, 4 uur / 1 dag / 1 week en expliciet niet-functionele live verversing. Tailwind en Iconify worden van hun publieke CDN geladen.

@@ -66,7 +66,7 @@ class OwlRenderTest {
             control.setup().visible()
             activity.setContent {
                 Box(Modifier.fillMaxSize().background(Color.Magenta)) {
-                    WidgetContent(inst, Modifier.width(width.dp).height(560.dp), cells=6 to 9)
+                    WidgetContent(inst, Modifier.width(width.dp).height(620.dp), cells=6 to 10)
                 }
             }
             val decor = activity.window.decorView
@@ -96,13 +96,13 @@ class OwlRenderTest {
                     node.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts)
                     for (layout in layouts) assertFalse("$width dp: clipped text '$text'",layout.hasVisualOverflow)
                     val b=node.boundsInRoot
-                    assertTrue("$width dp: text outside widget '$text': $b",b.left>=0 && b.right<=(width*density)+1 && b.bottom<=560*density+1)
+                    assertTrue("$width dp: text outside widget '$text': $b",b.left>=0 && b.right<=(width*density)+1 && b.bottom<=620*density+1)
                 }
                 assertTrue("Runtime errors: ${inst.problems}", inst.problems.isEmpty())
             }
             verifyText()
             fun capture(suffix: String) {
-                val bitmap=Bitmap.createBitmap((width*density).toInt(),(560*density).toInt(),Bitmap.Config.ARGB_8888)
+                val bitmap=Bitmap.createBitmap((width*density).toInt(),(620*density).toInt(),Bitmap.Config.ARGB_8888)
                 decor.draw(Canvas(bitmap))
                 val output=File("build/reports/omalauncher-native").apply { mkdirs() }
                 File(output,"omalauncher-$width-$suffix.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
@@ -110,7 +110,12 @@ class OwlRenderTest {
                 val chartStart=(caption.top-116*density).toInt().coerceAtLeast(0)
                 val chartEnd=caption.top.toInt().coerceAtMost(bitmap.height)
                 var red=0;var green=0
+                var boundaries=0
                 for(y in chartStart until chartEnd) for(x in 0 until bitmap.width) when(bitmap.getPixel(x,y)) {0xffff647c.toInt()->red++;0xff35e89a.toInt()->green++}
+                if(suffix=="cloud") {
+                    for(y in chartStart until chartEnd) for(x in 0 until bitmap.width) if(bitmap.getPixel(x,y) in listOf(0xffa5d6a7.toInt(),0xffef9a9a.toInt()))boundaries++
+                    assertTrue("Cloud boundaries must be drawn",boundaries>10)
+                }
                 assertTrue("Red and green must survive a green launcher theme: red=$red green=$green", red>10 && green>10)
                 assertEquals("Opaque widget background",0xff182230.toInt(),bitmap.getPixel(bitmap.width/2,4))
             }
@@ -122,14 +127,38 @@ class OwlRenderTest {
                 }
                 settle()
             }
+            tap("Cloud Uit");assertEquals(TRUE,inst.get("ichimoku"));settle();verifyText();capture("cloud")
+            fun verifyCloud(currency: String, sourceName: String) {
+                val rows=com.buildapptest.bitcoinpulse.data.CandleParser.parse(File("../../.tools/omalauncher-reference/data/$sourceName.json").readText(),currency)
+                val expected=com.buildapptest.bitcoinpulse.data.Ichimoku.calculate(rows).filter { it.index>=rows.size-36 }
+                val actual=(inst.get("cloudPoints") as Lst).items
+                assertEquals(expected.size,actual.size)
+                expected.zip(actual).forEach { (p,value) ->
+                    val fields=(value as Obj).fields
+                    assertEquals((p.index-(rows.size-36)).toDouble(),fields["index"]!!.num()!!,0.0)
+                    assertEquals(p.a,fields["a"]!!.num()!!,0.000001)
+                    assertEquals(p.b,fields["b"]!!.num()!!,0.000001)
+                }
+            }
+            verifyCloud("EUR","eur4h")
+            for(code in listOf("EUR","USD")) for((interval,name) in listOf(240.0 to "4h",1440.0 to "Day",10080.0 to "Week")) {
+                inst.set("currency",Str(code));inst.set("interval",Num(interval))
+                program.triggers.last().action.run(inst.root,emptyList())
+                verifyCloud(code,code.lowercase()+name)
+            }
+            inst.set("currency",Str("EUR"));inst.set("interval",Num(240.0));program.triggers.last().action.run(inst.root,emptyList());settle()
+            tap("Cloud Aan");assertEquals(FALSE,inst.get("ichimoku"));settle()
+            assertTrue((inst.get("cloudPoints") as Lst).items.isEmpty())
+            tap("Cloud Uit")
             tap("EUR ▾"); assertEquals(Str("USD"),inst.get("currency"))
             program.triggers.last().action.run(inst.root, emptyList());settle();verifyText();capture("usd")
             for ((label, interval) in listOf("1 dag" to 1440.0, "1 week" to 10080.0)) {
                 tap(label);assertEquals(Num(interval),inst.get("interval"))
                 program.triggers.last().action.run(inst.root, emptyList());settle();verifyText()
+                verifyCloud("USD",if(interval==1440.0)"usdDay" else "usdWeek")
             }
             tap("↻");assertTrue(inst.actions.contains("refresh"))
-            println("PASS upstream renderer at $width × 560 dp: text fits, footer visible, red/green candles, currency, all periods and refresh")
+            println("PASS upstream renderer at $width × 620 dp: text fits, footer visible, cloud toggle and bounds, all six cloud calculations match Kotlin, currency, periods and refresh")
             control.pause().stop().destroy()
         }
     }

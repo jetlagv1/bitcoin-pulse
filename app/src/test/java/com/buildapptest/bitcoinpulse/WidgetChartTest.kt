@@ -85,4 +85,15 @@ class WidgetChartTest {
         val root=layout("1w",360,Snapshot())
         assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("geen data"))
     }
+    @Test fun cloudIsIncludedInEveryCombinationChart() {
+        val history=(0 until 240).map { i -> Candle(1791576000+i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
+        val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
+        val root=layout("combi",580,state)
+        for(id in listOf(R.id.chart_image_1,R.id.chart_image_2,R.id.chart_image_3)) {
+            val image=(root.findViewById<ImageView>(id).drawable as android.graphics.drawable.BitmapDrawable).bitmap
+            var fill=0
+            for(y in 0 until image.height) for(x in 0 until image.width) if(android.graphics.Color.alpha(image.getPixel(x,y)) in 60..75)fill++
+            assertTrue("Each Combi chart needs its own cloud",fill>20)
+        }
+    }
 }

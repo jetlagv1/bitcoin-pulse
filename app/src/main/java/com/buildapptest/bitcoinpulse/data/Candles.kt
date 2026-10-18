@@ -24,6 +24,6 @@ object CandleParser {
             require(listOf(o,h,l,c).all { it.isFinite() && it > 0 })
             require(v.isFinite() && v >= 0 && h >= maxOf(o,c) && l <= minOf(o,c) && h >= l)
             Candle(timestamp, o,h,l,c,v, i == rows.length()-1)
-        }.takeLast(36)
+        }.takeLast(Ichimoku.HISTORY)
     }
 }

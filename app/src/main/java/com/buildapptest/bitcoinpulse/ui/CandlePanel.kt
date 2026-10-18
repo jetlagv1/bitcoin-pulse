@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -13,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import com.buildapptest.bitcoinpulse.data.*
 import java.time.Instant
 import java.time.ZoneOffset
@@ -22,6 +25,14 @@ import java.util.Locale
 @Composable
 fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: Boolean = true) {
     val context = LocalContext.current
+    Row(Modifier.fillMaxWidth().heightIn(min=48.dp), verticalAlignment=Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text("Ichimoku cloud",fontSize=14.sp)
+            Text("20 / 60 / 120 / 30",fontSize=11.sp,color=Color(0xFFBAC7DB))
+        }
+        Switch(checked=s.ichimoku,onCheckedChange={ repository.setIchimoku(it); com.buildapptest.bitcoinpulse.widget.WidgetUpdates.render(context) },
+            modifier=Modifier.semantics { contentDescription="Ichimoku cloud voor alle grafieken" })
+    }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         (PERIODS.map { it.id to it.label } + ("combi" to "Combi")).forEach { (id,label) ->
             TextButton(onClick={ repository.setChartMode(id); com.buildapptest.bitcoinpulse.widget.WidgetUpdates.render(context) },
@@ -42,7 +53,8 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
     }
     s.chartPeriods().forEach { period ->
         val source=s.history(period.id)
-        val candles=source.value.orEmpty()
+        val history=source.value.orEmpty()
+        val candles=history.takeLast(Ichimoku.VISIBLE)
         var chosen by remember(s.currency,period.id) { mutableIntStateOf(-1) }
         val selected=chosen.takeIf { it in candles.indices } ?: candles.lastIndex
         val candle=candles.getOrNull(selected)
@@ -52,14 +64,19 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
             val width=with(density){maxWidth.roundToPx()}.coerceAtLeast(240)
             val height=with(density){(if(s.chartMode=="combi")160.dp else 220.dp).roundToPx()}
             val chartDensity=density.density*density.fontScale
-            val image=remember(candles,width,height,selected,s.currency,chartDensity) { CandleBitmap.render(candles,s.currency,width,height,selected,chartDensity).asImageBitmap() }
+            val image=remember(history,width,height,selected,s.currency,chartDensity,s.ichimoku) { CandleBitmap.render(history,s.currency,width,height,selected,chartDensity,s.ichimoku).asImageBitmap() }
             Image(image,contentDescription="${period.label}-candles in ${s.currency}. Stijging: open candle, daling: gevuld. Datums in UTC. Selecteer met de knoppen hieronder.",
-                modifier=Modifier.fillMaxWidth().height(if(s.chartMode=="combi")160.dp else 220.dp).pointerInput(candles,width) {
+                modifier=Modifier.fillMaxWidth().height(if(s.chartMode=="combi")160.dp else 220.dp).pointerInput(history,width,s.ichimoku,chartDensity) {
                     detectTapGestures { offset ->
-                        if(candles.isNotEmpty()) chosen=((offset.x-3*chartDensity)/((width-68*chartDensity)/candles.size)).toInt().coerceIn(candles.indices)
+                        val slots=candles.size + if(s.ichimoku && history.size>=Ichimoku.REQUIRED) Ichimoku.OFFSET else 0
+                        if(candles.isNotEmpty()) {
+                            val index=((offset.x-3*chartDensity)/((width-68*chartDensity)/slots)).toInt()
+                            if(index in candles.indices) chosen=index
+                        }
                     }
                 })
         }
+        if(s.ichimoku && history.size<Ichimoku.REQUIRED) Text("Cloud: minstens ${Ichimoku.REQUIRED} historische candles nodig. Vernieuw om te laden.",fontSize=12.sp,color=Color(0xFFFFD166))
         if(candle!=null && detailed) {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
                 TextButton(onClick={chosen=(selected-1).coerceAtLeast(0)},enabled=selected>0) { Text("Vorige") }

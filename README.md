@@ -4,13 +4,19 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.2.5**, versionCode **8**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.3.0**, versionCode **9**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## Ichimoku cloud (1.3.0)
+
+Every existing candle graph has a cloud on/off option, initially off: the app's switch applies to all selected intervals including Combi; each expanded Android widget has a separate Cloud button in its footer; the Omalauncher widget has a persistent Cloud button above the chart. Compact Android widgets have no candle graph and are unchanged. App and widget settings survive restarts. Existing widget-specific choices take precedence over the app default.
+
+The cloud uses 20/60/120/30. Only Leading Span A, Leading Span B and transparent green/red fill are drawn behind the candles. Displacement follows inclusive bar counting (`30 - 1 = 29` index positions). Up to 240 real historical candles are retained for calculation; the visible window remains 36 candles. At least 184 candles are required to cover the visible window and the projected cloud. Insufficient history leaves candles visible with a refresh/history message. No future price candles are fabricated. See [ICHIMOKU.md](ICHIMOKU.md).
 
 ## Omalauncher support (1.2.3)
 

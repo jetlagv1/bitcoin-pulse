@@ -2,7 +2,7 @@
 
 [Interactieve preview](https://p.superdesign.dev/draft/0bcebac0-1c32-4583-b6c5-4724d3debb3a).
 
-De app en widgets blijven ongewijzigd op versie 1.2.5. Dit is geen productie-implementatie en geen live koersgrafiek. `ichimoku-preview.html` en `ichimoku-preview.png` tonen een cloud over de bestaande vormgeving, plus een eenvoudige aan/uit-schakelaar. De schakelaar is later bedoeld voor alle app-, standaardwidget-, Omalauncher- en Combi-grafieken; dit voorbeeld illustreert hem op één widget.
+Dit is het goedgekeurde oorspronkelijke voorbeeld met fictieve gegevens; de HTML en PNG blijven een ontwerp en geen live koersgrafiek. De cloud is inmiddels uitgevoerd in versie 1.3.0 voor alle bestaande app-, standaardwidget-, Omalauncher- en Combi-grafieken. Zie `ICHIMOKU.md` en `ichimoku-native.png` voor de implementatie en native controle.
 
 Het voorbeeld berekent de cloud uit 300 synthetische OHLC-candles: Conversion 20, Base 60, Leading Span B 120, verplaatsing 30. Span A is het gemiddelde van de twee high/low-midpunten over 20 en 60 candles; Span B is het high/low-midpunt over 120 candles. Alleen Span A, Span B en de transparante vulling worden getekend. De candles staan voor de cloud; er is geen extra volumeplot, Conversion-, Base- of Lagging-lijn. De toekomstzone bevat uitsluitend verschoven indicatorwaarden, geen verzonnen toekomstige candles of koersvoorspelling.
 

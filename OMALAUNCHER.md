@@ -4,15 +4,15 @@ Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalau
 
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.2.5 (versionCode 8)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.3.0 (versionCode 9)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets** → **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.
-5. Houd de widget ingedrukt om hem te verplaatsen of te vergroten. Begin met de volle breedte van 6 kolommen en 9 rijen. De geteste inhoudsmaten zijn 320–390 dp breed en 560 dp hoog. De launcher bepaalt de celmaten; vergroot de widget als de inhoud niet geheel past. Scrollen blijft beschikbaar bij weinig ruimte of grotere systeemtekst.
+5. Houd de widget ingedrukt om hem te verplaatsen of te vergroten. Begin met de volle breedte van 6 kolommen en 10 rijen. De geteste inhoudsmaten zijn 320–390 dp breed en 620 dp hoog. De launcher bepaalt de celmaten; vergroot de widget als de inhoud niet geheel past. Scrollen blijft beschikbaar bij weinig ruimte of grotere systeemtekst.
 
 De knop EUR/USD wisselt de valuta. Kies 4 uur, 1 dag of 1 week voor de candles. De laatste candle is nog niet afgesloten. De datums onder de grafiek gebruiken de tijdzone van je telefoon; de koersvergelijking blijft sinds middernacht UTC. Tik buiten de knoppen op de widget om Bitcoin Pulse te openen. Met ↻ vraag je de bronnen opnieuw op.
 
-De widget toont koers, wijziging sinds middernacht UTC, 36 candles, blokhoogte, blokleeftijd, transactieaantal, minerpool, mediane gerealiseerde blokfee, fee-advies en mempoolomvang. Blokleeftijd rekent door vanuit de laatst bekende bloktijd; dat bewijst niet dat er geen nieuwer blok is.
+De widget toont koers, wijziging sinds middernacht UTC, 36 candles, blokhoogte, blokleeftijd, transactieaantal, minerpool, mediane gerealiseerde blokfee, fee-advies en mempoolomvang. Met **Cloud Aan/Uit** schakel je de Ichimoku-cloud (20/60/120/30) in of uit; standaard staat hij uit. Er worden 240 historische candles voor de berekening bewaard. Zie `ICHIMOKU.md`. Blokleeftijd rekent door vanuit de laatst bekende bloktijd; dat bewijst niet dat er geen nieuwer blok is.
 
 ## Verversen en privacy
 

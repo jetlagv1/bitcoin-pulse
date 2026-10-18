@@ -41,6 +41,7 @@
             <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:textSize="11sp" android:text="Vernieuw om te laden" />
             <TextView style="@style/WidgetLabel" android:text="mempool.space · Kraken" android:textSize="11sp" />
         </LinearLayout>
+        <TextView android:id="@+id/widget_ichimoku" style="@style/WidgetLabel" android:layout_width="64dp" android:layout_height="48dp" android:gravity="center" android:maxLines="2" android:text="Cloud\nUit" android:background="@drawable/widget_inner" android:contentDescription="Ichimoku cloud aan of uit" />
         <ImageButton android:id="@+id/widget_refresh" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp"
             android:background="@drawable/widget_inner" android:src="@drawable/ic_refresh" android:contentDescription="@string/refresh" />
     </LinearLayout>

@@ -11,10 +11,10 @@ class CandleTest {
         assertEquals(2,data.size); assertFalse(data.first().provisional); assertTrue(data.last().provisional)
         assertEquals(120.0,data.first().high,0.0); assertEquals(2.5,data.first().volume,0.0)
     }
-    @Test fun `retains last 36 observations and complete final candle flag`() {
-        val rows=(1..50).joinToString(",") { row.replace("[100,","[$it,") }
+    @Test fun `retains calculation history and complete final candle flag`() {
+        val rows=(1..300).joinToString(",") { row.replace("[100,","[$it,") }
         val data=CandleParser.parse(response(rows),"EUR")
-        assertEquals(36,data.size); assertEquals(15L,data.first().timestamp); assertTrue(data.last().provisional)
+        assertEquals(240,data.size); assertEquals(61L,data.first().timestamp); assertTrue(data.last().provisional)
     }
     @Test(expected=IllegalArgumentException::class) fun `rejects impossible high`() {
         CandleParser.parse(response(row.replace("\"120\"","\"99\"")),"EUR")

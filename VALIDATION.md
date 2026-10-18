@@ -113,3 +113,10 @@ Test reports are generated under `app/build/reports/`. The separate `SHA256SUMS.
 - APK build, all **32 regular tests**, upload-signed AAB build and release lint succeeded (0 errors, 64 warnings). Bundletool 1.18.3 validation passed. APK and AAB contain the exact final checked OWL source. Existing APK/debug and Play/upload signing identities were preserved.
 - APK SHA-256: `2bfe29430bfc785b48c5b87859bedb4f1b54a9297d2f011208dac82e86c1dcb0`.
 - AAB SHA-256: `42c941ca6ed8cfa360d6dd68574288564abd8dd864776108a3c52dee48b00852`.
+# Ichimoku — 1.3.0 / versionCode 9 (18 October 2026)
+
+- Added the approved cloud-only 20/60/120/30 option to the app, expanded Android widgets and OWL widget 3.0. Combi plots share their surface's toggle. Each Android widget can override the app default; OWL keeps its own persisted state. Defaults are off. No change to the compact chartless widget or data endpoints.
+- Retain 240 real candles, draw the last 36, require 184 observations for full cloud coverage. Inclusive displacement 30 is index offset 29 in both implementations. Hand-computed window fixtures verify the first and last values, offset, warmup and lack of lookahead. Crossings split at their interpolated intersection, with continuous fills rather than per-candle transparency seams.
+- All **41 regular tests passed**, including real Compose switch operation in single/Combi mode, settings persistence, translucent rendering, off-state equivalence, insufficient-history behavior and all three RemoteViews Combi cloud plots. APK, upload-signed AAB and release lint builds succeeded.
+- Isolated official OWL renderer passed at **320/360/390 × 620 dp**, including visible boundaries, both cloud toggle states, normal controls and non-clipped text/footer. All cloud points for all six currency/period pairs numerically match the production Kotlin calculation within 1e-6. Native snapshot: `docs/design/ichimoku-native.png` (recorded public API responses).
+- Physical-phone import, full-launcher framing and background scheduling remain unverified. Imported OWL copies must be replaced by the user. See `ICHIMOKU.md` for calculation and setting semantics.

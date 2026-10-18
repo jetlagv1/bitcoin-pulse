@@ -17,6 +17,7 @@ import com.buildapptest.bitcoinpulse.PulseApplication
 import com.buildapptest.bitcoinpulse.R
 import com.buildapptest.bitcoinpulse.data.Format
 import com.buildapptest.bitcoinpulse.data.Snapshot
+import com.buildapptest.bitcoinpulse.data.Ichimoku
 import com.buildapptest.bitcoinpulse.ui.CandleBitmap
 import java.util.concurrent.TimeUnit
 
@@ -34,6 +35,16 @@ open class PulseWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == WidgetUpdates.REFRESH) WidgetUpdates.refresh(context)
+        if (intent.action == WidgetUpdates.CLOUD) {
+            val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,AppWidgetManager.INVALID_APPWIDGET_ID)
+            val owned=AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java))
+            if(id in owned) {
+                val prefs=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE)
+                val fallback=(context.applicationContext as PulseApplication).repository.state.value.ichimoku
+                prefs.edit().putBoolean("ichimoku-$id",!prefs.getBoolean("ichimoku-$id",fallback)).apply()
+                WidgetUpdates.render(context)
+            }
+        }
         if (intent.action == WidgetUpdates.PERIOD) {
             val id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             val mode = intent.getStringExtra("period")
@@ -46,7 +57,7 @@ open class PulseWidget : AppWidgetProvider() {
     }
     override fun onDeleted(context: Context, ids: IntArray) {
         val editor=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
-        ids.forEach { editor.remove("period-$it") }; editor.apply()
+        ids.forEach { editor.remove("period-$it");editor.remove("ichimoku-$it") }; editor.apply()
     }
 }
 class CompactWidget : PulseWidget()
@@ -54,6 +65,7 @@ class CompactWidget : PulseWidget()
 object WidgetUpdates {
     const val REFRESH = "com.buildapptest.bitcoinpulse.REFRESH"
     const val PERIOD = "com.buildapptest.bitcoinpulse.PERIOD"
+    const val CLOUD = "com.buildapptest.bitcoinpulse.CLOUD"
     private val providers = listOf(PulseWidget::class.java, CompactWidget::class.java)
     fun hasWidgets(context: Context): Boolean = providers.any {
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, it)).isNotEmpty()
@@ -95,7 +107,14 @@ object WidgetUpdates {
                     views.setTextViewText(R.id.widget_tx, Format.number(snapshot.block.value?.transactions))
                     views.setTextViewText(R.id.widget_pool, snapshot.block.value?.pool ?: "Onbekend")
                     views.setTextViewText(R.id.widget_median, "${Format.fee(snapshot.block.value?.medianFee)} sat/vB")
-                    charts(views,snapshot,mode,width,height,now)
+                    val cloud=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).getBoolean("ichimoku-$id",snapshot.ichimoku)
+                    views.setTextViewText(R.id.widget_ichimoku,"Cloud\n${if(cloud)"Aan" else "Uit"}")
+                    views.setTextColor(R.id.widget_ichimoku,Color.parseColor(if(cloud)"#FF8A1F" else "#BAC7DB"))
+                    views.setContentDescription(R.id.widget_ichimoku,"Ichimoku cloud ${if(cloud)"aan" else "uit"}; 20 / 60 / 120 / 30. Tik om te wisselen.")
+                    val toggle=Intent(context,PulseWidget::class.java).setAction(CLOUD).setData(Uri.parse("bitcoinpulse://widget/$id/cloud"))
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+                    views.setOnClickPendingIntent(R.id.widget_ichimoku,PendingIntent.getBroadcast(context,id,toggle,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                    charts(views,snapshot,mode,width,height,now,cloud)
                     listOf(R.id.period_4h to "4h",R.id.period_1d to "1d",R.id.period_1w to "1w",R.id.period_combi to "combi").forEach { (viewId,period) ->
                         views.setTextColor(viewId,Color.parseColor(if(period==mode)"#17120D" else "#BAC7DB"))
                         views.setInt(viewId,"setBackgroundResource",if(period==mode)R.drawable.widget_period_selected else R.drawable.widget_inner)
@@ -130,7 +149,7 @@ object WidgetUpdates {
         }
     }
 
-    internal fun charts(views: RemoteViews, s: Snapshot, mode: String, width: Int, height: Int, now: Long) {
+    internal fun charts(views: RemoteViews, s: Snapshot, mode: String, width: Int, height: Int, now: Long, ichimoku: Boolean = s.ichimoku) {
         val periods=s.chartPeriods(mode)
         val needed=when(periods.size) { 3 -> 580; 2 -> 460; else -> 330 }
         val fits=height>=needed
@@ -146,10 +165,11 @@ object WidgetUpdates {
             if(show) {
                 val source=s.history(period.id)
                 val status=when { source.value==null -> "geen data"; source.error!=null -> "cache ${Format.time(source.fetchedAt)}"; source.isStale(now) -> "oud ${Format.time(source.fetchedAt)}"; else -> Format.time(source.fetchedAt) }
-                views.setTextViewText(labels[i],"${period.label} · $status · UTC · in opbouw ●")
+                val cloudHint=if(ichimoku && source.value.orEmpty().size<Ichimoku.REQUIRED) " · cloud: vernieuw" else ""
+                views.setTextViewText(labels[i],"${period.label} · $status · UTC · in opbouw ●$cloudHint")
                 val w=(width.coerceIn(280,500)-24)*2
                 val h=((height.coerceAtMost(800)-286)/periods.size-14).coerceIn(40,300)*2
-                views.setImageViewBitmap(images[i],CandleBitmap.render(source.value.orEmpty(),s.currency,w,h,density=2f))
+                views.setImageViewBitmap(images[i],CandleBitmap.render(source.value.orEmpty(),s.currency,w,h,density=2f,ichimoku=ichimoku))
                 val last=source.value?.lastOrNull()
                 views.setContentDescription(images[i],"${period.label} per candle in ${s.currency}. ${source.status(now)}. Laatste slot ${Format.money(last?.close,s.currency)}; laatste candle in opbouw. Datums UTC. Tik om de details te openen.")
             }

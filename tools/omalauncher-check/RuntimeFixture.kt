@@ -3,6 +3,8 @@ package dev.omalauncher.widgets.runtime
 import android.graphics.Picture
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.State
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -13,6 +15,7 @@ import dev.omalauncher.widgets.lang.*
 class WidgetInstance(val program: Program) : Host {
     private val stored = mutableStateMapOf<Int, Value>()
     private val dimensions = mutableStateMapOf<String, Value>()
+    private val derived = mutableMapOf<Int, State<Value>>()
     val root = Env.root(this)
     override val budget = Budget()
     val updates = mutableIntStateOf(0)
@@ -22,7 +25,7 @@ class WidgetInstance(val program: Program) : Host {
     override fun time(): Double { timeRead = true; return time }
     override fun theme(name: String) = 0xff00ff00.toInt()
     override fun read(slot: Int): Value = when (val g = program.globals[slot]) {
-        is Global.Let -> g.value(root)
+        is Global.Let -> derived.getOrPut(slot) { derivedStateOf { g.value(root) } }.value
         is Global.State -> stored[slot] ?: g.init(root)
         else -> stored[slot] ?: Null
     }

@@ -36,9 +36,15 @@ class PulseRepository(context: Context) {
         } }.toMap(),
         chartMode = preferences.getString("chart-mode", "4h").let { if (it in listOf("4h", "1d", "1w", "combi")) it!! else "4h" },
         combo = preferences.getStringSet("chart-combo", setOf("4h", "1d", "1w"))!!.filter { id -> PERIODS.any { it.id == id } }.toSet().let { if (it.size >= 2) it else setOf("4h", "1d", "1w") },
-        difficulty = cached("difficulty", Parse::difficulty)
+        difficulty = cached("difficulty", Parse::difficulty),
+        ichimoku = preferences.getBoolean("ichimoku", false)
     ))
     val state = mutable.asStateFlow()
+
+    fun setIchimoku(enabled: Boolean) {
+        preferences.edit().putBoolean("ichimoku", enabled).apply()
+        mutable.update { it.copy(ichimoku = enabled) }
+    }
 
     fun setChartMode(mode: String) {
         require(mode in listOf("4h", "1d", "1w", "combi"))

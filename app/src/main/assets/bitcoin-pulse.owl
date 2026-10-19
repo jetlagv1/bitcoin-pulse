@@ -1,5 +1,5 @@
 widget "Bitcoin Pulse" {
-  meta { owl: 8; version: "4.2"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  meta { owl: 8; version: "4.3"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
   size: 4x5
   minSize: 4x5
   padding: 0
@@ -103,15 +103,16 @@ widget "Bitcoin Pulse" {
   let txDigits = block == null ? "" : str(int(block.tx_count))
   let txText = block == null ? "—" : join(reverse(map(range(ceil(len(txDigits) / 3)), i => sub(txDigits, max(0, len(txDigits) - (i + 1) * 3), len(txDigits) - i * 3))), ".")
   let lastChange = priceAt != null && blockAt != null ? min(priceAt, blockAt) : null
-  let dense = tileHeight < (graphCount == 2 ? 760 : 600)
+  let single = graphCount == 1
+  let dense = single || tileHeight < 760
   let plotSize = dense ? max((tileHeight - 248 - 36 * (graphCount - 1)) / graphCount, 40) : 116
   Column {
     fill: true
     padding: dense ? 8 : 14
     background: #182230
     radius: 28
-    gap: dense ? 4 : 6
-    scroll: true
+    gap: single ? 2 : dense ? 4 : 6
+    scroll: !single
     if dense {
       Row {
         fill: width
@@ -124,7 +125,12 @@ widget "Bitcoin Pulse" {
         fill: width
         height: 32
         align: center
-        Text { weight: 1; text: change == null ? "Kraken · wacht op koers" : "${replace(fixed(change, 2), '.', ',')}% vandaag (UTC) · Kraken"; font: sans; fontSize: 10; color: change < 0 ? #FF647C : #35E89A; maxLines: 1 }
+        Column {
+          weight: 1
+          gap: 0
+          Text { text: change == null ? "Kraken · wacht op koers" : "${replace(fixed(change, 2), '.', ',')}% vandaag (UTC) · Kraken"; font: sans; fontSize: 10; color: change < 0 ? #FF647C : #35E89A; maxLines: 1 }
+          if single { Text { text: "Ichimoku 20 / 60 / 120 / 30"; font: sans; fontSize: 9; color: #BAC7DB; maxLines: 1 } }
+        }
         Box { width: 76; height: 32; align: center; background: #243246; radius: 24; border: 1; borderColor: ichimoku ? #FF8A1F : #38485F; onTap: ichimoku = !ichimoku; Text { text: ichimoku ? "Cloud Aan" : "Cloud Uit"; font: sans; fontSize: 12; color: ichimoku ? #FF8A1F : #BAC7DB; align: center; maxLines: 1 } }
       }
     } else {
@@ -247,17 +253,18 @@ widget "Bitcoin Pulse" {
     if len(chart) > 0 {
       Canvas {
         fill: width
-        height: plotSize
+        height: single ? null : plotSize
+        weight: single ? 1 : 0
         let plotWidth = max(width - 68, 1)
-        let plotHeight = plotSize - (plotSize < 90 ? 23 : 35)
-        let top = plotSize < 90 ? 6 : 10
+        let plotHeight = height - (height < 90 ? 23 : 35)
+        let top = height < 90 ? 6 : 10
         let step = plotWidth / max(len(chart) + (cloudReady ? 29 : 0), 1)
         for j in [0, 1, 2] {
           let axisValue = high - span * j / 2
           let axisDigits = str(int(round(axisValue)))
           let axisText = "${replace(fixed(axisValue / 1000, 1), '.', ',')}k"
           line(3, top + j * plotHeight / 2, 3 + plotWidth, top + j * plotHeight / 2, stroke: #38485F, width: 0.6)
-          text(axisText, width - 2, top + j * plotHeight / 2, size: plotSize < 90 ? 9 : 11, align: end, color: #BAC7DB)
+          text(axisText, width - 2, top + j * plotHeight / 2, size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
         }
         let points = cloudPoints
         if len(points) > 1 {
@@ -282,25 +289,26 @@ widget "Bitcoin Pulse" {
           rect(x - step * 0.28, min(openY, closeY), step * 0.56, max(abs(openY - closeY), 2), fill: rising ? #182230 : #FF647C, stroke: rising ? #35E89A : #FF647C, width: 1)
           if i == len(chart) - 1 { circle(x, top - 5, 2, fill: rising ? #35E89A : #FF647C) }
         }
-        text(fmtTime(num(first(chart)[0]), "d MMM"), 3, plotSize - (plotSize < 90 ? 3 : 11), size: plotSize < 90 ? 9 : 11, color: #BAC7DB)
+        text(fmtTime(num(first(chart)[0]), "d MMM"), 3, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, color: #BAC7DB)
         if !cloudReady {
-          text(fmtTime(num(chart[floor(len(chart) / 2)][0]), "d MMM"), 3 + plotWidth / 2, plotSize - (plotSize < 90 ? 3 : 11), size: plotSize < 90 ? 9 : 11, align: center, color: #BAC7DB)
+          text(fmtTime(num(chart[floor(len(chart) / 2)][0]), "d MMM"), 3 + plotWidth / 2, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: center, color: #BAC7DB)
         }
         if cloudReady {
-          text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + (len(chart) - 0.5) * step, plotSize - (plotSize < 90 ? 3 : 11), size: plotSize < 90 ? 9 : 11, align: center, color: #BAC7DB)
-          text("Cloud", 3 + plotWidth, plotSize - (plotSize < 90 ? 3 : 11), size: plotSize < 90 ? 9 : 11, align: end, color: #BAC7DB)
+          text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + (len(chart) - 0.5) * step, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: center, color: #BAC7DB)
+          text("Cloud", 3 + plotWidth, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
         } else {
-          text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + plotWidth, plotSize - (plotSize < 90 ? 3 : 11), size: plotSize < 90 ? 9 : 11, align: end, color: #BAC7DB)
+          text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + plotWidth, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
         }
-        text(currency, width - 2, plotSize - (plotSize < 90 ? 3 : 11), size: plotSize < 90 ? 9 : 11, align: end, color: #BAC7DB)
+        text(currency, width - 2, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
       }
-      if !dense {
+      if !dense || single {
       Text { text: ichimoku && !cloudReady ? "Cloud: ${cloudRequired} candles nodig · vernieuw" : ohlc.ok == false ? "Cache · vernieuwen mislukt · ${fmtTime(candleAt, 'HH:mm')}" : "Laatste candle loopt nog · ${fmtTime(candleAt, 'HH:mm')}"; font: sans; fontSize: 11; color: ohlc.ok == false || now - candleAt > 660 ? #FFD166 : #BAC7DB; maxLines: 1 }
       }
     } else {
       Box {
         fill: width
-        height: plotSize
+        weight: single ? 1 : 0
+        height: single ? null : plotSize
         align: center
         Text { text: ohlc.ok == false || len(ohlc.out.error) > 0 ? "Candles niet beschikbaar · tik op ↻" : "Candles laden…"; font: sans; fontSize: 12; color: #FFD166; align: center; maxLines: 2 }
       }
@@ -308,7 +316,7 @@ widget "Bitcoin Pulse" {
     }
     Column {
       fill: width
-      gap: 4
+      gap: single ? 2 : 4
       padding: dense ? 6 : 10
       background: #243246
       radius: 14
@@ -318,13 +326,13 @@ widget "Bitcoin Pulse" {
         Text { text: "Blok #${heightText}"; weight: 1; font: sans; fontSize: dense ? 13 : 15; bold: true; color: #49CFFF; maxLines: 1 }
         Text { text: block == null ? "—" : "${fmtDuration(max(now - block.timestamp, 0))} geleden"; weight: 1; font: sans; fontSize: 12; color: #F7FAFF; align: end; maxLines: 1 }
       }
-      Text { text: "${txText} transacties · ${block.extras.pool.name ?? 'Onbekende pool'}"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
-      if !dense { Text { text: block.extras.medianFee == null ? "Mediaan blokfee —" : "Mediaan blokfee ${replace(fixed(block.extras.medianFee, 1), '.', ',')} sat/vB"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 } }
+      Text { text: "${txText} transacties · ${block.extras.pool.name ?? 'Onbekende pool'}"; font: sans; fontSize: single ? 11 : 12; color: #BAC7DB; maxLines: 1 }
+      if !dense || single { Text { text: block.extras.medianFee == null ? "Mediaan blokfee —" : "Mediaan blokfee ${replace(fixed(block.extras.medianFee, 1), '.', ',')} sat/vB"; font: sans; fontSize: single ? 11 : 12; color: #BAC7DB; maxLines: 1 } }
     }
     Column {
       fill: width
       gap: 4
-      if !dense { Text { text: "Fee-advies · schatting"; font: sans; fontSize: 11; color: #BAC7DB; maxLines: 1 } }
+      if !dense || single { Text { text: "Fee-advies · schatting"; font: sans; fontSize: single ? 10 : 11; color: #BAC7DB; maxLines: 1 } }
       Row {
         fill: width
         gap: 6
@@ -333,13 +341,13 @@ widget "Bitcoin Pulse" {
             weight: 1
             gap: 1
             Text { text: f == null ? "— sat/vB" : "${replace(str(num(f)), '.', ',')} sat/vB"; font: sans; fontSize: dense ? 13 : 16; bold: true; color: i == 0 ? #FF8A1F : #F7FAFF; maxLines: 1 }
-            Text { text: i == 0 ? "Volgend blok" : i == 1 ? "~30 min" : "~1 uur"; font: sans; fontSize: 11; color: #BAC7DB; maxLines: 1 }
+            Text { text: i == 0 ? "Volgend blok" : i == 1 ? "~30 min" : "~1 uur"; font: sans; fontSize: single ? 10 : 11; color: #BAC7DB; maxLines: 1 }
           }
         }
       }
     }
     if !dense { Box { fill: width; height: 1; background: #38485F } }
-if !dense { Text { text: mem == null ? "Mempool laden…" : "Mempool ${join(reverse(map(range(ceil(len(str(int(mem.count))) / 3)), i => sub(str(int(mem.count)), max(0, len(str(int(mem.count))) - (i + 1) * 3), len(str(int(mem.count))) - i * 3))), '.')} tx · ${replace(fixed(mem.vsize / 1000000, 1), '.', ',')} vMB"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 } }
+if !dense || single { Text { text: mem == null ? "Mempool laden…" : "Mempool ${join(reverse(map(range(ceil(len(str(int(mem.count))) / 3)), i => sub(str(int(mem.count)), max(0, len(str(int(mem.count))) - (i + 1) * 3), len(str(int(mem.count))) - i * 3))), '.')} tx · ${replace(fixed(mem.vsize / 1000000, 1), '.', ',')} vMB"; font: sans; fontSize: single ? 11 : 12; color: #BAC7DB; maxLines: 1 } }
     Row {
       fill: width
       gap: 8
@@ -348,7 +356,7 @@ if !dense { Text { text: mem == null ? "Mempool laden…" : "Mempool ${join(reve
         weight: 1
         gap: 2
         Text { text: failed ? "Bron niet bereikbaar · vorige waarden" : stale ? "Oudere waarden · controleer met ↻" : "Gewijzigd ${fmtTime(lastChange, 'HH:mm')}"; font: sans; fontSize: dense ? 10 : 12; color: failed || stale ? #FFD166 : #BAC7DB; maxLines: 1 }
-        if !dense { Text { text: "mempool.space · Kraken"; font: sans; fontSize: 11; color: #BAC7DB; maxLines: 1 } }
+        if !dense || single { Text { text: single ? "Bitcoin Pulse · mempool.space · Kraken" : "mempool.space · Kraken"; font: sans; fontSize: single ? 9 : 11; color: #BAC7DB; maxLines: 1 } }
       }
       Box {
         width: dense ? 40 : 48
@@ -359,7 +367,7 @@ if !dense { Text { text: mem == null ? "Mempool laden…" : "Mempool ${join(reve
         borderColor: #38485F
         radius: 14
         onTap: refresh()
-        Text { text: "↻"; font: sans; fontSize: dense ? 25 : 30; color: #FF8A1F; align: center; maxLines: 1 }
+        Text { text: "↻"; font: sans; fontSize: single ? 22 : dense ? 25 : 30; color: #FF8A1F; align: center; maxLines: 1 }
       }
     }
   }

@@ -21,6 +21,11 @@
             <TextView android:id="@+id/chart_count_1" style="@style/WidgetLabel" android:layout_width="26dp" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:gravity="center" android:textSize="11sp" android:textColor="#F7FAFF" />
             <TextView android:id="@+id/chart_plus_1" style="@style/ChartZoomButton" android:text="+" />
         </LinearLayout>
+    <LinearLayout android:id="@+id/chart_picker_1" android:layout_width="match_parent" android:layout_height="32dp" android:layout_marginTop="2dp" android:orientation="horizontal" android:visibility="gone">
+      <TextView android:id="@+id/chart_pick_1_4h" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="4 uur" android:clickable="true" android:focusable="true"/>
+      <TextView android:id="@+id/chart_pick_1_1d" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 dag" android:clickable="true" android:focusable="true"/>
+      <TextView android:id="@+id/chart_pick_1_1w" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 week" android:clickable="true" android:focusable="true"/>
+    </LinearLayout>
         <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="116dp" android:scaleType="fitXY" android:layout_marginTop="6dp" android:contentDescription="Candlegrafiek" />
         <TextView android:id="@+id/chart_status_1" style="@style/WidgetLabel" android:layout_width="match_parent" android:textSize="11sp" android:layout_marginTop="6dp" />
         <LinearLayout android:id="@+id/chart_header_2" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone" android:layout_marginTop="6dp">
@@ -29,6 +34,11 @@
             <TextView android:id="@+id/chart_count_2" style="@style/WidgetLabel" android:layout_width="26dp" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:gravity="center" android:textSize="11sp" android:textColor="#F7FAFF" />
             <TextView android:id="@+id/chart_plus_2" style="@style/ChartZoomButton" android:text="+" />
         </LinearLayout>
+    <LinearLayout android:id="@+id/chart_picker_2" android:layout_width="match_parent" android:layout_height="32dp" android:layout_marginTop="2dp" android:orientation="horizontal" android:visibility="gone">
+      <TextView android:id="@+id/chart_pick_2_4h" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="4 uur" android:clickable="true" android:focusable="true"/>
+      <TextView android:id="@+id/chart_pick_2_1d" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 dag" android:clickable="true" android:focusable="true"/>
+      <TextView android:id="@+id/chart_pick_2_1w" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 week" android:clickable="true" android:focusable="true"/>
+    </LinearLayout>
         <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="116dp" android:scaleType="fitXY" android:layout_marginTop="6dp" android:visibility="gone" android:contentDescription="Candlegrafiek" />
         <TextView android:id="@+id/chart_status_2" style="@style/WidgetLabel" android:layout_width="match_parent" android:textSize="11sp" android:layout_marginTop="6dp" android:visibility="gone" />
         <TextView android:id="@+id/chart_hint" style="@style/WidgetLabel" android:layout_width="match_parent" android:maxLines="3" android:text="Vergroot de widget voor de grafieken." android:visibility="gone" />

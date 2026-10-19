@@ -61,6 +61,7 @@ class WidgetAppearanceTest {
         WidgetVisualFixture.seed(context,System.currentTimeMillis())
         val manager=AppWidgetManager.getInstance(context)
         manager.bindAppWidgetIdIfAllowed(21,ComponentName(context,PulseWidget::class.java))
+        val singleHeights=mutableMapOf<Int,Int>()
         for(count in 1..2) for(width in listOf(280,320,360)) for(height in listOf(320,400,480,560,640,840)) {
             WidgetCharts(count=count).save(context,21)
             manager.updateAppWidgetOptions(21,Bundle().apply { putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,width);putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,height) })
@@ -68,20 +69,30 @@ class WidgetAppearanceTest {
             val root=shadowOf(manager).getViewFor(21) as ViewGroup
             val d=context.resources.displayMetrics.density;val w=(width*d).toInt();val h=(height*d).toInt()
             root.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));root.layout(0,0,w,h)
+            if(count==1) {
+                assertEquals("Resizing must reset previously applied compact padding",((if(height<400)5 else 8)*d).toInt(),root.paddingTop)
+                for(id in listOf(R.id.widget_median,R.id.widget_mempool,R.id.widget_next,R.id.widget_half,R.id.widget_hour,R.id.chart_status_1)) {
+                    val v=root.findViewById<View>(id);val r=Rect();v.getDrawingRect(r);root.offsetDescendantRectToMyCoords(v,r)
+                    assertEquals("All single-chart data must stay visible",View.VISIBLE,v.visibility)
+                    assertTrue("Single-chart metadata clipped: $width × $height: $r",r.bottom<=h && r.top>=0)
+                }
+                if(width==320) singleHeights[height]=root.findViewById<View>(R.id.chart_image_1).height
+            }
             for(id in listOf(R.id.chart_header_1,R.id.chart_image_1,R.id.widget_block,R.id.widget_refresh)+if(count==2)listOf(R.id.chart_header_2,R.id.chart_image_2)else emptyList()) {
                 val v=root.findViewById<View>(id);val r=Rect();v.getDrawingRect(r);root.offsetDescendantRectToMyCoords(v,r)
                 assertEquals(View.VISIBLE,v.visibility)
                 assertTrue("Clipped $id: $width × $height, count=$count: $r",r.bottom<=h && r.right<=w && r.top>=0)
                 if(id==R.id.chart_image_1 || id==R.id.chart_image_2) {
-                    assertTrue("Readable plot: $width × $height, count=$count",v.height>=40*d)
+                    assertTrue("Readable plot: $width × $height, count=$count, actual=${v.height/d} dp",v.height>=40*d)
                     assertNotNull((v as android.widget.ImageView).drawable)
                 }
             }
-            if(width==320 && height in listOf(400,480,560)) {
+            if(width==320 && height in listOf(400,480,560,640,840)) {
                 val bitmap=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);root.draw(Canvas(bitmap))
                 val folder=File("build/reports/widget-resize").apply { mkdirs() }
                 File(folder,"android-$width-$height-$count.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
             }
         }
+        for((a,b) in listOf(480 to 560,560 to 640,640 to 840)) assertEquals("Every added dp goes to the single chart",((b-a)*context.resources.displayMetrics.density).toInt(),singleHeights.getValue(b)-singleHeights.getValue(a))
     }
 }

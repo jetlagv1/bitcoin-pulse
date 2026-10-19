@@ -37,6 +37,20 @@ open class PulseWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == WidgetUpdates.REFRESH) WidgetUpdates.refresh(context)
+        if (intent.action == WidgetUpdates.PICKER || intent.action == WidgetUpdates.PERIOD) {
+            val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)
+            val slot=intent.getIntExtra("slot",-1)
+            if(WidgetCharts.owned(context,id)) {
+                val prefs=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE)
+                if(intent.action==WidgetUpdates.PICKER && slot in 0 until WidgetCharts.read(context,id).count) {
+                    prefs.edit().putInt("picker-$id",if(prefs.getInt("picker-$id",-1)==slot)-1 else slot).apply()
+                    WidgetUpdates.render(context)
+                } else if(intent.action==WidgetUpdates.PERIOD && WidgetCharts.select(context,id,slot,intent.getStringExtra("period") ?: "")) {
+                    prefs.edit().remove("picker-$id").apply()
+                    WidgetUpdates.render(context)
+                }
+            }
+        }
         if (intent.action == WidgetUpdates.ZOOM) {
             val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,AppWidgetManager.INVALID_APPWIDGET_ID)
             val period=intent.getStringExtra("period") ?: ""
@@ -56,7 +70,7 @@ open class PulseWidget : AppWidgetProvider() {
     }
     override fun onDeleted(context: Context, ids: IntArray) {
         val editor=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
-        ids.forEach { id -> editor.remove("period-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
+        ids.forEach { id -> editor.remove("period-$id");editor.remove("picker-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
     }
 }
 class CompactWidget : PulseWidget()
@@ -65,6 +79,8 @@ object WidgetUpdates {
     const val REFRESH = "com.buildapptest.bitcoinpulse.REFRESH"
     const val CLOUD = "com.buildapptest.bitcoinpulse.CLOUD"
     const val ZOOM = "com.buildapptest.bitcoinpulse.ZOOM"
+    const val PICKER = "com.buildapptest.bitcoinpulse.PICKER"
+    const val PERIOD = "com.buildapptest.bitcoinpulse.PERIOD"
     private val minus=listOf(R.id.chart_minus_1,R.id.chart_minus_2)
     private val plus=listOf(R.id.chart_plus_1,R.id.chart_plus_2)
     internal fun zooms(context: Context,id: Int) = PERIODS.associate {
@@ -103,12 +119,16 @@ object WidgetUpdates {
                 val small=compact
                 val selection=WidgetCharts.read(context,id,snapshot)
                 val dense=!small && WidgetAppearance.dense(height,selection.count)
-                val views = RemoteViews(context.packageName, if (small) R.layout.widget_compact else if(dense) R.layout.widget_expanded_dense else R.layout.widget_expanded)
+                val views = RemoteViews(context.packageName, if (small) R.layout.widget_compact else if(selection.count==1) R.layout.widget_single else if(dense) R.layout.widget_expanded_dense else R.layout.widget_expanded)
                 views.setTextViewText(R.id.widget_currency, if (small) "BTC/${snapshot.currency}" else "${snapshot.currency} ▾")
                 views.setTextViewText(R.id.widget_price, if(small)Format.money(snapshot.quote?.price,snapshot.currency,true) else WidgetAppearance.price(snapshot.quote?.price,snapshot.currency))
                 views.setTextViewText(R.id.widget_next, if (small) "Next ${Format.fee(snapshot.fees.value?.next)} sat/vB" else "${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB")
                 if (!small) {
-                    if(dense) views.setViewVisibility(R.id.widget_fee_row,if(height<400)View.GONE else View.VISIBLE)
+                    if(selection.count==1) {
+                        val inset=((if(height<400)5 else 8)*context.resources.displayMetrics.density).toInt()
+                        views.setViewPadding(R.id.widget_root,inset,inset,inset,inset)
+                    }
+                    if(dense) views.setViewVisibility(R.id.widget_fee_row,if(selection.count==2 && height<400)View.GONE else View.VISIBLE)
                     views.setTextViewText(R.id.widget_half, "${WidgetAppearance.fee(snapshot.fees.value?.halfHour)} sat/vB")
                     views.setTextViewText(R.id.widget_hour, "${WidgetAppearance.fee(snapshot.fees.value?.hour)} sat/vB")
                     views.setTextViewText(R.id.widget_block, "Blok #${WidgetAppearance.number(snapshot.block.value?.height)}")
@@ -132,11 +152,17 @@ object WidgetUpdates {
                         .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
                     views.setOnClickPendingIntent(R.id.widget_ichimoku,PendingIntent.getBroadcast(context,id,toggle,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                     selection.save(context,id)
-                    charts(views,snapshot,selection,width,height,now,cloud,zooms(context,id))
+                    val picker=context.getSharedPreferences("widget-options",0).getInt("picker-$id",-1).takeIf { it in 0 until selection.count } ?: -1
+                    charts(views,snapshot,selection,width,height,now,cloud,zooms(context,id),picker)
                     selection.periods.forEachIndexed { i,period ->
-                        val picker=Intent(context,WidgetChartPickerActivity::class.java).setData(Uri.parse("bitcoinpulse://widget/$id/pick/$i"))
+                        val pick=Intent(context,PulseWidget::class.java).setAction(PICKER).setData(Uri.parse("bitcoinpulse://widget/$id/pick/$i"))
                             .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i)
-                        views.setOnClickPendingIntent(if(i==0)R.id.chart_label_1 else R.id.chart_label_2,PendingIntent.getActivity(context,id,picker,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                        views.setOnClickPendingIntent(if(i==0)R.id.chart_label_1 else R.id.chart_label_2,PendingIntent.getBroadcast(context,id,pick,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                        PERIODS.forEachIndexed { j,choice ->
+                            val choose=Intent(context,PulseWidget::class.java).setAction(PERIOD).setData(Uri.parse("bitcoinpulse://widget/$id/select/$i/${choice.id}"))
+                                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i).putExtra("period",choice.id)
+                            views.setOnClickPendingIntent(pickerChoices[i][j],PendingIntent.getBroadcast(context,id,choose,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                        }
                         for((viewId,direction) in listOf(minus[i] to 1,plus[i] to -1)) {
                             val zoom=Intent(context,PulseWidget::class.java).setAction(ZOOM)
                                 .setData(Uri.parse("bitcoinpulse://widget/$id/zoom/${period.id}/$direction"))
@@ -168,7 +194,9 @@ object WidgetUpdates {
         }
     }
 
-    internal fun charts(views: RemoteViews, s: Snapshot, selection: WidgetCharts, width: Int, height: Int, now: Long, ichimoku: Boolean = s.ichimoku, zooms: Map<String,Int> = emptyMap()) {
+    private val pickerRows=listOf(R.id.chart_picker_1,R.id.chart_picker_2)
+    private val pickerChoices=listOf(listOf(R.id.chart_pick_1_4h,R.id.chart_pick_1_1d,R.id.chart_pick_1_1w),listOf(R.id.chart_pick_2_4h,R.id.chart_pick_2_1d,R.id.chart_pick_2_1w))
+    internal fun charts(views: RemoteViews, s: Snapshot, selection: WidgetCharts, width: Int, height: Int, now: Long, ichimoku: Boolean = s.ichimoku, zooms: Map<String,Int> = emptyMap(), picker: Int = -1) {
         val periods=selection.periods
         val dense=WidgetAppearance.dense(height,selection.count)
         val fits=true
@@ -184,7 +212,13 @@ object WidgetUpdates {
             views.setViewVisibility(labels[i],if(show)View.VISIBLE else View.GONE)
             views.setViewVisibility(headers[i],if(show)View.VISIBLE else View.GONE)
             views.setViewVisibility(images[i],if(show)View.VISIBLE else View.GONE)
-            views.setViewVisibility(captions[i],if(show && !dense)View.VISIBLE else View.GONE)
+            views.setViewVisibility(captions[i],if(show && (selection.count==1 || (!dense && picker<0)))View.VISIBLE else View.GONE)
+            views.setViewVisibility(pickerRows[i],if(show && picker==i)View.VISIBLE else View.GONE)
+            PERIODS.forEachIndexed { j,choice ->
+                val available=selection.count==1 || choice.id!=(if(i==0)selection.second else selection.first)
+                views.setBoolean(pickerChoices[i][j],"setEnabled",available)
+                views.setTextColor(pickerChoices[i][j],Color.parseColor(if(!available)"#718096" else if(choice.id==period?.id)"#FF8A1F" else "#F7FAFF"))
+            }
             if(show) {
                 val source=s.history(period.id)
                 val zoom=ChartZoom.clamp(zooms[period.id] ?: ChartZoom.DEFAULT)
@@ -204,7 +238,7 @@ object WidgetUpdates {
                 views.setTextColor(labels[i],Color.parseColor(if(source.error!=null || source.isStale(now))"#FFD166" else "#F7FAFF"))
                 views.setContentDescription(labels[i],"Kies interval voor grafiek ${i+1}; ${period.label} · $status · UTC · in opbouw$cloudHint")
                 val w=(width.coerceIn(250,500)-if(dense)16 else 28)*2
-                val h=WidgetAppearance.plotHeight(height,selection.count)*2
+                val h=(WidgetAppearance.plotHeight(height,selection.count)-if(picker>=0 && dense)32/selection.count else 0).coerceAtLeast(24)*2
                 views.setImageViewBitmap(images[i],CandleBitmap.render(source.value.orEmpty(),s.currency,w,h,density=2f,ichimoku=ichimoku,visibleCount=zoom,widgetStyle=true))
                 val last=source.value?.lastOrNull()
                 views.setContentDescription(images[i],"${period.label} per candle in ${s.currency}. ${source.status(now)}. Laatste slot ${Format.money(last?.close,s.currency)}; laatste candle in opbouw. Datums UTC. Tik om de details te openen.")

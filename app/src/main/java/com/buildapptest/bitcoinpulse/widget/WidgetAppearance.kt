@@ -8,8 +8,8 @@ internal object WidgetAppearance {
     const val SINGLE_HEIGHT=320
     const val DOUBLE_HEIGHT=320
     const val DENSE_HEIGHT=600
-    fun dense(height: Int,count: Int) = height < if(count==2)760 else DENSE_HEIGHT
-    fun plotHeight(height: Int,count: Int) = if(dense(height,count)) ((height-228-36*(count-1)+if(height<400)32 else 0)/count).coerceAtLeast(40) else 116
+    fun dense(height: Int,count: Int) = count==1 || height<760
+    fun plotHeight(height: Int,count: Int) = if(count==1) (height-288).coerceAtLeast(40) else if(dense(height,count)) ((height-264+if(height<400)32 else 0)/2).coerceAtLeast(40) else 116
     fun number(value: Long?) = value?.let { NumberFormat.getIntegerInstance(Locale.GERMANY).format(it) } ?: "—"
     fun fee(value: Double?) = value?.let { NumberFormat.getNumberInstance(Locale.GERMANY).apply { maximumFractionDigits=2 }.format(it) } ?: "—"
     fun fixed(value: Double?,decimals: Int) = value?.let { String.format(Locale.GERMANY,"%.${decimals}f",it) } ?: "—"

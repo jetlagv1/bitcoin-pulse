@@ -24,6 +24,7 @@ data class WidgetCharts(val first: String="4h",val second: String="1d",val count
             context.getSharedPreferences("widget-options",0).edit().putInt("default-chart-count",count).apply()
             AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java)).forEach { id ->
                 read(context,id).copy(count=count).save(context,id)
+                context.getSharedPreferences("widget-options",0).edit().remove("picker-$id").apply()
             }
             WidgetUpdates.render(context)
         }

@@ -1,3 +1,17 @@
+# Bitcoin Pulse 1.5.3 / versionCode 15
+
+Verified on 19 October 2026.
+
+- 55 ordinary JVM/Robolectric tests passed. The new actual-RemoteViews click test opens inline selectors and switches both slots on single/two-chart widgets at 400, 480, 640 and 840 dp. It verifies broadcast handling, disabled duplicate intervals, closing the selector, persisted choices and absence of any started activity.
+- Single-chart RemoteViews retain median block fee, mempool, fee estimates, candle status and source/parameter labels at every measured size. Across 480/560/640/840 dp heights, every added dp goes to the chart. Compact padding resets when a previously tiny widget is enlarged. The 320 dp minimum retains a 40 dp plot with all metadata.
+- Three upstream OWL renderer/compiler tests and the isolated resize interaction test passed. Single-chart plots use measured remaining Canvas height at 400/480/560/640/840 dp, preserve all metadata and receive all added height. Inline period/zoom/cloud/refresh taps work without androidApp actions. Two-chart layout and behavior remain covered by the original cases.
+- Full two-chart appearance comparison retains eight anchors with maximum center difference 0.25 dp. Actual single-chart and inline-menu renders were inspected at short and tall sizes. Reference images are in docs/design/widget-single-short.png, widget-single-tall.png and widget-inline-periods.png.
+- APK and upload-signed AAB built successfully; release lint reports 0 errors and 162 warnings, without a new suppression or baseline.
+- Official bundletool 1.18.3 verifies version 1.5.3, versionCode 15, application ID, minimum API 26 / target API 36, non-debuggable release, RSA signature, universal APK generation and 16KB bundle/ZIP/ELF alignment.
+- No physical-device/full-launcher test or Play Console upload/publication was performed. OWL 4.3 must be reimported because the launcher stores its own independent copy.
+
+## Historical verification
+
 # Bitcoin Pulse 1.5.2 / versionCode 14
 
 Verified on 19 October 2026.

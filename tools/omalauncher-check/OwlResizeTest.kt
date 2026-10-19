@@ -47,7 +47,8 @@ class OwlResizeTest {
     @Test fun denseWidgetsFitFourByFiveAndScaleToFourBySixWithWorkingControls() {
         val context=RuntimeEnvironment.getApplication()
         val program=Compiler.compile(context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() })
-        for(count in 1..2) for(heightDp in listOf(400,480,560)) {
+        val singlePlots=mutableMapOf<Int,Float>()
+        for(count in 1..2) for(heightDp in if(count==1)listOf(400,480,560,640,840)else listOf(400,480,560)) {
             val inst=WidgetInstance(program);val now=System.currentTimeMillis()
             inst.setTile(4,if(heightDp==400)5 else 6,320.0,heightDp.toDouble())
             inst.set("now",Num(now/1000.0));inst.set("ichimoku",TRUE);inst.set("graphCount",Num(count.toDouble()))
@@ -76,6 +77,12 @@ class OwlResizeTest {
             assertTrue(inst.problems.toString(),inst.problems.isEmpty())
             assertEquals(count,nodes().count { text(it) in listOf("4 uur ▾","1 dag ▾","1 week ▾") })
             assertFalse(nodes().any { text(it) in listOf("1 grafiek","2 grafieken") })
+            if(count==1) {
+                for(prefix in listOf("Mediaan blokfee","Mempool","Laatste candle","Bitcoin Pulse","Ichimoku")) assertTrue("Missing single-chart data: $prefix at $heightDp dp",nodes().any { text(it).startsWith(prefix) })
+                val caption=nodes().first { text(it).startsWith("Laatste candle") }.boundsInRoot
+                val title=nodes().first { text(it)=="4 uur ▾" }.boundsInRoot
+                singlePlots[heightDp]=(caption.top-title.bottom)/d
+            }
             for(n in nodes()) assertTrue("$count charts at $heightDp dp clipped: ${text(n)} ${n.boundsInRoot}",n.boundsInRoot.bottom<=h+1)
             val folder=File("build/reports/widget-resize").apply { mkdirs() }
             File(folder,"omalauncher-320-$heightDp-$count.png").outputStream().use { frame.compress(Bitmap.CompressFormat.PNG,100,it) }
@@ -85,8 +92,10 @@ class OwlResizeTest {
             tap("4 uur ▾");assertEquals("Picker must open",Num(0.0),inst.get("picker"));tap("1 week");assertEquals(Num(10080.0),inst.get("interval"))
             if(count==2) { tap("1 dag ▾");tap("4 uur");assertEquals(Num(240.0),inst.get("interval2")) }
             tap("↻");assertTrue(inst.actions.contains("refresh"))
+            assertFalse("Interval and zoom controls must stay in the launcher",inst.actions.contains("androidApp"))
             assertTrue(inst.problems.toString(),inst.problems.isEmpty())
             control.pause().stop().destroy()
         }
+        for((a,b) in listOf(480 to 560,560 to 640,640 to 840)) assertEquals("All added height must go to the plot",(b-a).toFloat(),singlePlots.getValue(b)-singlePlots.getValue(a),1f)
     }
 }

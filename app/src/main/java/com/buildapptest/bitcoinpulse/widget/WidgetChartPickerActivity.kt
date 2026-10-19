@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.buildapptest.bitcoinpulse.PulseApplication
 import com.buildapptest.bitcoinpulse.data.PERIODS
 
-/** Native interval chooser, opened by tapping a widget's period title. */
+/** Legacy target for PendingIntents issued by old releases; current widgets use inline broadcasts. */
 class WidgetChartPickerActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

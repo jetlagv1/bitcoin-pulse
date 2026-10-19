@@ -252,7 +252,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
         WidgetFooter(s, false, now, onRefresh)
     }
     Button(onClick = { onPin(false) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add network widget") }
-    Text("De grafiekwidget schaalt mee, ook op 4×5. Kies hierboven één of twee grafieken. Tik in de widget op de grafiektitel voor 4 uur, 1 dag of 1 week. De −/+ knoppen zoomen per grafiek; het getal ertussen is het aantal candles. Op kleine formaten is de netwerkinfo compacter.",color=Muted,fontSize=12.sp)
+    Text("De grafiekwidget schaalt mee, ook op 4×5. Kies hierboven één of twee grafieken. Tik in de widget op de grafiektitel voor 4 uur, 1 dag of 1 week. De −/+ knoppen zoomen per grafiek; het getal ertussen is het aantal candles. Bij één grafiek blijft alle informatie zichtbaar en groeit de grafiek mee. Bij twee grafieken is de netwerkinfo compacter. De intervalkeuze blijft binnen de widget.",color=Muted,fontSize=12.sp)
     Surface(color = Card, shape = RoundedCornerShape(28.dp), modifier = Modifier.width(200.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("BTC/${s.currency}", color = Muted, fontSize = 12.sp)

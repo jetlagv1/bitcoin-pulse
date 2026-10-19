@@ -21,4 +21,10 @@
         <item name="android:layout_weight">1</item><item name="android:orientation">vertical</item>
         <item name="android:gravity">center</item>
     </style>
+    <style name="ChartZoomButton" parent="WidgetLabel">
+        <item name="android:layout_width">40dp</item><item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center</item><item name="android:textSize">20sp</item>
+        <item name="android:textColor">#FF8A1F</item><item name="android:background">@drawable/widget_zoom_button</item>
+        <item name="android:clickable">true</item><item name="android:focusable">true</item>
+    </style>
 </resources>

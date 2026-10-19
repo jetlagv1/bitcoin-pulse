@@ -1,6 +1,8 @@
 package com.buildapptest.bitcoinpulse
 
 import android.os.Looper
+import android.os.SystemClock
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
@@ -10,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -46,8 +49,10 @@ class CandlePanelCloudTest {
         val activity=controller.get()
         activity.setContent {
             val s by repository.state.collectAsState()
-            MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xffff8a1f))) {
-                Column(Modifier.verticalScroll(rememberScrollState())) { CandlePanel(s,repository,now,detailed=false) }
+            MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xffff8a1f),onPrimary=Color(0xff17120d),onSurface=Color(0xfff7faff),secondaryContainer=Color(0xff243246))) {
+                Surface(color=Color(0xff182230),contentColor=Color(0xfff7faff)) {
+                    Column(Modifier.verticalScroll(rememberScrollState())) { CandlePanel(s,repository,now,detailed=false) }
+                }
             }
         }
         fun settle() = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(350))
@@ -67,6 +72,39 @@ class CandlePanelCloudTest {
         val images=nodes().filter { it.config.getOrNull(SemanticsProperties.ContentDescription)?.any { text -> text.contains("-candles in EUR") }==true }
         assertEquals(3,images.size)
         assertTrue(repository.state.value.ichimoku)
+        // Send real multi-pointer Android events through the scrollable Compose panel.
+        val bounds=images.first().boundsInRoot
+        val decor=activity.window.decorView
+        val cx=bounds.center.x;val cy=bounds.center.y
+        val start=SystemClock.uptimeMillis()
+        fun touch(action: Int, spread: Float, count: Int=2) {
+            val props=Array(count) { i -> MotionEvent.PointerProperties().apply { id=i;toolType=MotionEvent.TOOL_TYPE_FINGER } }
+            val coords=Array(count) { i -> MotionEvent.PointerCoords().apply { x=cx+(if(i==0)-spread else spread);y=cy;pressure=1f;size=1f } }
+            val event=MotionEvent.obtain(start,SystemClock.uptimeMillis(),action,count,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0)
+            decor.dispatchTouchEvent(event);event.recycle();settle()
+        }
+        touch(MotionEvent.ACTION_DOWN,40f,1)
+        touch(MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),40f)
+        touch(MotionEvent.ACTION_MOVE,70f)
+        touch(MotionEvent.ACTION_MOVE,100f)
+        touch(MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),100f)
+        touch(MotionEvent.ACTION_UP,100f,1)
+        assertEquals("Spreading fingers zooms in",24,repository.state.value.chartZoom["4h"])
+        assertEquals("Other Combi graph is independent",36,repository.state.value.chartZoom["1d"])
+        touch(MotionEvent.ACTION_DOWN,100f,1)
+        touch(MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),100f)
+        touch(MotionEvent.ACTION_MOVE,60f)
+        touch(MotionEvent.ACTION_MOVE,40f)
+        touch(MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),40f)
+        touch(MotionEvent.ACTION_UP,40f,1)
+        assertEquals("Bringing fingers together zooms out from the last viewport",60,repository.state.value.chartZoom["4h"])
+        val actions=nodes().first { it.config.getOrNull(SemanticsProperties.ContentDescription)?.any { text -> text.startsWith("1 dag-candles") }==true }.config[SemanticsActions.CustomActions]
+        assertTrue(actions.single { it.label=="Uitzoomen" }.action())
+        settle();assertEquals(60,repository.state.value.chartZoom["1d"])
+        val image=android.graphics.Bitmap.createBitmap(decor.width,decor.height,android.graphics.Bitmap.Config.ARGB_8888)
+        decor.draw(android.graphics.Canvas(image))
+        val folder=java.io.File("build/reports/zoom-native").apply { mkdirs() }
+        java.io.File(folder,"app-combi.png").outputStream().use { image.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it) }
         assertTrue(switch().config[SemanticsActions.OnClick].action!!.invoke())
         settle();assertFalse(repository.state.value.ichimoku)
         controller.pause().stop().destroy()

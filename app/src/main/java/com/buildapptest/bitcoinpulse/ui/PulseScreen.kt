@@ -243,7 +243,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
         WidgetFooter(s, false, now, onRefresh)
     }
     Button(onClick = { onPin(false) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add network widget") }
-    Text("Grote widget: vergroot tot minstens 360 dp hoog voor de grafiek. Combi met 2 intervallen heeft 460 dp nodig, met 3 intervallen 580 dp. Kies de combinatie hierboven; de intervalknoppen in elke widget werken onafhankelijk.",color=Muted,fontSize=12.sp)
+    Text("Grote widget: vergroot tot minstens 390 dp hoog voor de grafiek. Combi met 2 intervallen heeft 500 dp nodig, met 3 intervallen 600 dp. De compacte −/+ knoppen naast elke grafiektitel zoomen onafhankelijk; het getal ertussen is het aantal candles.",color=Muted,fontSize=12.sp)
     Surface(color = Card, shape = RoundedCornerShape(28.dp), modifier = Modifier.width(200.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("BTC/${s.currency}", color = Muted, fontSize = 12.sp)

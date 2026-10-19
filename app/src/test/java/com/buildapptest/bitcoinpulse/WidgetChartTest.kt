@@ -30,10 +30,11 @@ class WidgetChartTest {
     }
     private val s=Snapshot(candles=PERIODS.associate { candleKey("EUR",it.id) to Source(candles,now) })
 
-    private fun layout(mode:String,height:Int,snapshot:Snapshot=s):View {
+    private fun layout(mode:String,height:Int,snapshot:Snapshot=s,zooms:Map<String,Int> = emptyMap()):View {
         val context=RuntimeEnvironment.getApplication()
         val views=RemoteViews(context.packageName,R.layout.widget_expanded)
-        WidgetUpdates.charts(views,snapshot,mode,320,height,now)
+        WidgetUpdates.charts(views,snapshot,mode,320,height,now,zooms=zooms)
+        views.setTextViewText(R.id.widget_ichimoku,"Cloud\n${if(snapshot.ichimoku)"Aan" else "Uit"}")
         listOf(R.id.period_4h to "4h",R.id.period_1d to "1d",R.id.period_1w to "1w",R.id.period_combi to "combi").forEach { (id,period) ->
             views.setInt(id,"setBackgroundResource",if(period==mode)R.drawable.widget_period_selected else R.drawable.widget_inner)
             views.setTextColor(id,android.graphics.Color.parseColor(if(period==mode)"#17120D" else "#BAC7DB"))
@@ -52,21 +53,21 @@ class WidgetChartTest {
         parent.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY))
         parent.layout(0,0,320,height)
         val image=root.findViewById<ImageView>(R.id.chart_image_1)
-        if(image.visibility==View.VISIBLE) assertTrue("Chart must retain readable height",image.height>=60)
+        if(image.visibility==View.VISIBLE) assertTrue("Chart must retain readable height: ${image.height}px at $height dp",image.height>=60)
         val bitmap=Bitmap.createBitmap(320,height,Bitmap.Config.ARGB_8888)
         parent.draw(Canvas(bitmap))
         val output=File("build/reports/widget-previews").apply { mkdirs() }
-        File(output,"$mode-$height.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
+        File(output,"${if(zooms.isNotEmpty())"zoom-" else ""}$mode-$height.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
         return root
     }
     @Test fun singleChartFitsMinimumAndContainsActualBitmap() {
-        val root=layout("4h",360)
+        val root=layout("4h",390)
         assertNotNull(root.findViewById<ImageView>(R.id.chart_image_1).drawable)
         assertEquals(View.GONE,root.findViewById<View>(R.id.chart_hint).visibility)
         assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("4 uur"))
     }
     @Test fun comboUsesThreeIndependentChartsWhenTallEnough() {
-        val root=layout("combi",580)
+        val root=layout("combi",600)
         assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_3).visibility)
         assertTrue(root.findViewById<TextView>(R.id.chart_label_3).text.contains("1 week"))
     }
@@ -77,21 +78,41 @@ class WidgetChartTest {
     }
     @Test fun failedCandleSourceKeepsItsTimestampAndShowsCache() {
         val cached=s.copy(candles=s.candles.mapValues { it.value.copy(error="Offline") })
-        val root=layout("1d",360,cached)
+        val root=layout("1d",390,cached)
         assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("cache"))
         assertNotNull(root.findViewById<ImageView>(R.id.chart_image_1).drawable)
     }
     @Test fun emptyHistoryStillInflatesWithAnHonestMissingDataState() {
-        val root=layout("1w",360,Snapshot())
+        val root=layout("1w",390,Snapshot())
         assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("geen data"))
     }
     @Test fun cloudIsIncludedInEveryCombinationChart() {
         val history=(0 until 240).map { i -> Candle(1791576000+i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
         val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
-        val root=layout("combi",580,state)
+        val root=layout("combi",600,state)
         for(id in listOf(R.id.chart_image_1,R.id.chart_image_2,R.id.chart_image_3)) {
             val image=(root.findViewById<ImageView>(id).drawable as android.graphics.drawable.BitmapDrawable).bitmap
             assertTrue("Each Combi chart needs its own green cloud area",cloudFillPixels(image,true)>100)
+        }
+    }
+    @Test fun compactZoomHeadersKeepIndependentCountsAndDisableLimits() {
+        val history=(0 until 240).map { i -> Candle(i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
+        val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
+        val root=layout("combi",600,state,mapOf("4h" to 24,"1d" to 90,"1w" to 60))
+        for((id,count) in listOf(R.id.chart_count_1 to "24",R.id.chart_count_2 to "90",R.id.chart_count_3 to "60"))
+            assertEquals(count,root.findViewById<TextView>(id).text.toString())
+        assertFalse(root.findViewById<View>(R.id.chart_plus_1).isEnabled)
+        assertFalse(root.findViewById<View>(R.id.chart_minus_2).isEnabled)
+        val header=root.findViewById<View>(R.id.chart_header_1)
+        val button=root.findViewById<View>(R.id.chart_minus_1)
+        assertEquals("No separate control row",40,header.height)
+        assertEquals(40,button.height)
+        assertTrue(button.right<=root.width)
+        for(id in listOf(R.id.chart_minus_1,R.id.chart_plus_1,R.id.chart_minus_2,R.id.chart_plus_2,R.id.chart_minus_3,R.id.chart_plus_3)) {
+            val view=root.findViewById<View>(id)
+            val bounds=android.graphics.Rect();view.getDrawingRect(bounds)
+            (root as android.view.ViewGroup).offsetDescendantRectToMyCoords(view,bounds)
+            assertTrue("Zoom control clipped: $id at $bounds",bounds.left>=12 && bounds.right<=root.width-12)
         }
     }
 }

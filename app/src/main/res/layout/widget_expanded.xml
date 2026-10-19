@@ -13,11 +13,26 @@
         <TextView android:id="@+id/period_combi" style="@style/PeriodButton" android:text="Combi" />
     </LinearLayout>
     <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical">
-        <TextView android:id="@+id/chart_label_1" style="@style/WidgetLabel" android:text="4 uur · laatste candle in opbouw ●" android:textSize="11sp" />
+        <LinearLayout android:id="@+id/chart_header_1" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:id="@+id/chart_label_1" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:textSize="10sp" android:maxLines="2" />
+            <TextView android:id="@+id/chart_minus_1" style="@style/ChartZoomButton" android:text="−" />
+            <TextView android:id="@+id/chart_count_1" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp" />
+            <TextView android:id="@+id/chart_plus_1" style="@style/ChartZoomButton" android:text="+" />
+        </LinearLayout>
         <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:contentDescription="Candlestickgrafiek · open stijging, gevuld daling; tik voor de app" />
-        <TextView android:id="@+id/chart_label_2" style="@style/WidgetLabel" android:textSize="11sp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/chart_header_2" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone">
+            <TextView android:id="@+id/chart_label_2" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:textSize="10sp" android:maxLines="2" />
+            <TextView android:id="@+id/chart_minus_2" style="@style/ChartZoomButton" android:text="−" />
+            <TextView android:id="@+id/chart_count_2" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp" />
+            <TextView android:id="@+id/chart_plus_2" style="@style/ChartZoomButton" android:text="+" />
+        </LinearLayout>
         <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:visibility="gone" android:contentDescription="Tweede candle-interval" />
-        <TextView android:id="@+id/chart_label_3" style="@style/WidgetLabel" android:textSize="11sp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/chart_header_3" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone">
+            <TextView android:id="@+id/chart_label_3" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:textSize="10sp" android:maxLines="2" />
+            <TextView android:id="@+id/chart_minus_3" style="@style/ChartZoomButton" android:text="−" />
+            <TextView android:id="@+id/chart_count_3" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp" />
+            <TextView android:id="@+id/chart_plus_3" style="@style/ChartZoomButton" android:text="+" />
+        </LinearLayout>
         <ImageView android:id="@+id/chart_image_3" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:visibility="gone" android:contentDescription="Derde candle-interval" />
         <TextView android:id="@+id/chart_hint" style="@style/WidgetLabel" android:layout_width="match_parent" android:maxLines="3" android:text="Vergroot de widget voor Combi, of open de app." android:visibility="gone" />
     </LinearLayout>

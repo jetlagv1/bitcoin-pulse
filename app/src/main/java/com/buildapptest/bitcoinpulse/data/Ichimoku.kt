@@ -11,6 +11,7 @@ object Ichimoku {
     const val VISIBLE = 36
     const val REQUIRED = SPAN_B + OFFSET + VISIBLE - 1
     const val HISTORY = 240
+    fun required(visible: Int) = SPAN_B + OFFSET + visible - 1
     data class Point(val index: Int, val a: Double, val b: Double)
 
     fun calculate(history: List<Candle>): List<Point> {

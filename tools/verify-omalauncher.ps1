@@ -1,4 +1,4 @@
-param([switch]$RefreshSources)
+param([switch]$RefreshSources, [switch]$RecordedData)
 $ErrorActionPreference = 'Stop'
 $pulseProject = Split-Path -Parent $PSScriptRoot
 $pulseEnvironment = Join-Path $pulseProject '../.tools/android-env.ps1'
@@ -40,7 +40,10 @@ foreach ($pulseCurrency in @('eur','usd')) {
         $pulseUrls[$pulseCurrency + $pulsePeriod[0]] = 'https://api.kraken.com/0/public/OHLC?pair=XBT' + $pulseCurrency.ToUpperInvariant() + '&interval=' + $pulsePeriod[1]
     }
 }
-foreach ($pulseName in $pulseUrls.Keys) { Invoke-WebRequest $pulseUrls[$pulseName] -OutFile (Join-Path $pulseData "$pulseName.json") }
+foreach ($pulseName in $pulseUrls.Keys) {
+    $pulseResponsePath=Join-Path $pulseData "$pulseName.json"
+    if (-not $RecordedData -or -not (Test-Path -LiteralPath $pulseResponsePath)) { Invoke-WebRequest $pulseUrls[$pulseName] -OutFile $pulseResponsePath }
+}
 $pulseSourceDir = $pulseCache.Replace('\','/').Replace("'", "\'")
 $pulseFixtureDir = (Join-Path $pulseProject 'tools/omalauncher-check').Replace('\','/').Replace("'", "\'")
 $pulseInitPath = Join-Path $pulseCache 'native-check.init.gradle'

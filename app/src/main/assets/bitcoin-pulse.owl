@@ -1,11 +1,14 @@
 widget "Bitcoin Pulse" {
-  meta { owl: 8; version: "3.0"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  meta { owl: 8; version: "3.1"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
   size: 6x10
   minSize: 6x10
   padding: 14
   state currency = "EUR" persist
   state interval = 240 persist
   state ichimoku = false persist
+  state zoom4h = 36 persist
+  state zoomDay = 36 persist
+  state zoomWeek = 36 persist
   source now = clock every 1s
   source ticker = http("https://api.kraken.com/0/public/Ticker?pair=XBTEUR,XBTUSD") every 1m json status
   source blocks = http("https://mempool.space/api/v1/blocks") every 1m json status
@@ -48,8 +51,10 @@ widget "Bitcoin Pulse" {
   let change = opening > 0 ? (price - opening) / opening * 100 : null
   let symbol = currency == "EUR" ? "€" : "$"
   let history = candleCurrency == currency && candleInterval == interval ? candles ?? [] : []
-  let chart = reverse(take(reverse(history), 36))
-  let cloudReady = ichimoku && len(history) >= 184
+  let zoomCount = interval == 240 ? zoom4h : interval == 1440 ? zoomDay : zoomWeek
+  let chart = reverse(take(reverse(history), zoomCount))
+  let cloudRequired = 148 + len(chart)
+  let cloudReady = ichimoku && len(chart) > 0 && len(history) >= cloudRequired
   let highs = map(history, c => num(c[2]))
   let lows = map(history, c => num(c[3]))
   let cloudPoints = cloudReady ? map(range(max(119, len(history) - len(chart) - 29), len(history)), i => {index: i + 29 - (len(history) - len(chart)), a: (max(take(drop(highs, i - 19), 20)) + min(take(drop(lows, i - 19), 20)) + max(take(drop(highs, i - 59), 60)) + min(take(drop(lows, i - 59), 60))) / 4, b: (max(take(drop(highs, i - 119), 120)) + min(take(drop(lows, i - 119), 120))) / 2}) : []
@@ -120,7 +125,7 @@ widget "Bitcoin Pulse" {
         weight: 1
         gap: 2
         Text { text: "Ichimoku cloud"; font: sans; fontSize: 13; color: #F7FAFF; maxLines: 1 }
-        Text { text: ichimoku && !cloudReady ? "184 candles nodig · vernieuw" : "20 / 60 / 120 / 30"; font: sans; fontSize: 11; color: ichimoku && !cloudReady ? #FFD166 : #BAC7DB; maxLines: 1 }
+        Text { text: ichimoku && !cloudReady ? "${cloudRequired} candles nodig · vernieuw" : "20 / 60 / 120 / 30"; font: sans; fontSize: 11; color: ichimoku && !cloudReady ? #FFD166 : #BAC7DB; maxLines: 1 }
       }
       Box {
         width: 76
@@ -132,6 +137,35 @@ widget "Bitcoin Pulse" {
         radius: 24
         onTap: ichimoku = !ichimoku
         Text { text: ichimoku ? "Cloud Aan" : "Cloud Uit"; font: sans; fontSize: 12; color: ichimoku ? #FF8A1F : #BAC7DB; align: center; maxLines: 1 }
+      }
+    }
+    Row {
+      fill: width
+      align: center
+      gap: 3
+      Text { weight: 1; text: "${interval == 240 ? '4 uur' : interval == 1440 ? '1 dag' : '1 week'} · ${currency}"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
+      Box {
+        width: 40
+        height: 40
+        align: center
+        onTap: {
+          zoom4h = interval == 240 ? (zoom4h < 36 ? 36 : zoom4h < 60 ? 60 : 90) : zoom4h
+          zoomDay = interval == 1440 ? (zoomDay < 36 ? 36 : zoomDay < 60 ? 60 : 90) : zoomDay
+          zoomWeek = interval == 10080 ? (zoomWeek < 36 ? 36 : zoomWeek < 60 ? 60 : 90) : zoomWeek
+        }
+        Box { width: 30; height: 30; align: center; radius: 8; background: #243246; border: 1; borderColor: #38485F; Text { text: "−"; font: sans; fontSize: 20; color: zoomCount >= 90 ? #5F563F : #FF8A1F; align: center } }
+      }
+      Text { width: 26; text: str(len(chart)); font: sans; fontSize: 11; color: #F7FAFF; align: center; maxLines: 1 }
+      Box {
+        width: 40
+        height: 40
+        align: center
+        onTap: {
+          zoom4h = interval == 240 ? (zoom4h > 60 ? 60 : zoom4h > 36 ? 36 : 24) : zoom4h
+          zoomDay = interval == 1440 ? (zoomDay > 60 ? 60 : zoomDay > 36 ? 36 : 24) : zoomDay
+          zoomWeek = interval == 10080 ? (zoomWeek > 60 ? 60 : zoomWeek > 36 ? 36 : 24) : zoomWeek
+        }
+        Box { width: 30; height: 30; align: center; radius: 8; background: #243246; border: 1; borderColor: #38485F; Text { text: "+"; font: sans; fontSize: 20; color: zoomCount <= 24 ? #5F563F : #FF8A1F; align: center } }
       }
     }
     if len(chart) > 0 {

@@ -1,7 +1,6 @@
 package com.buildapptest.bitcoinpulse.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +15,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import com.buildapptest.bitcoinpulse.data.*
 import java.time.Instant
 import java.time.ZoneOffset
@@ -52,9 +53,11 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
         }
     }
     s.chartPeriods().forEach { period ->
+      key(period.id) {
         val source=s.history(period.id)
         val history=source.value.orEmpty()
-        val candles=history.takeLast(Ichimoku.VISIBLE)
+        var zoom by remember(period.id) { mutableIntStateOf(s.chartZoom[period.id] ?: ChartZoom.DEFAULT) }
+        val candles=history.takeLast(ChartZoom.visible(zoom,history.size))
         var chosen by remember(s.currency,period.id) { mutableIntStateOf(-1) }
         val selected=chosen.takeIf { it in candles.indices } ?: candles.lastIndex
         val candle=candles.getOrNull(selected)
@@ -64,19 +67,28 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
             val width=with(density){maxWidth.roundToPx()}.coerceAtLeast(240)
             val height=with(density){(if(s.chartMode=="combi")160.dp else 220.dp).roundToPx()}
             val chartDensity=density.density*density.fontScale
-            val image=remember(history,width,height,selected,s.currency,chartDensity,s.ichimoku) { CandleBitmap.render(history,s.currency,width,height,selected,chartDensity,s.ichimoku).asImageBitmap() }
-            Image(image,contentDescription="${period.label}-candles in ${s.currency}. Stijging: open candle, daling: gevuld. Datums in UTC. Selecteer met de knoppen hieronder.",
-                modifier=Modifier.fillMaxWidth().height(if(s.chartMode=="combi")160.dp else 220.dp).pointerInput(history,width,s.ichimoku,chartDensity) {
-                    detectTapGestures { offset ->
-                        val slots=candles.size + if(s.ichimoku && history.size>=Ichimoku.REQUIRED) Ichimoku.OFFSET else 0
-                        if(candles.isNotEmpty()) {
+            val image=remember(history,width,height,selected,s.currency,chartDensity,s.ichimoku,zoom) { CandleBitmap.render(history,s.currency,width,height,selected,chartDensity,s.ichimoku,zoom).asImageBitmap() }
+            Image(image,contentDescription="${period.label}-candles in ${s.currency}. ${candles.size} candles. Zoom met twee vingers of de toegankelijkheidsacties. Stijging: open candle, daling: gevuld. Datums in UTC. Tik op een candle voor selectie.",
+                modifier=Modifier.fillMaxWidth().height(if(s.chartMode=="combi")160.dp else 220.dp).semantics {
+                    customActions=listOf(
+                        CustomAccessibilityAction("Inzoomen") { zoom=ChartZoom.step(zoom,false);chosen=-1;repository.setChartZoom(period.id,zoom);true },
+                        CustomAccessibilityAction("Uitzoomen") { zoom=ChartZoom.step(zoom,true);chosen=-1;repository.setChartZoom(period.id,zoom);true })
+                }.pointerInput(history,width,s.ichimoku,chartDensity) {
+                    chartGestures(currentCount={zoom},onZoom={zoom=it;chosen=-1},onZoomEnd={repository.setChartZoom(period.id,zoom)}) { offset ->
+                        val count=ChartZoom.visible(zoom,history.size)
+                        val slots=count + if(s.ichimoku && history.size>=Ichimoku.required(count)) Ichimoku.OFFSET else 0
+                        if(count>0) {
                             val index=((offset.x-3*chartDensity)/((width-68*chartDensity)/slots)).toInt()
-                            if(index in candles.indices) chosen=index
+                            if(offset.x>=3*chartDensity && index in 0 until count) chosen=index
                         }
                     }
                 })
         }
-        if(s.ichimoku && history.size<Ichimoku.REQUIRED) Text("Cloud: minstens ${Ichimoku.REQUIRED} historische candles nodig. Vernieuw om te laden.",fontSize=12.sp,color=Color(0xFFFFD166))
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
+            Text("Zoom met twee vingers",fontSize=11.sp,color=Color(0xFFBAC7DB))
+            Text("${candles.size} candles",fontSize=11.sp,color=Color(0xFFBAC7DB))
+        }
+        if(s.ichimoku && history.size<Ichimoku.required(candles.size)) Text("Cloud: minstens ${Ichimoku.required(candles.size)} historische candles nodig. Vernieuw om te laden.",fontSize=12.sp,color=Color(0xFFFFD166))
         if(candle!=null && detailed) {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
                 TextButton(onClick={chosen=(selected-1).coerceAtLeast(0)},enabled=selected>0) { Text("Vorige") }
@@ -89,5 +101,6 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
             Text("Volume ${String.format(Locale.getDefault(),"%.4f",candle.volume)} BTC",fontSize=12.sp,color=Color(0xFFBAC7DB))
         }
         Text("Kraken · ${source.status(now)} · as: UTC",fontSize=12.sp,color=if(source.isStale(now)||source.error!=null)Color(0xFFFFD166) else Color(0xFFBAC7DB))
+      }
     }
 }

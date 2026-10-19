@@ -43,7 +43,8 @@ data class Snapshot(
     val chartMode: String = "4h",
     val combo: Set<String> = setOf("4h", "1d", "1w"),
     val difficulty: Source<Difficulty> = Source(),
-    val ichimoku: Boolean = false
+    val ichimoku: Boolean = false,
+    val chartZoom: Map<String, Int> = emptyMap()
 ) {
     fun history(period: String) = candles[candleKey(currency, period)] ?: Source()
     fun chartPeriods(mode: String = chartMode) = if (mode == "combi") PERIODS.filter { it.id in combo } else PERIODS.filter { it.id == mode }

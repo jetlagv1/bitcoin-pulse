@@ -130,17 +130,25 @@ class OwlRenderTest {
             tap("Cloud Uit");assertEquals(TRUE,inst.get("ichimoku"));settle();verifyText();capture("cloud")
             fun verifyCloud(currency: String, sourceName: String) {
                 val rows=com.buildapptest.bitcoinpulse.data.CandleParser.parse(File("../../.tools/omalauncher-reference/data/$sourceName.json").readText(),currency)
-                val expected=com.buildapptest.bitcoinpulse.data.Ichimoku.calculate(rows).filter { it.index>=rows.size-36 }
+                val count=inst.get("zoomCount").num()!!.toInt()
+                val expected=com.buildapptest.bitcoinpulse.data.Ichimoku.calculate(rows).filter { it.index>=rows.size-count }
                 val actual=(inst.get("cloudPoints") as Lst).items
                 assertEquals(expected.size,actual.size)
                 expected.zip(actual).forEach { (p,value) ->
                     val fields=(value as Obj).fields
-                    assertEquals((p.index-(rows.size-36)).toDouble(),fields["index"]!!.num()!!,0.0)
+                    assertEquals((p.index-(rows.size-count)).toDouble(),fields["index"]!!.num()!!,0.0)
                     assertEquals(p.a,fields["a"]!!.num()!!,0.000001)
                     assertEquals(p.b,fields["b"]!!.num()!!,0.000001)
                 }
             }
             verifyCloud("EUR","eur4h")
+            tap("−");assertEquals(Num(60.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h")
+            tap("−");assertEquals(Num(90.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h");verifyText();capture("zoom-90")
+            tap("−");assertEquals(Num(90.0),inst.get("zoom4h"))
+            tap("+");tap("+");tap("+");assertEquals(Num(24.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h");verifyText();capture("zoom-24")
+            tap("+");assertEquals(Num(24.0),inst.get("zoom4h"))
+            assertEquals(Num(36.0),inst.get("zoomDay"));assertEquals(Num(36.0),inst.get("zoomWeek"))
+            tap("−");assertEquals(Num(36.0),inst.get("zoom4h"))
             for(code in listOf("EUR","USD")) for((interval,name) in listOf(240.0 to "4h",1440.0 to "Day",10080.0 to "Week")) {
                 inst.set("currency",Str(code));inst.set("interval",Num(interval))
                 program.triggers.last().action.run(inst.root,emptyList())

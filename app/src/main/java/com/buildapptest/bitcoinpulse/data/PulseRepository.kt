@@ -37,9 +37,17 @@ class PulseRepository(context: Context) {
         chartMode = preferences.getString("chart-mode", "4h").let { if (it in listOf("4h", "1d", "1w", "combi")) it!! else "4h" },
         combo = preferences.getStringSet("chart-combo", setOf("4h", "1d", "1w"))!!.filter { id -> PERIODS.any { it.id == id } }.toSet().let { if (it.size >= 2) it else setOf("4h", "1d", "1w") },
         difficulty = cached("difficulty", Parse::difficulty),
-        ichimoku = preferences.getBoolean("ichimoku", false)
+        ichimoku = preferences.getBoolean("ichimoku", false),
+        chartZoom = PERIODS.associate { it.id to ChartZoom.clamp(preferences.getInt("zoom-${it.id}",ChartZoom.DEFAULT)) }
     ))
     val state = mutable.asStateFlow()
+
+    fun setChartZoom(period: String, count: Int) {
+        require(PERIODS.any { it.id==period })
+        val value=ChartZoom.clamp(count)
+        preferences.edit().putInt("zoom-$period",value).apply()
+        mutable.update { it.copy(chartZoom=it.chartZoom + (period to value)) }
+    }
 
     fun setIchimoku(enabled: Boolean) {
         preferences.edit().putBoolean("ichimoku", enabled).apply()

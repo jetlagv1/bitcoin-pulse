@@ -9,6 +9,7 @@ import android.graphics.Path
 import android.graphics.DashPathEffect
 import com.buildapptest.bitcoinpulse.data.Candle
 import com.buildapptest.bitcoinpulse.data.Ichimoku
+import com.buildapptest.bitcoinpulse.data.ChartZoom
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -17,10 +18,10 @@ import kotlin.math.max
 
 /** Same chart renderer for Compose and RemoteViews; only real OHLC observations are drawn. */
 object CandleBitmap {
-    fun render(history: List<Candle>, currency: String, width: Int, height: Int, selected: Int? = null, density: Float = 1f, ichimoku: Boolean = false): Bitmap {
-        val candles=history.takeLast(Ichimoku.VISIBLE)
+    fun render(history: List<Candle>, currency: String, width: Int, height: Int, selected: Int? = null, density: Float = 1f, ichimoku: Boolean = false, visibleCount: Int = ChartZoom.DEFAULT): Bitmap {
+        val candles=history.takeLast(ChartZoom.visible(visibleCount,history.size))
         val start=history.size-candles.size
-        val cloud=if(ichimoku && history.size>=Ichimoku.REQUIRED) Ichimoku.calculate(history).filter { it.index>=start } else emptyList()
+        val cloud=if(ichimoku && candles.isNotEmpty() && history.size>=Ichimoku.required(candles.size)) Ichimoku.calculate(history).filter { it.index>=start } else emptyList()
         val bitmap = Bitmap.createBitmap(width.coerceAtLeast(1), height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val scale = density

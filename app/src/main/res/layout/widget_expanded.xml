@@ -7,11 +7,6 @@
         <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:layout_width="60dp" android:layout_height="48dp" android:gravity="center" android:textColor="#F7FAFF" android:textSize="13sp" android:text="EUR ▾" android:background="@drawable/widget_currency_frame" />
     </LinearLayout>
     <TextView android:id="@+id/widget_change" style="@style/WidgetLabel" android:text="— vandaag (UTC) · Kraken" android:layout_marginTop="6dp" />
-    <LinearLayout android:id="@+id/widget_periods" android:layout_width="match_parent" android:layout_height="44dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
-        <TextView style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:text="Grafieken" />
-        <TextView android:id="@+id/widget_one_chart" style="@style/WidgetCountButton" android:text="1 grafiek" />
-        <TextView android:id="@+id/widget_two_charts" style="@style/WidgetCountButton" android:text="2 grafieken" android:layout_marginStart="4dp" />
-    </LinearLayout>
     <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
         <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
             <TextView style="@style/WidgetLabel" android:text="Ichimoku cloud" android:textSize="13sp" android:textColor="#F7FAFF" />

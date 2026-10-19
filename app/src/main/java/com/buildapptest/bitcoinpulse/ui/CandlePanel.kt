@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: Boolean = true) {
+fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: Boolean = true, widgetPreviewCount: Int? = null) {
     val context = LocalContext.current
     Row(Modifier.fillMaxWidth().heightIn(min=48.dp), verticalAlignment=Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
@@ -34,6 +34,7 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
         Switch(checked=s.ichimoku,onCheckedChange={ repository.setIchimoku(it); com.buildapptest.bitcoinpulse.widget.WidgetUpdates.render(context) },
             modifier=Modifier.semantics { contentDescription="Ichimoku cloud voor alle grafieken" })
     }
+    if(widgetPreviewCount==null) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         (PERIODS.map { it.id to it.label } + ("combi" to "Combi")).forEach { (id,label) ->
             TextButton(onClick={ repository.setChartMode(id); com.buildapptest.bitcoinpulse.widget.WidgetUpdates.render(context) },
@@ -52,7 +53,8 @@ fun CandlePanel(s: Snapshot, repository: PulseRepository, now: Long, detailed: B
             }
         }
     }
-    s.chartPeriods().forEach { period ->
+    }
+    (if(widgetPreviewCount==null)s.chartPeriods() else PERIODS.take(widgetPreviewCount)).forEach { period ->
       key(period.id) {
         val source=s.history(period.id)
         val history=source.value.orEmpty()

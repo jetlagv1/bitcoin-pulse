@@ -17,6 +17,16 @@ data class WidgetCharts(val first: String="4h",val second: String="1d",val count
         context.getSharedPreferences("widget-options",0).edit().putString("charts-$id","$first,$second").putInt("chart-count-$id",count).apply()
     }
     companion object {
+        fun defaultCount(context: Context) = context.getSharedPreferences("widget-options",0).getInt("default-chart-count",2).coerceIn(1,2)
+        /** App setting applies to existing widgets as well as widgets added later. */
+        fun configureCount(context: Context,count: Int) {
+            require(count in 1..2)
+            context.getSharedPreferences("widget-options",0).edit().putInt("default-chart-count",count).apply()
+            AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java)).forEach { id ->
+                read(context,id).copy(count=count).save(context,id)
+            }
+            WidgetUpdates.render(context)
+        }
         fun owned(context: Context,id: Int) = id in AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java))
         fun read(context: Context,id: Int,snapshot: Snapshot=Snapshot()): WidgetCharts {
             val prefs=context.getSharedPreferences("widget-options",0)
@@ -24,7 +34,7 @@ data class WidgetCharts(val first: String="4h",val second: String="1d",val count
             if(saved?.size==2) return WidgetCharts(saved[0],saved[1],prefs.getInt("chart-count-$id",2).coerceIn(1,2))
             val old=prefs.getString("period-$id",snapshot.chartMode) ?: "4h"
             val selected=snapshot.chartPeriods(old).map { it.id }.ifEmpty { listOf("4h") }.take(2)
-            return WidgetCharts(selected[0],selected.getOrNull(1) ?: PERIODS.first { it.id!=selected[0] }.id,if(old=="combi")2 else 1)
+            return WidgetCharts(selected[0],selected.getOrNull(1) ?: PERIODS.first { it.id!=selected[0] }.id,if(prefs.contains("default-chart-count"))defaultCount(context) else if(old=="combi")2 else 1)
         }
         fun select(context: Context,id: Int,slot: Int,period: String): Boolean {
             if(!owned(context,id)) return false

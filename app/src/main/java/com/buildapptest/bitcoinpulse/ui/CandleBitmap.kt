@@ -25,14 +25,15 @@ object CandleBitmap {
         val bitmap = Bitmap.createBitmap(width.coerceAtLeast(1), height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val scale = density
-        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 11f * scale; typeface = if(widgetStyle)android.graphics.Typeface.MONOSPACE else android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL) }
+        val short=widgetStyle && height/density<90
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = (if(short)9f else 11f) * scale; typeface = if(widgetStyle)android.graphics.Typeface.MONOSPACE else android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL) }
         fun text(label: String, x: Float, y: Float, end: Boolean = false) {
             p.color = Color.parseColor("#BAC7DB"); p.style = Paint.Style.FILL
             p.textAlign = if (end) Paint.Align.RIGHT else Paint.Align.LEFT
             canvas.drawText(label, x, y, p)
         }
         if (candles.isEmpty()) { text("Geen candledata · vernieuw om te laden", 4*scale, height/2f); return bitmap }
-        val left = 3*scale; val right = width-65*scale; val top = 10*scale; val bottom = height-25*scale
+        val left = 3*scale; val right = width-65*scale; val top = (if(short)6 else 10)*scale; val bottom = height-(if(short)17 else 25)*scale
         if (bottom <= top || right <= left) return bitmap
         val low = minOf(candles.minOf { it.low },cloud.minOfOrNull { minOf(it.a,it.b) } ?: Double.POSITIVE_INFINITY)
         val high = maxOf(candles.maxOf { it.high },cloud.maxOfOrNull { maxOf(it.a,it.b) } ?: Double.NEGATIVE_INFINITY)
@@ -43,7 +44,7 @@ object CandleBitmap {
             val value = min+(max-min)*j/2
             p.color = Color.parseColor("#38485F"); p.strokeWidth = scale
             canvas.drawLine(left,y(value),right,y(value),p)
-            text(String.format(if(widgetStyle)Locale.GERMANY else Locale.getDefault(), "%.1fk",value/1000),width-2*scale,y(value)+4*scale,true)
+            if(!short || height/density>=60 || j!=1) text(String.format(if(widgetStyle)Locale.GERMANY else Locale.getDefault(), "%.1fk",value/1000),width-2*scale,y(value)+(if(short)0 else 4)*scale,true)
         }
         val step = (right-left)/(candles.size + if(cloud.isNotEmpty()) Ichimoku.OFFSET else 0)
         fun x(index: Int) = left+step*(index-start+.5f)
@@ -99,10 +100,10 @@ object CandleBitmap {
             val x = if(cloud.isNotEmpty()) left+step*(i+.5f) else when(index) {0 -> left; 1 -> (left+right)/2; else -> right}
             p.textAlign = Paint.Align.LEFT
             val offset = if(index==1) p.measureText(label)/2 else 0f
-            text(label,x-offset,height-7*scale,index==2)
+            text(label,x-offset,height-(if(short)3 else 7)*scale,index==2)
         }
-        if(cloud.isNotEmpty()) text("Cloud",right,height-7*scale,true)
-        text(currency,width-2*scale,height-7*scale,true)
+        if(cloud.isNotEmpty()) text("Cloud",right,height-(if(short)3 else 7)*scale,true)
+        text(currency,width-2*scale,height-(if(short)3 else 7)*scale,true)
         return bitmap
     }
 }

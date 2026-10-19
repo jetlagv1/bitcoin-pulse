@@ -225,6 +225,15 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
     val context = LocalContext.current
     Text("Your home screen, at a glance", fontSize = 18.sp, fontWeight = FontWeight.Medium)
     Text("Widgets use your selected ${s.currency} currency. Change it on the Dashboard.", color = Muted, fontSize = 14.sp)
+    var widgetCount by remember { mutableIntStateOf(com.buildapptest.bitcoinpulse.widget.WidgetCharts.defaultCount(context)) }
+    Text("Aantal grafieken in de widget",fontSize=16.sp)
+    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+        for(count in 1..2) FilterChip(selected=widgetCount==count,onClick={
+            widgetCount=count
+            com.buildapptest.bitcoinpulse.widget.WidgetCharts.configureCount(context,count)
+        },label={ Text(if(count==1)"1 grafiek" else "2 grafieken") })
+    }
+    Text("Geldt direct voor standaardwidgets. Voor Omalauncher: kies het aantal en voeg de widget hieronder opnieuw toe. De dashboardgrafieken blijven ongewijzigd.",color=Muted,fontSize=12.sp)
     Panel {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column {
@@ -234,7 +243,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
             Text("Block\n${Format.number(s.block.value?.height)}", fontSize = 12.sp, color = Muted)
         }
         Text("${Format.percent(s.quote)} vandaag (UTC)",color=if((s.quote?.todayPercent ?: 0.0)<0)Red else Green,fontSize=12.sp)
-        CandlePanel(s, repository, now, detailed=false)
+        CandlePanel(s, repository, now, detailed=false,widgetPreviewCount=widgetCount)
         Text("Blok ${Format.number(s.block.value?.height)} · ${Format.blockAge(s.block.value,now)} geleden",fontSize=14.sp)
         Text("${Format.number(s.block.value?.transactions)} tx · ${s.block.value?.pool ?: "Onbekende pool"} · mediaan ${Format.fee(s.block.value?.medianFee)} sat/vB",color=Muted,fontSize=12.sp)
         FeeRow(s)
@@ -243,7 +252,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
         WidgetFooter(s, false, now, onRefresh)
     }
     Button(onClick = { onPin(false) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add network widget") }
-    Text("Grote widget: kies 1 of 2 grafieken. Tik op de grafiektitel om 4 uur, 1 dag of 1 week te kiezen. Vergroot tot minstens 620 dp hoog voor één grafiek of 800 dp voor twee. De compacte −/+ knoppen zoomen onafhankelijk; het getal ertussen is het aantal candles.",color=Muted,fontSize=12.sp)
+    Text("De grafiekwidget schaalt mee, ook op 4×5. Kies hierboven één of twee grafieken. Tik in de widget op de grafiektitel voor 4 uur, 1 dag of 1 week. De −/+ knoppen zoomen per grafiek; het getal ertussen is het aantal candles. Op kleine formaten is de netwerkinfo compacter.",color=Muted,fontSize=12.sp)
     Surface(color = Card, shape = RoundedCornerShape(28.dp), modifier = Modifier.width(200.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("BTC/${s.currency}", color = Muted, fontSize = 12.sp)

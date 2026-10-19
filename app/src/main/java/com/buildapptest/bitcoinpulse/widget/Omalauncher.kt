@@ -27,12 +27,16 @@ object Omalauncher {
     }
 
     fun install(context: Context) {
-        val source = context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() }
+        val source = configuredSource(context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() },WidgetCharts.defaultCount(context))
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(widgetLink(source))).setPackage("dev.omalauncher")
         try {
             context.startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(context, "Installeer of update Omalauncher om deze widget toe te voegen.", Toast.LENGTH_LONG).show()
         }
+    }
+    fun configuredSource(source: String,count: Int): String {
+        require(count in 1..2)
+        return source.replace("state graphCount = 2 persist","state graphCount = $count persist")
     }
 }

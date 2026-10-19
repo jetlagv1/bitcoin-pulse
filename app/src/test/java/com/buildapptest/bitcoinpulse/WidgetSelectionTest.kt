@@ -68,4 +68,16 @@ class WidgetSelectionTest {
         assertTrue(controller.get().isFinishing)
         controller.pause().stop().destroy()
     }
+    @Test fun appCountUpdatesExistingWidgetsAndNewDefaultsWithoutChangingPeriods() {
+        val context=setup();WidgetCharts("1w","4h",2).save(context,10)
+        WidgetCharts.configureCount(context,1)
+        assertEquals(WidgetCharts("1w","4h",1),WidgetCharts.read(context,10))
+        assertEquals(1,WidgetCharts.read(context,11).count)
+        assertEquals(1,WidgetCharts.read(context,999).count)
+        WidgetCharts.configureCount(context,2)
+        assertEquals(listOf("1w","4h"),WidgetCharts.read(context,10).periods.map { it.id })
+        val owl=context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() }
+        assertTrue(Omalauncher.configuredSource(owl,1).contains("state graphCount = 1 persist"))
+        assertTrue(Omalauncher.configuredSource(owl,2).contains("state graphCount = 2 persist"))
+    }
 }

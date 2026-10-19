@@ -33,7 +33,7 @@ class WidgetChartTest {
 
     private fun layout(mode:String,height:Int,snapshot:Snapshot=s,zooms:Map<String,Int> = emptyMap(), selection:WidgetCharts?=null):View {
         val context=RuntimeEnvironment.getApplication()
-        val views=RemoteViews(context.packageName,R.layout.widget_expanded)
+        val views=RemoteViews(context.packageName,if(height<600)R.layout.widget_expanded_dense else R.layout.widget_expanded)
         WidgetUpdates.charts(views,snapshot,selection ?: if(mode=="combi")WidgetCharts() else WidgetCharts(mode,PERIODS.first { it.id!=mode }.id,1),320,height,now,zooms=zooms)
         views.setTextViewText(R.id.widget_ichimoku,"Cloud ${if(snapshot.ichimoku)"Aan" else "Uit"}")
         views.setTextViewText(R.id.widget_price,"€ 96.420")
@@ -72,10 +72,11 @@ class WidgetChartTest {
         assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_2).visibility)
         assertTrue(root.findViewById<TextView>(R.id.chart_label_2).text.contains("1 dag"))
     }
-    @Test fun comboAtSmallSizeRequestsMoreSpaceInsteadOfClipping() {
+    @Test fun comboAtSmallSizeKeepsBothChartsVisible() {
         val root=layout("combi",560)
-        assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_hint).visibility)
-        assertEquals(View.GONE,root.findViewById<View>(R.id.chart_image_1).visibility)
+        assertEquals(View.GONE,root.findViewById<View>(R.id.chart_hint).visibility)
+        assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_1).visibility)
+        assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_2).visibility)
     }
     @Test fun failedCandleSourceKeepsItsTimestampAndShowsCache() {
         val cached=s.copy(candles=s.candles.mapValues { it.value.copy(error="Offline") })

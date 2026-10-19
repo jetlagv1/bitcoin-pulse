@@ -1,3 +1,16 @@
+# Bitcoin Pulse 1.5.2 / versionCode 14
+
+Verified on 19 October 2026.
+
+- 54 regular JVM/Robolectric tests passed. Actual standard RemoteViews were measured at 280, 320 and 360 dp wide, 320/400/480/560/640/840 dp high, with one and two charts. Charts and refresh remain inside the widget, and both charts retain at least 40 dp at the smallest supported size. App count changes update existing widgets and defaults without losing selected intervals.
+- Three original upstream OWL renderer/compiler tests passed. The additional compact interaction suite passed in a separate test JVM at 320 dp wide and 400/480/560 dp high with both counts. It sends real taps to zoom, cloud, both interval pickers and refresh. A fresh JVM avoids retained Compose frame scheduling across independent UI suites.
+- Full appearance comparison with identical synthetic data: eight vertical anchors, maximum center difference 0.25 dp. Compact Android/OWL captures were inspected for graph readability, footer visibility and separated price/date labels.
+- APK and upload-signed release AAB built successfully. Release lint: zero errors, 115 warnings; no added lint suppression/baseline.
+- Official bundletool 1.18.3 validates version 1.5.2, versionCode 14, package com.buildapptest.bitcoinpulse, minimum API 26, target API 36 and non-debuggable release. RSA signature, universal APK generation and 16KB bundle/ZIP/ELF alignment checks passed.
+- No Play Console upload/publication or physical-phone/full-launcher test was performed. Cell sizes depend on the installed launcher. Existing OWL imports must be replaced; their graph count cannot be remotely changed by the separate Android app.
+
+## Historical verification
+
 # Bitcoin Pulse Play release 1.2.2 verification
 
 Version 1.2.2 uses versionCode 5 because Play Console reports versionCode 4 is already used. This rebuild changes only publishing version metadata, retaining application ID, upload key, API targets, supported architectures, privacy text and app behavior. Verification tooling now reads the expected version from Gradle and checks the built manifest against it. Current release artifacts include the version code in the AAB filename to avoid selecting the previous upload by mistake. Full bundle verification results are saved separately in `deliverables/play-store/VERIFICATION.json`.

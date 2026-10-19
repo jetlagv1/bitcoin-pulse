@@ -53,10 +53,6 @@ open class PulseWidget : AppWidgetProvider() {
                 WidgetUpdates.render(context)
             }
         }
-        if (intent.action == WidgetUpdates.COUNT) {
-            val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)
-            if(WidgetCharts.setCount(context,id,intent.getIntExtra("count",0))) WidgetUpdates.render(context)
-        }
     }
     override fun onDeleted(context: Context, ids: IntArray) {
         val editor=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
@@ -67,7 +63,6 @@ class CompactWidget : PulseWidget()
 
 object WidgetUpdates {
     const val REFRESH = "com.buildapptest.bitcoinpulse.REFRESH"
-    const val COUNT = "com.buildapptest.bitcoinpulse.COUNT"
     const val CLOUD = "com.buildapptest.bitcoinpulse.CLOUD"
     const val ZOOM = "com.buildapptest.bitcoinpulse.ZOOM"
     private val minus=listOf(R.id.chart_minus_1,R.id.chart_minus_2)
@@ -105,17 +100,19 @@ object WidgetUpdates {
                 val options=manager.getAppWidgetOptions(id)
                 val height=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,WidgetAppearance.SINGLE_HEIGHT)
                 val width=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,320)
-                val small=compact || height<560
-                val views = RemoteViews(context.packageName, if (small) R.layout.widget_compact else R.layout.widget_expanded)
+                val small=compact
+                val selection=WidgetCharts.read(context,id,snapshot)
+                val dense=!small && WidgetAppearance.dense(height,selection.count)
+                val views = RemoteViews(context.packageName, if (small) R.layout.widget_compact else if(dense) R.layout.widget_expanded_dense else R.layout.widget_expanded)
                 views.setTextViewText(R.id.widget_currency, if (small) "BTC/${snapshot.currency}" else "${snapshot.currency} ▾")
                 views.setTextViewText(R.id.widget_price, if(small)Format.money(snapshot.quote?.price,snapshot.currency,true) else WidgetAppearance.price(snapshot.quote?.price,snapshot.currency))
                 views.setTextViewText(R.id.widget_next, if (small) "Next ${Format.fee(snapshot.fees.value?.next)} sat/vB" else "${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB")
-                val selection=WidgetCharts.read(context,id,snapshot)
                 if (!small) {
+                    if(dense) views.setViewVisibility(R.id.widget_fee_row,if(height<400)View.GONE else View.VISIBLE)
                     views.setTextViewText(R.id.widget_half, "${WidgetAppearance.fee(snapshot.fees.value?.halfHour)} sat/vB")
                     views.setTextViewText(R.id.widget_hour, "${WidgetAppearance.fee(snapshot.fees.value?.hour)} sat/vB")
                     views.setTextViewText(R.id.widget_block, "Blok #${WidgetAppearance.number(snapshot.block.value?.height)}")
-                    views.setTextViewTextSize(R.id.widget_price,android.util.TypedValue.COMPLEX_UNIT_SP,if(width<340)28f else 32f)
+                    views.setTextViewTextSize(R.id.widget_price,android.util.TypedValue.COMPLEX_UNIT_SP,if(dense)26f else if(width<340)28f else 32f)
                     views.setContentDescription(R.id.widget_currency,"Valuta ${snapshot.currency}; tik om in de app te wijzigen")
                     views.setTextViewText(R.id.widget_mempool,snapshot.mempool.value?.let { "Mempool ${WidgetAppearance.number(it.count)} tx · ${WidgetAppearance.fixed(it.virtualBytes/1000000.0,1)} vMB" } ?: "Mempool laden…")
                     views.setTextColor(R.id.widget_block, Color.parseColor("#49CFFF"))
@@ -147,12 +144,6 @@ object WidgetUpdates {
                             views.setOnClickPendingIntent(viewId,PendingIntent.getBroadcast(context,id,zoom,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                         }
                     }
-                    for((viewId,count) in listOf(R.id.widget_one_chart to 1,R.id.widget_two_charts to 2)) {
-                        val action=Intent(context,PulseWidget::class.java).setAction(COUNT)
-                            .setData(Uri.parse("bitcoinpulse://widget/$id/count/$count"))
-                            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("count",count)
-                        views.setOnClickPendingIntent(viewId,PendingIntent.getBroadcast(context,id,action,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                    }
                 }
                 val required=mutableListOf(snapshot.prices.fetchedAt,snapshot.fees.fetchedAt)
                 if(!small) { required+=snapshot.block.fetchedAt; required+=snapshot.mempool.fetchedAt; required+=selection.periods.map { snapshot.history(it.id).fetchedAt } }
@@ -160,7 +151,6 @@ object WidgetUpdates {
                 val errors = if (small) snapshot.prices.error != null || snapshot.fees.error != null
                     else snapshot.prices.error!=null || snapshot.fees.error!=null || snapshot.block.error!=null || snapshot.mempool.error!=null || selection.periods.any { snapshot.history(it.id).error!=null }
                 val status = when {
-                    small && !compact -> "Vergroot tot 620 dp voor grafiek"
                     busy || snapshot.refreshing -> "Refreshing…"
                     oldest == 0L -> "Waiting for data · tap refresh"
                     errors -> "Cached · oldest ${Format.time(oldest)}"
@@ -180,27 +170,21 @@ object WidgetUpdates {
 
     internal fun charts(views: RemoteViews, s: Snapshot, selection: WidgetCharts, width: Int, height: Int, now: Long, ichimoku: Boolean = s.ichimoku, zooms: Map<String,Int> = emptyMap()) {
         val periods=selection.periods
-        val needed=if(periods.size==2)WidgetAppearance.DOUBLE_HEIGHT else WidgetAppearance.SINGLE_HEIGHT
-        for((id,count) in listOf(R.id.widget_one_chart to 1,R.id.widget_two_charts to 2)) {
-            views.setTextColor(id,Color.parseColor(if(count==selection.count)"#17120D" else "#BAC7DB"))
-            views.setInt(id,"setBackgroundResource",if(count==selection.count)R.drawable.widget_choice_on else R.drawable.widget_choice_off)
-            views.setContentDescription(id,"$count grafiek(en)${if(count==selection.count)", geselecteerd" else ""}")
-        }
-        val fits=height>=needed
+        val dense=WidgetAppearance.dense(height,selection.count)
+        val fits=true
         val labels=listOf(R.id.chart_label_1,R.id.chart_label_2)
         val headers=listOf(R.id.chart_header_1,R.id.chart_header_2)
         val counts=listOf(R.id.chart_count_1,R.id.chart_count_2)
         val images=listOf(R.id.chart_image_1,R.id.chart_image_2)
         val captions=listOf(R.id.chart_status_1,R.id.chart_status_2)
         views.setViewVisibility(R.id.chart_hint,if(fits)View.GONE else View.VISIBLE)
-        views.setTextViewText(R.id.chart_hint,"Vergroot tot $needed dp hoog voor ${periods.size} grafiek(en), of open de app. Kies één interval voor minder ruimte.")
         for(i in 0..1) {
             val period=periods.getOrNull(i)
             val show=fits && period!=null
             views.setViewVisibility(labels[i],if(show)View.VISIBLE else View.GONE)
             views.setViewVisibility(headers[i],if(show)View.VISIBLE else View.GONE)
             views.setViewVisibility(images[i],if(show)View.VISIBLE else View.GONE)
-            views.setViewVisibility(captions[i],if(show)View.VISIBLE else View.GONE)
+            views.setViewVisibility(captions[i],if(show && !dense)View.VISIBLE else View.GONE)
             if(show) {
                 val source=s.history(period.id)
                 val zoom=ChartZoom.clamp(zooms[period.id] ?: ChartZoom.DEFAULT)
@@ -219,8 +203,8 @@ object WidgetUpdates {
                 views.setTextColor(captions[i],Color.parseColor(if(source.error!=null || source.isStale(now) || cloudHint.isNotEmpty())"#FFD166" else "#BAC7DB"))
                 views.setTextColor(labels[i],Color.parseColor(if(source.error!=null || source.isStale(now))"#FFD166" else "#F7FAFF"))
                 views.setContentDescription(labels[i],"Kies interval voor grafiek ${i+1}; ${period.label} · $status · UTC · in opbouw$cloudHint")
-                val w=(width.coerceIn(280,500)-28)*2
-                val h=116*2
+                val w=(width.coerceIn(250,500)-if(dense)16 else 28)*2
+                val h=WidgetAppearance.plotHeight(height,selection.count)*2
                 views.setImageViewBitmap(images[i],CandleBitmap.render(source.value.orEmpty(),s.currency,w,h,density=2f,ichimoku=ichimoku,visibleCount=zoom,widgetStyle=true))
                 val last=source.value?.lastOrNull()
                 views.setContentDescription(images[i],"${period.label} per candle in ${s.currency}. ${source.status(now)}. Laatste slot ${Format.money(last?.close,s.currency)}; laatste candle in opbouw. Datums UTC. Tik om de details te openen.")

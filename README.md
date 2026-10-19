@@ -4,7 +4,7 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.5.1**, versionCode **13**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.5.2**, versionCode **14**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -12,25 +12,13 @@ Current version: **1.5.1**, versionCode **13**. Open this repository in Android 
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
 
-## Consistent widget appearance (1.5.1)
+## Resizable widgets (1.5.2)
 
-The expanded Android widget now follows the approved OWL layout: matching header, cloud controls above the plots, chart geometry, block card, fee fields, mempool row and refresh icon. Both renderers are compared with the same synthetic data at 360 × 840 dp. The full layout needs 620 dp for one plot or 800 dp for two; existing smaller standard widgets need resizing. Existing OWL imports need replacement for OWL 4.1. See [WIDGET-APPEARANCE.md](WIDGET-APPEARANCE.md).
+Choose one or two widget charts in the app's **Widgets** tab. The widget no longer has a graph-count row. This updates existing standard widgets and defaults for newly added widgets without changing their periods. For Omalauncher, choose the count and reimport OWL 4.2 from the app; imported OWL copies remain independent.
 
-## One or two widget charts (1.5.0)
+The graph widget starts at 4×5 cells and remains vertically and horizontally resizable, including 4×6. Actual cell dimensions depend on the launcher. Compact layouts use available height for both candle/cloud plots, retain interval, zoom and cloud controls, and condense network metadata. The Android minimum resize height is 320 dp; exceptionally short layouts omit the fee row. Larger layouts include median block fee and mempool data. The separate network-only widget is unchanged. Dashboard charts still support three Combi intervals and two-finger zoom.
 
-Expanded Android widgets and OWL 4.0 show at most two charts. Choose one/two at the top, then tap each period title to select 4-hour, daily or weekly candles. Each widget stores its own distinct pair, independent of the app; the app retains three-chart Combi and pinch zoom. Standard widgets migrate earlier selections to at most two. OWL now caches each currency/period separately and activates only the selected one/two candle feeds. Existing OWL imports need replacement. See [WIDGET-GRAPHS.md](WIDGET-GRAPHS.md).
-
-## Horizontal zoom (1.4.0)
-
-Pinch each app chart to show 24–90 candles; each period retains its own zoom, including Combi. Standard Android widgets and OWL 3.1 use compact −/+ buttons beside each chart title, with 24/36/60/90 steps and independent persisted settings. The cloud uses the full existing 240-candle history, keeping its 20/60/120/30 parameters. No extra API calls are made. Existing Omalauncher imports must be replaced to receive the controls. See [ZOOM.md](ZOOM.md) for behavior, minimum widget sizes and validation.
-
-## Ichimoku cloud (1.3.1)
-
-Version 1.3.1 fixes missing cloud fill in the app and standard Android widgets: both colored paths are now populated before drawing. Omalauncher's independent OWL renderer was unaffected; existing OWL imports need no replacement for this fix.
-
-Every existing candle graph has a cloud on/off option, initially off: the app's switch applies to all selected intervals including Combi; each expanded Android widget has a separate Cloud button in its footer; the Omalauncher widget has a persistent Cloud button above the chart. Compact Android widgets have no candle graph and are unchanged. App and widget settings survive restarts. Existing widget-specific choices take precedence over the app default.
-
-The cloud uses 20/60/120/30. Only Leading Span A, Leading Span B and transparent green/red fill are drawn behind the candles. Displacement follows inclusive bar counting (`30 - 1 = 29` index positions). Up to 240 real historical candles are retained for calculation; the visible window defaults to 36 candles and can be zoomed to 24–90. At the default zoom, at least 184 candles are required to cover the visible window and the projected cloud. Insufficient history leaves candles visible with a refresh/history message. No future price candles are fabricated. See [ICHIMOKU.md](ICHIMOKU.md).
+See [WIDGET-GRAPHS.md](WIDGET-GRAPHS.md) and [WIDGET-APPEARANCE.md](WIDGET-APPEARANCE.md).
 
 ## Omalauncher support (1.2.3)
 

@@ -69,7 +69,7 @@ class OwlRenderTest {
         }
         val nodes=owner(decor)!!.getAllSemanticsNodes(false)
         val anchors=org.json.JSONObject()
-        for((name,text) in listOf("price" to "€ 72.521,90","count" to "2 grafieken","cloud" to "Cloud Aan","first" to "4 uur ▾","second" to "1 dag ▾","block" to "Blok #971.890","fee" to "3 sat/vB","mempool" to "Mempool 18.420 tx · 12,8 vMB","refresh" to "↻")) {
+        for((name,text) in listOf("price" to "€ 72.521,90","cloud" to "Cloud Aan","first" to "4 uur ▾","second" to "1 dag ▾","block" to "Blok #971.890","fee" to "3 sat/vB","mempool" to "Mempool 18.420 tx · 12,8 vMB","refresh" to "↻")) {
             val node=nodes.first { it.config.getOrNull(SemanticsProperties.Text)?.any { t -> t.text==text }==true }
             anchors.put(name,node.boundsInRoot.center.y/density)
         }
@@ -222,9 +222,9 @@ class OwlRenderTest {
                 verifyCloud("USD",names.getValue(first));verifyCloud("USD",names.getValue(second),1)
             }
             capture("two-charts")
-            tap("1 grafiek");assertEquals(Num(1.0),inst.get("graphCount"));settle();verifyText()
+            inst.set("graphCount",Num(1.0));assertEquals(Num(1.0),inst.get("graphCount"));settle();verifyText()
             assertEquals(1,textNodes().count { nodeText(it).endsWith(" ▾") && !nodeText(it).startsWith("USD") })
-            tap("2 grafieken");assertEquals(Num(2.0),inst.get("graphCount"));settle();verifyText()
+            inst.set("graphCount",Num(2.0));assertEquals(Num(2.0),inst.get("graphCount"));settle();verifyText()
             val saved=(inst.get("histories") as Lst).items[1]
             inst.set("usdWeek",Obj(mapOf("ok" to FALSE)))
             program.triggers.forEach { it.action.run(inst.root,emptyList()) };settle()

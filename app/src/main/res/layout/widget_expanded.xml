@@ -1,55 +1,67 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical"
-    android:padding="12dp" android:background="@drawable/widget_background" android:contentDescription="@string/open_app">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="14dp" android:background="@drawable/widget_background" android:contentDescription="@string/open_app">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-        <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:text="Bitcoin · EUR" />
-        <TextView android:id="@+id/widget_change" style="@style/WidgetLabel" android:text="— vandaag UTC" />
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView style="@style/WidgetLabel" android:text="Bitcoin Pulse" android:textSize="13sp" />
+            <TextView android:id="@+id/widget_price" style="@style/WidgetNumber" android:textSize="32sp" android:fontFamily="sans-serif" android:textStyle="bold" android:text="—" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:layout_width="60dp" android:layout_height="48dp" android:gravity="center" android:textColor="#F7FAFF" android:textSize="13sp" android:text="EUR ▾" android:background="@drawable/widget_currency_frame" />
     </LinearLayout>
-    <TextView android:id="@+id/widget_price" style="@style/WidgetNumber" android:textSize="30sp" android:text="—" />
-    <LinearLayout android:id="@+id/widget_periods" android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal">
-        <TextView style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="center_vertical" android:text="Grafieken" />
-        <TextView android:id="@+id/widget_one_chart" style="@style/PeriodButton" android:text="1 grafiek" />
-        <TextView android:id="@+id/widget_two_charts" style="@style/PeriodButton" android:text="2 grafieken" />
+    <TextView android:id="@+id/widget_change" style="@style/WidgetLabel" android:text="— vandaag (UTC) · Kraken" android:layout_marginTop="6dp" />
+    <LinearLayout android:id="@+id/widget_periods" android:layout_width="match_parent" android:layout_height="44dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+        <TextView style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:text="Grafieken" />
+        <TextView android:id="@+id/widget_one_chart" style="@style/WidgetCountButton" android:text="1 grafiek" />
+        <TextView android:id="@+id/widget_two_charts" style="@style/WidgetCountButton" android:text="2 grafieken" android:layout_marginStart="4dp" />
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView style="@style/WidgetLabel" android:text="Ichimoku cloud" android:textSize="13sp" android:textColor="#F7FAFF" />
+            <TextView style="@style/WidgetLabel" android:text="20 / 60 / 120 / 30" android:textSize="11sp" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <TextView android:id="@+id/widget_ichimoku" style="@style/WidgetLabel" android:layout_width="76dp" android:layout_height="48dp" android:gravity="center" android:text="Cloud Uit" android:background="@drawable/widget_cloud_off" android:contentDescription="Ichimoku cloud aan of uit" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="6dp">
         <LinearLayout android:id="@+id/chart_header_1" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:id="@+id/chart_label_1" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:gravity="center_vertical" android:textSize="12sp" android:background="@drawable/widget_inner" android:paddingHorizontal="8dp" android:clickable="true" android:focusable="true" />
+            <TextView android:id="@+id/chart_label_1" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:gravity="center" android:textSize="12sp" android:textColor="#F7FAFF" android:background="@drawable/widget_choice_frame" android:paddingHorizontal="6dp" android:layout_marginEnd="3dp" android:clickable="true" android:focusable="true" />
             <TextView android:id="@+id/chart_minus_1" style="@style/ChartZoomButton" android:text="−" />
-            <TextView android:id="@+id/chart_count_1" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp" />
+            <TextView android:id="@+id/chart_count_1" style="@style/WidgetLabel" android:layout_width="26dp" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:gravity="center" android:textSize="11sp" android:textColor="#F7FAFF" />
             <TextView android:id="@+id/chart_plus_1" style="@style/ChartZoomButton" android:text="+" />
         </LinearLayout>
-        <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:contentDescription="Candlestickgrafiek · open stijging, gevuld daling; tik voor de app" />
-        <LinearLayout android:id="@+id/chart_header_2" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone">
-            <TextView android:id="@+id/chart_label_2" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:gravity="center_vertical" android:textSize="12sp" android:background="@drawable/widget_inner" android:paddingHorizontal="8dp" android:clickable="true" android:focusable="true" />
+        <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="116dp" android:scaleType="fitXY" android:layout_marginTop="6dp" android:contentDescription="Candlegrafiek" />
+        <TextView android:id="@+id/chart_status_1" style="@style/WidgetLabel" android:layout_width="match_parent" android:textSize="11sp" android:layout_marginTop="6dp" />
+        <LinearLayout android:id="@+id/chart_header_2" android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone" android:layout_marginTop="6dp">
+            <TextView android:id="@+id/chart_label_2" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:gravity="center" android:textSize="12sp" android:textColor="#F7FAFF" android:background="@drawable/widget_choice_frame" android:paddingHorizontal="6dp" android:layout_marginEnd="3dp" android:clickable="true" android:focusable="true" />
             <TextView android:id="@+id/chart_minus_2" style="@style/ChartZoomButton" android:text="−" />
-            <TextView android:id="@+id/chart_count_2" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp" />
+            <TextView android:id="@+id/chart_count_2" style="@style/WidgetLabel" android:layout_width="26dp" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:gravity="center" android:textSize="11sp" android:textColor="#F7FAFF" />
             <TextView android:id="@+id/chart_plus_2" style="@style/ChartZoomButton" android:text="+" />
         </LinearLayout>
-        <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:visibility="gone" android:contentDescription="Tweede candle-interval" />
-        <TextView android:id="@+id/chart_hint" style="@style/WidgetLabel" android:layout_width="match_parent" android:maxLines="3" android:text="Vergroot de widget voor twee grafieken, of open de app." android:visibility="gone" />
+        <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="116dp" android:scaleType="fitXY" android:layout_marginTop="6dp" android:visibility="gone" android:contentDescription="Candlegrafiek" />
+        <TextView android:id="@+id/chart_status_2" style="@style/WidgetLabel" android:layout_width="match_parent" android:textSize="11sp" android:layout_marginTop="6dp" android:visibility="gone" />
+        <TextView android:id="@+id/chart_hint" style="@style/WidgetLabel" android:layout_width="match_parent" android:maxLines="3" android:text="Vergroot de widget voor de grafieken." android:visibility="gone" />
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="6dp">
-        <TextView android:id="@+id/widget_block" style="@style/WidgetNumber" android:textSize="14sp" android:textColor="#49CFFF" android:layout_width="0dp" android:layout_weight="1" android:text="Blok —" />
-        <TextView android:id="@+id/widget_age" style="@style/WidgetLabel" android:textColor="#FF8A1F" android:text="— geleden" />
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="5dp">
-        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Transacties"/><TextView android:id="@+id/widget_tx" style="@style/WidgetNumber" android:textSize="13sp" android:text="—"/></LinearLayout>
-        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Minerpool"/><TextView android:id="@+id/widget_pool" style="@style/WidgetNumber" android:textSize="13sp" android:text="Onbekend"/></LinearLayout>
-        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Mediaan fee"/><TextView android:id="@+id/widget_median" style="@style/WidgetNumber" android:textSize="13sp" android:text="— sat/vB"/></LinearLayout>
-    </LinearLayout>
-    <TextView style="@style/WidgetLabel" android:text="FEE-ADVIES · sat/vB" android:textSize="11sp" android:layout_marginTop="8dp" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="3dp">
-        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="Volgend blok"/><TextView android:id="@+id/widget_next" style="@style/WidgetNumber" android:textSize="17sp" android:textColor="#FF8A1F" android:text="—"/></LinearLayout>
-        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="~30 min"/><TextView android:id="@+id/widget_half" style="@style/WidgetNumber" android:textSize="17sp" android:text="—"/></LinearLayout>
-        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView style="@style/WidgetLabel" android:text="~1 uur"/><TextView android:id="@+id/widget_hour" style="@style/WidgetNumber" android:textSize="17sp" android:text="—"/></LinearLayout>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical">
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:textSize="11sp" android:text="Vernieuw om te laden" />
-            <TextView style="@style/WidgetLabel" android:text="mempool.space · Kraken" android:textSize="11sp" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="10dp" android:background="@drawable/widget_block_frame" android:layout_marginTop="6dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:id="@+id/widget_block" style="@style/WidgetNumber" android:layout_width="0dp" android:layout_weight="1" android:textSize="15sp" android:fontFamily="sans-serif" android:textStyle="bold" android:textColor="#49CFFF" android:text="Blok #—" />
+            <TextView android:id="@+id/widget_age" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:gravity="end" android:textColor="#F7FAFF" android:text="— geleden" />
         </LinearLayout>
-        <TextView android:id="@+id/widget_ichimoku" style="@style/WidgetLabel" android:layout_width="64dp" android:layout_height="48dp" android:gravity="center" android:maxLines="2" android:text="Cloud\nUit" android:background="@drawable/widget_inner" android:contentDescription="Ichimoku cloud aan of uit" />
-        <ImageButton android:id="@+id/widget_refresh" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp"
-            android:background="@drawable/widget_inner" android:src="@drawable/ic_refresh" android:contentDescription="@string/refresh" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="4dp">
+            <TextView android:id="@+id/widget_tx" style="@style/WidgetLabel" android:text="— transacties · " />
+            <TextView android:id="@+id/widget_pool" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:text="Onbekende pool" />
+        </LinearLayout>
+        <TextView android:id="@+id/widget_median" style="@style/WidgetLabel" android:layout_marginTop="4dp" android:text="Mediaan blokfee — sat/vB" />
+    </LinearLayout>
+    <TextView style="@style/WidgetLabel" android:text="Fee-advies · schatting" android:textSize="11sp" android:layout_marginTop="6dp" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="4dp">
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView android:id="@+id/widget_next" style="@style/WidgetNumber" android:textSize="16sp" android:fontFamily="sans-serif" android:textStyle="bold" android:textColor="#FF8A1F" android:text="— sat/vB"/><TextView style="@style/WidgetLabel" android:text="Volgend blok" android:textSize="11sp" android:layout_marginTop="1dp"/></LinearLayout>
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView android:id="@+id/widget_half" style="@style/WidgetNumber" android:textSize="16sp" android:fontFamily="sans-serif" android:textStyle="bold" android:textColor="#F7FAFF" android:text="— sat/vB"/><TextView style="@style/WidgetLabel" android:text="~30 min" android:textSize="11sp" android:layout_marginTop="1dp"/></LinearLayout>
+        <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView android:id="@+id/widget_hour" style="@style/WidgetNumber" android:textSize="16sp" android:fontFamily="sans-serif" android:textStyle="bold" android:textColor="#F7FAFF" android:text="— sat/vB"/><TextView style="@style/WidgetLabel" android:text="~1 uur" android:textSize="11sp" android:layout_marginTop="1dp"/></LinearLayout>
+    </LinearLayout>
+    <TextView android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="6dp" android:background="#38485F" />
+    <TextView android:id="@+id/widget_mempool" style="@style/WidgetLabel" android:layout_width="match_parent" android:text="Mempool laden…" android:layout_marginTop="6dp" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:textSize="12sp" android:text="Vernieuw om te laden" />
+            <TextView style="@style/WidgetLabel" android:text="mempool.space · Kraken" android:textSize="11sp" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <TextView android:id="@+id/widget_refresh" style="@style/WidgetLabel" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center" android:text="↻" android:textSize="30sp" android:textColor="#FF8A1F" android:background="@drawable/widget_refresh_frame" android:contentDescription="@string/refresh" />
     </LinearLayout>
 </LinearLayout>

@@ -1,6 +1,6 @@
-# Eén of twee widgetgrafieken — Bitcoin Pulse 1.5.0
+# Eén of twee widgetgrafieken — Bitcoin Pulse 1.5.1
 
-Dit geldt voor de grote standaard Android-widget en OWL-widget 4.0 in Omalauncher. De grafiekkeuzes in de app blijven intact: daar kun je nog drie Combi-grafieken gebruiken en met twee vingers zoomen. De compacte Android-widget zonder grafiek verandert niet.
+Dit geldt voor de grote standaard Android-widget en OWL-widget 4.1 in Omalauncher. De grafiekkeuzes in de app blijven intact: daar kun je nog drie Combi-grafieken gebruiken en met twee vingers zoomen. De compacte Android-widget zonder grafiek verandert niet.
 
 ## Bediening
 
@@ -13,11 +13,11 @@ Dit geldt voor de grote standaard Android-widget en OWL-widget 4.0 in Omalaunche
 
 Bestaande Combi-widgets nemen bij de eerste weergave na deze update maximaal twee van hun eerdere intervallen over. Daarna is hun keuze onafhankelijk van de app. Een eerdere keuze voor één interval blijft één grafiek. Je kunt met de nieuwe knoppen altijd wisselen tussen één en twee.
 
-Minimale hoogte voor leesbare grafieken: **390 dp** voor één en **500 dp** voor twee. Bij minder ruimte toont de widget een verzoek om te vergroten. De intervalkiezer wijzigt uitsluitend de widget waarvan je op de titel tikt. Dubbelen, ongeldige widget-ID's en ongeldige intervallen worden geweigerd; verwijderen van de widget ruimt zijn instellingen op.
+Minimale hoogte voor leesbare grafieken: **620 dp** voor één en **800 dp** voor twee. Bij minder ruimte toont de widget een verzoek om te vergroten. De intervalkiezer wijzigt uitsluitend de widget waarvan je op de titel tikt. Dubbelen, ongeldige widget-ID's en ongeldige intervallen worden geweigerd; verwijderen van de widget ruimt zijn instellingen op.
 
 ## Omalauncher
 
-Verwijder de oude geïmporteerde kopie en voeg de nieuwe toe via **Bitcoin Pulse → Widgets → Toevoegen aan Omalauncher**. Alleen de app bijwerken vervangt de launcher-kopie niet. Dit is **OWL-widget 4.0**; hij begint met twee grafieken: 4 uur en 1 dag.
+Verwijder de oude geïmporteerde kopie en voeg de nieuwe toe via **Bitcoin Pulse → Widgets → Toevoegen aan Omalauncher**. Alleen de app bijwerken vervangt de launcher-kopie niet. Dit is **OWL-widget 4.1**; hij begint met twee grafieken: 4 uur en 1 dag.
 
 Begin voor twee grafieken met **6 kolommen × 13 rijen**. De native inhoud is gecontroleerd op 320, 360 en 390 dp breed bij 840 dp hoog, inclusief het open intervalmenu. Voor één grafiek kan de widget kleiner; scrollen blijft beschikbaar als de launcher minder ruimte geeft.
 

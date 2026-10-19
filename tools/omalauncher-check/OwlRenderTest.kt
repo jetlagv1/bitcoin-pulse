@@ -44,6 +44,38 @@ import java.time.Duration
 @Config(sdk=[35], application=Application::class, qualifiers="w430dp-h900dp-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class OwlRenderTest {
+    @Test fun sharedAppearanceFixtureRendersAtSameSizeAsStandardWidget() {
+        val context=RuntimeEnvironment.getApplication()
+        val program=Compiler.compile(context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() })
+        val inst=WidgetInstance(program);val now=System.currentTimeMillis()
+        inst.set("now",Num(now/1000.0));inst.set("ichimoku",TRUE)
+        for((name,raw) in com.buildapptest.bitcoinpulse.WidgetVisualFixture.data(now)) inst.set(name,Obj(mapOf("ok" to TRUE,"out" to Json.parseOrText(raw))))
+        program.triggers.forEach { it.action.run(inst.root,emptyList()) }
+        val control=Robolectric.buildActivity(ComponentActivity::class.java);val activity=control.get();activity.enableEdgeToEdge();control.setup().visible()
+        activity.setContent { Box(Modifier.fillMaxSize()) { WidgetContent(inst,Modifier.width(360.dp).height(840.dp),cells=6 to 13) } }
+        val density=context.resources.displayMetrics.density;val width=(360*density).toInt();val height=(840*density).toInt();val decor=activity.window.decorView
+        val bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888)
+        repeat(3) {
+            shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(350))
+            decor.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));decor.layout(0,0,width,height);decor.draw(Canvas(bitmap))
+        }
+        assertTrue("Runtime errors: ${inst.problems}",inst.problems.isEmpty())
+        val folder=File("build/reports/widget-parity").apply { mkdirs() }
+        File(folder,"omalauncher-360.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
+        fun owner(v:View):SemanticsOwner? {
+            if(v.javaClass.name.contains("AndroidComposeView")) return v.javaClass.getMethod("getSemanticsOwner").invoke(v) as SemanticsOwner
+            if(v is ViewGroup) for(i in 0 until v.childCount) owner(v.getChildAt(i))?.let { return it }
+            return null
+        }
+        val nodes=owner(decor)!!.getAllSemanticsNodes(false)
+        val anchors=org.json.JSONObject()
+        for((name,text) in listOf("price" to "€ 72.521,90","count" to "2 grafieken","cloud" to "Cloud Aan","first" to "4 uur ▾","second" to "1 dag ▾","block" to "Blok #971.890","fee" to "3 sat/vB","mempool" to "Mempool 18.420 tx · 12,8 vMB","refresh" to "↻")) {
+            val node=nodes.first { it.config.getOrNull(SemanticsProperties.Text)?.any { t -> t.text==text }==true }
+            anchors.put(name,node.boundsInRoot.center.y/density)
+        }
+        File(folder,"omalauncher-anchors.json").writeText(anchors.toString(2))
+        control.pause().stop().destroy()
+    }
     @Test fun missingAndFailedFeedsKeepCurrencyAndPeriodCachesSeparate() {
         val source=RuntimeEnvironment.getApplication().assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() }
         val program=Compiler.compile(source);val inst=WidgetInstance(program)

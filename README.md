@@ -4,13 +4,17 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.5.0**, versionCode **12**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.5.1**, versionCode **13**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## Consistent widget appearance (1.5.1)
+
+The expanded Android widget now follows the approved OWL layout: matching header, cloud controls above the plots, chart geometry, block card, fee fields, mempool row and refresh icon. Both renderers are compared with the same synthetic data at 360 × 840 dp. The full layout needs 620 dp for one plot or 800 dp for two; existing smaller standard widgets need resizing. Existing OWL imports need replacement for OWL 4.1. See [WIDGET-APPEARANCE.md](WIDGET-APPEARANCE.md).
 
 ## One or two widget charts (1.5.0)
 

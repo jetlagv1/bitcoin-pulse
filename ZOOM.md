@@ -10,11 +10,11 @@ Elke periode heeft een eigen lokaal opgeslagen zoomstand, ook in Combi. Wisselen
 
 De compacte −/+ knoppen staan naast elke grafiektitel, met het aantal candles ertussen. **−** toont meer candles, **+** minder: 24, 36, 60 of 90. De zichtbare knop is 30 dp, binnen een aanraakvlak van 40 dp. Aan de grenzen wordt de betreffende knop uitgeschakeld. Elke widget en elke periode hebben onafhankelijke opgeslagen standen. Verwijderen van een widget verwijdert zijn zoominstellingen.
 
-Voor leesbare grafieken zijn minimaal 390 dp hoogte voor één grafiek, 500 dp voor twee nodig. Widgets tonen maximaal twee grafieken. Vergroot een bestaande widget als hij daarom vraagt. De compacte widget zonder grafiek verandert niet.
+Voor leesbare grafieken zijn minimaal 620 dp hoogte voor één grafiek, 800 dp voor twee nodig. Widgets tonen maximaal twee grafieken. Vergroot een bestaande widget als hij daarom vraagt. De compacte widget zonder grafiek verandert niet.
 
 ## Omalauncher
 
-OWL-widget **4.0** heeft dezelfde compacte knoppen, 24/36/60/90-standen en afzonderlijk opgeslagen zoom voor 4 uur, 1 dag en 1 week. Hij toont naar keuze één of twee verschillende intervallen tegelijk; zie `WIDGET-GRAPHS.md`. Een eerder geïmporteerde kopie moet worden vervangen via **Bitcoin Pulse → Widgets → Toevoegen aan Omalauncher**; een app-update vervangt die kopie niet automatisch.
+OWL-widget **4.1** heeft dezelfde compacte knoppen, 24/36/60/90-standen en afzonderlijk opgeslagen zoom voor 4 uur, 1 dag en 1 week. Hij toont naar keuze één of twee verschillende intervallen tegelijk; zie `WIDGET-GRAPHS.md`. Een eerder geïmporteerde kopie moet worden vervangen via **Bitcoin Pulse → Widgets → Toevoegen aan Omalauncher**; een app-update vervangt die kopie niet automatisch.
 
 ## Cloud en gegevens
 

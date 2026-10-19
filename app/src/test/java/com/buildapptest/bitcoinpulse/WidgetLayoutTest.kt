@@ -17,8 +17,8 @@ import org.robolectric.annotation.GraphicsMode
 @Config(sdk = [35], application = Application::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class WidgetLayoutTest {
-    @Test fun expandedLayoutInflatesAndKeepsRefreshVisible() { verify(R.layout.widget_expanded, 280, 360) }
-    @Test fun expandedComboLayoutKeepsRefreshVisible() { verify(R.layout.widget_expanded, 320, 580) }
+    @Test fun expandedLayoutInflatesAndKeepsRefreshVisible() { verify(R.layout.widget_expanded, 280, 620) }
+    @Test fun expandedComboLayoutKeepsRefreshVisible() { verify(R.layout.widget_expanded, 320, 840) }
     @Test fun compactLayoutInflatesAndKeepsRefreshVisible() { verify(R.layout.widget_compact, 160, 160) }
 
     private fun verify(layout: Int, widthDp: Int, heightDp: Int) {

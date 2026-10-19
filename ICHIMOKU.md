@@ -1,4 +1,4 @@
-# Ichimoku cloud — Bitcoin Pulse 1.5.0
+# Ichimoku cloud — Bitcoin Pulse 1.5.1
 
 De bestaande vormgeving blijft behouden. Er zijn alleen een schakelaar, twee cloudgrenzen en een transparante groen/rode vulling toegevoegd. Er zijn geen extra Conversion-, Base- of Lagging-lijnen en geen volumegrafiek toegevoegd.
 
@@ -9,7 +9,7 @@ De bestaande vormgeving blijft behouden. Er zijn alleen een schakelaar, twee clo
 - **Omalauncher:** tik op `Cloud Aan/Uit` boven de grafiek. De keuze blijft bij het wisselen van EUR/USD en 4 uur / 1 dag / 1 week behouden en wordt door Omalauncher opgeslagen.
 - De cloud is standaard uit. De compacte 2×2-widget heeft geen candleplot en blijft ongewijzigd.
 
-Een app-update vervangt een eerder geïmporteerde Omalauncher-widget niet: verwijder de oude kopie en voeg de nieuwe toe via **Widgets → Toevoegen aan Omalauncher**. De OWL-widget heeft versie 4.0. Begin met 6 kolommen × 13 rijen; de native inhoud is gecontroleerd op 320–390 dp breed bij 840 dp hoog. Vergroot de tegel als de launcher kleinere cellen gebruikt.
+Een app-update vervangt een eerder geïmporteerde Omalauncher-widget niet: verwijder de oude kopie en voeg de nieuwe toe via **Widgets → Toevoegen aan Omalauncher**. De OWL-widget heeft versie 4.1. Begin met 6 kolommen × 13 rijen; de native inhoud is gecontroleerd op 320–390 dp breed bij 840 dp hoog. Vergroot de tegel als de launcher kleinere cellen gebruikt.
 
 ## Berekening
 

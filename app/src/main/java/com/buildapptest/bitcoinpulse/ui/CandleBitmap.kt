@@ -18,14 +18,14 @@ import kotlin.math.max
 
 /** Same chart renderer for Compose and RemoteViews; only real OHLC observations are drawn. */
 object CandleBitmap {
-    fun render(history: List<Candle>, currency: String, width: Int, height: Int, selected: Int? = null, density: Float = 1f, ichimoku: Boolean = false, visibleCount: Int = ChartZoom.DEFAULT): Bitmap {
+    fun render(history: List<Candle>, currency: String, width: Int, height: Int, selected: Int? = null, density: Float = 1f, ichimoku: Boolean = false, visibleCount: Int = ChartZoom.DEFAULT, widgetStyle: Boolean = false): Bitmap {
         val candles=history.takeLast(ChartZoom.visible(visibleCount,history.size))
         val start=history.size-candles.size
         val cloud=if(ichimoku && candles.isNotEmpty() && history.size>=Ichimoku.required(candles.size)) Ichimoku.calculate(history).filter { it.index>=start } else emptyList()
         val bitmap = Bitmap.createBitmap(width.coerceAtLeast(1), height.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val scale = density
-        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 11f * scale; typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL) }
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 11f * scale; typeface = if(widgetStyle)android.graphics.Typeface.MONOSPACE else android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL) }
         fun text(label: String, x: Float, y: Float, end: Boolean = false) {
             p.color = Color.parseColor("#BAC7DB"); p.style = Paint.Style.FILL
             p.textAlign = if (end) Paint.Align.RIGHT else Paint.Align.LEFT
@@ -43,7 +43,7 @@ object CandleBitmap {
             val value = min+(max-min)*j/2
             p.color = Color.parseColor("#38485F"); p.strokeWidth = scale
             canvas.drawLine(left,y(value),right,y(value),p)
-            text(String.format(Locale.getDefault(), "%.1fk",value/1000),width-2*scale,y(value)+4*scale,true)
+            text(String.format(if(widgetStyle)Locale.GERMANY else Locale.getDefault(), "%.1fk",value/1000),width-2*scale,y(value)+4*scale,true)
         }
         val step = (right-left)/(candles.size + if(cloud.isNotEmpty()) Ichimoku.OFFSET else 0)
         fun x(index: Int) = left+step*(index-start+.5f)
@@ -84,6 +84,10 @@ object CandleBitmap {
             val body = RectF(x-step*.28f,y(maxOf(d.open,d.close)),x+step*.28f,y(minOf(d.open,d.close)))
             if (body.height() < scale*2) body.bottom=body.top+scale*2
             p.style = if (up) Paint.Style.STROKE else Paint.Style.FILL
+            if(widgetStyle && up) {
+                p.style=Paint.Style.FILL;p.color=Color.parseColor("#182230");canvas.drawRect(body,p)
+                p.color=Color.parseColor("#35E89A");p.style=Paint.Style.STROKE
+            }
             canvas.drawRect(body,p)
             // The current, uncommitted candle is explicitly marked with a dot.
             if (d.provisional) { p.style=Paint.Style.FILL; canvas.drawCircle(x,top-5*scale,2*scale,p) }

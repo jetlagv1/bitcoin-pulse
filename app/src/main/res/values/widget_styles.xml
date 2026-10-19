@@ -27,4 +27,10 @@
         <item name="android:textColor">#FF8A1F</item><item name="android:background">@drawable/widget_zoom_button</item>
         <item name="android:clickable">true</item><item name="android:focusable">true</item>
     </style>
+    <style name="WidgetCountButton" parent="WidgetLabel">
+        <item name="android:layout_width">88dp</item><item name="android:layout_height">44dp</item>
+        <item name="android:gravity">center</item><item name="android:fontFamily">sans-serif</item><item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/widget_choice_off</item>
+        <item name="android:clickable">true</item><item name="android:focusable">true</item>
+    </style>
 </resources>

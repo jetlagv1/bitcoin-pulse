@@ -1,8 +1,8 @@
 widget "Bitcoin Pulse" {
-  meta { owl: 8; version: "4.0"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  meta { owl: 8; version: "4.1"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
   size: 6x13
   minSize: 6x10
-  padding: 14
+  padding: 0
   state currency = "EUR" persist
   state interval = 240 persist
   state interval2 = 1440 persist
@@ -94,7 +94,7 @@ widget "Bitcoin Pulse" {
   let stale = priceAt == null || blockAt == null || feesAt == null || memAt == null || now - priceAt > 180 || now - blockAt > 180 || now - feesAt > 180 || now - memAt > 180
   let failed = ticker.ok == false || len(ticker.out.error) > 0 || blocks.ok == false || fees.ok == false || pool.ok == false
   onTap: androidApp("com.buildapptest.bitcoinpulse")
-  background: #182230
+  background: #00000000
   let whole = price == null ? "" : first(split(fixed(price, 2), "."))
   let grouped = join(reverse(map(range(ceil(len(whole) / 3)), i => sub(whole, max(0, len(whole) - (i + 1) * 3), len(whole) - i * 3))), ".")
   let priceText = price == null ? "Koers laden…" : "${symbol} ${grouped},${last(split(fixed(price, 2), '.'))}"
@@ -104,7 +104,10 @@ widget "Bitcoin Pulse" {
   let txText = block == null ? "—" : join(reverse(map(range(ceil(len(txDigits) / 3)), i => sub(txDigits, max(0, len(txDigits) - (i + 1) * 3), len(txDigits) - i * 3))), ".")
   let lastChange = priceAt != null && blockAt != null ? min(priceAt, blockAt) : null
   Column {
-    fill: width
+    fill: true
+    padding: 14
+    background: #182230
+    radius: 28
     gap: 6
     scroll: true
     Row {
@@ -178,8 +181,11 @@ widget "Bitcoin Pulse" {
       let cloudRequired = 148 + len(chart)
       let cloudReady = ichimoku && len(chart) > 0 && len(history) >= cloudRequired
       let cloudPoints = clouds[slot]
-      let low = cloudReady ? min(min(map(chart, c => num(c[3]))), min(map(cloudPoints, p => min(p.a, p.b)))) : min(map(chart, c => num(c[3])))
-      let high = cloudReady ? max(max(map(chart, c => num(c[2]))), max(map(cloudPoints, p => max(p.a, p.b)))) : max(map(chart, c => num(c[2])))
+      let rawLow = cloudReady ? min(min(map(chart, c => num(c[3]))), min(map(cloudPoints, p => min(p.a, p.b)))) : min(map(chart, c => num(c[3])))
+      let rawHigh = cloudReady ? max(max(map(chart, c => num(c[2]))), max(map(cloudPoints, p => max(p.a, p.b)))) : max(map(chart, c => num(c[2])))
+      let pad = max((rawHigh - rawLow) * 0.08, rawHigh * 0.0001)
+      let low = rawLow - pad
+      let high = rawHigh + pad
       let span = max(high - low, 1)
     Row {
       fill: width
@@ -203,7 +209,7 @@ widget "Bitcoin Pulse" {
           zoomDay = period == 1440 ? (zoomDay < 36 ? 36 : zoomDay < 60 ? 60 : 90) : zoomDay
           zoomWeek = period == 10080 ? (zoomWeek < 36 ? 36 : zoomWeek < 60 ? 60 : 90) : zoomWeek
         }
-        Box { width: 30; height: 30; align: center; radius: 8; background: #243246; border: 1; borderColor: #38485F; Text { text: "−"; font: sans; fontSize: 20; color: zoomCount >= 90 ? #5F563F : #FF8A1F; align: center } }
+        Box { width: 30; height: 30; align: center; radius: 8; opacity: zoomCount >= 90 ? 0.3 : 1; background: #243246; border: 1; borderColor: #38485F; Text { text: "−"; font: sans; fontSize: 20; color: #FF8A1F; align: center } }
       }
       Text { width: 26; text: str(len(chart)); font: sans; fontSize: 11; color: #F7FAFF; align: center; maxLines: 1 }
       Box {
@@ -215,7 +221,7 @@ widget "Bitcoin Pulse" {
           zoomDay = period == 1440 ? (zoomDay > 60 ? 60 : zoomDay > 36 ? 36 : 24) : zoomDay
           zoomWeek = period == 10080 ? (zoomWeek > 60 ? 60 : zoomWeek > 36 ? 36 : 24) : zoomWeek
         }
-        Box { width: 30; height: 30; align: center; radius: 8; background: #243246; border: 1; borderColor: #38485F; Text { text: "+"; font: sans; fontSize: 20; color: zoomCount <= 24 ? #5F563F : #FF8A1F; align: center } }
+        Box { width: 30; height: 30; align: center; radius: 8; opacity: zoomCount <= 24 ? 0.3 : 1; background: #243246; border: 1; borderColor: #38485F; Text { text: "+"; font: sans; fontSize: 20; color: #FF8A1F; align: center } }
       }
     }
     if picker == slot {
@@ -240,49 +246,51 @@ widget "Bitcoin Pulse" {
       Canvas {
         fill: width
         height: 116
-        let plotWidth = max(width - 58, 1)
-        let plotHeight = 82
-        let top = 7
+        let plotWidth = max(width - 68, 1)
+        let plotHeight = 81
+        let top = 10
         let step = plotWidth / max(len(chart) + (cloudReady ? 29 : 0), 1)
         for j in [0, 1, 2] {
           let axisValue = high - span * j / 2
           let axisDigits = str(int(round(axisValue)))
-          let axisText = join(reverse(map(range(ceil(len(axisDigits) / 3)), k => sub(axisDigits, max(0, len(axisDigits) - (k + 1) * 3), len(axisDigits) - k * 3))), ".")
-          line(0, top + j * plotHeight / 2, plotWidth, top + j * plotHeight / 2, stroke: #38485F, width: 0.6)
-          text(axisText, width, top + j * plotHeight / 2, size: 10, align: end, color: #BAC7DB)
+          let axisText = "${replace(fixed(axisValue / 1000, 1), '.', ',')}k"
+          line(3, top + j * plotHeight / 2, 3 + plotWidth, top + j * plotHeight / 2, stroke: #38485F, width: 0.6)
+          text(axisText, width - 2, top + j * plotHeight / 2, size: 11, align: end, color: #BAC7DB)
         }
         let points = cloudPoints
         if len(points) > 1 {
           let edges = map(range(len(points)), j => {p: points[j], q: points[j + 1], t: j + 1 < len(points) && (points[j].a - points[j].b) * (points[j + 1].a - points[j + 1].b) < 0 ? (points[j].a - points[j].b) / ((points[j].a - points[j].b) - (points[j + 1].a - points[j + 1].b)) : null})
           let fillPoints = flatten(map(edges, r => r.t == null ? [r.p] : [r.p, {index: r.p.index + r.t, a: r.p.a + (r.q.a - r.p.a) * r.t, b: r.p.a + (r.q.a - r.p.a) * r.t}]))
-          path(flatten([map(fillPoints, p => [(p.index + 0.5) * step, top + (high - p.a) / span * plotHeight]), reverse(map(fillPoints, p => [(p.index + 0.5) * step, top + (high - min(p.a, p.b)) / span * plotHeight]))]), closed: true, fill: alpha(#43A047,0.26))
-          path(flatten([map(fillPoints, p => [(p.index + 0.5) * step, top + (high - p.a) / span * plotHeight]), reverse(map(fillPoints, p => [(p.index + 0.5) * step, top + (high - max(p.a, p.b)) / span * plotHeight]))]), closed: true, fill: alpha(#F23645,0.26))
+          path(flatten([map(fillPoints, p => [3 + (p.index + 0.5) * step, top + (high - p.a) / span * plotHeight]), reverse(map(fillPoints, p => [3 + (p.index + 0.5) * step, top + (high - min(p.a, p.b)) / span * plotHeight]))]), closed: true, fill: alpha(#43A047,0.26))
+          path(flatten([map(fillPoints, p => [3 + (p.index + 0.5) * step, top + (high - p.a) / span * plotHeight]), reverse(map(fillPoints, p => [3 + (p.index + 0.5) * step, top + (high - max(p.a, p.b)) / span * plotHeight]))]), closed: true, fill: alpha(#F23645,0.26))
           for p, j in points {
             if j < len(points) - 1 {
               let q = points[j + 1]
-              line((p.index + 0.5) * step, top + (high - p.a) / span * plotHeight, (q.index + 0.5) * step, top + (high - q.a) / span * plotHeight, stroke: #A5D6A7, width: 1)
-              line((p.index + 0.5) * step, top + (high - p.b) / span * plotHeight, (q.index + 0.5) * step, top + (high - q.b) / span * plotHeight, stroke: #EF9A9A, width: 1)
+              line(3 + (p.index + 0.5) * step, top + (high - p.a) / span * plotHeight, 3 + (q.index + 0.5) * step, top + (high - q.a) / span * plotHeight, stroke: #A5D6A7, width: 1)
+              line(3 + (p.index + 0.5) * step, top + (high - p.b) / span * plotHeight, 3 + (q.index + 0.5) * step, top + (high - q.b) / span * plotHeight, stroke: #EF9A9A, width: 1)
             }
           }
         }
         for c, i in chart {
-          let x = (i + 0.5) * step
+          let x = 3 + (i + 0.5) * step
           let openY = top + (high - num(c[1])) / span * plotHeight
           let closeY = top + (high - num(c[4])) / span * plotHeight
           let rising = num(c[4]) >= num(c[1])
           line(x, top + (high - num(c[2])) / span * plotHeight, x, top + (high - num(c[3])) / span * plotHeight, stroke: rising ? #35E89A : #FF647C, width: 1)
-          rect(x - step * 0.27, min(openY, closeY), step * 0.54, max(abs(openY - closeY), 1.5), fill: rising ? #182230 : #FF647C, stroke: rising ? #35E89A : #FF647C, width: 1)
+          rect(x - step * 0.28, min(openY, closeY), step * 0.56, max(abs(openY - closeY), 2), fill: rising ? #182230 : #FF647C, stroke: rising ? #35E89A : #FF647C, width: 1)
+          if i == len(chart) - 1 { circle(x, top - 5, 2, fill: rising ? #35E89A : #FF647C) }
         }
-        text(fmtTime(num(first(chart)[0]), "d MMM"), 0, 107, size: 10, color: #BAC7DB)
+        text(fmtTime(num(first(chart)[0]), "d MMM"), 3, 105, size: 11, color: #BAC7DB)
         if !cloudReady {
-          text(fmtTime(num(chart[floor(len(chart) / 2)][0]), "d MMM"), plotWidth / 2, 107, size: 10, align: center, color: #BAC7DB)
+          text(fmtTime(num(chart[floor(len(chart) / 2)][0]), "d MMM"), 3 + plotWidth / 2, 105, size: 11, align: center, color: #BAC7DB)
         }
         if cloudReady {
-          text(fmtTime(num(last(chart)[0]), "d MMM"), (len(chart) - 0.5) * step, 107, size: 10, align: center, color: #BAC7DB)
-          text("Cloud", plotWidth, 107, size: 10, align: end, color: #BAC7DB)
+          text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + (len(chart) - 0.5) * step, 105, size: 11, align: center, color: #BAC7DB)
+          text("Cloud", 3 + plotWidth, 105, size: 11, align: end, color: #BAC7DB)
         } else {
-          text(fmtTime(num(last(chart)[0]), "d MMM"), plotWidth, 107, size: 10, align: end, color: #BAC7DB)
+          text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + plotWidth, 105, size: 11, align: end, color: #BAC7DB)
         }
+        text(currency, width - 2, 105, size: 11, align: end, color: #BAC7DB)
       }
       Text { text: ichimoku && !cloudReady ? "Cloud: ${cloudRequired} candles nodig · vernieuw" : ohlc.ok == false ? "Cache · vernieuwen mislukt · ${fmtTime(candleAt, 'HH:mm')}" : "Laatste candle loopt nog · ${fmtTime(candleAt, 'HH:mm')}"; font: sans; fontSize: 11; color: ohlc.ok == false || now - candleAt > 660 ? #FFD166 : #BAC7DB; maxLines: 1 }
     } else {
@@ -327,7 +335,7 @@ widget "Bitcoin Pulse" {
       }
     }
     Box { fill: width; height: 1; background: #38485F }
-    Text { text: mem == null ? "Mempool laden…" : "Mempool ${int(mem.count)} tx · ${replace(fixed(mem.vsize / 1000000, 1), '.', ',')} vMB"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
+    Text { text: mem == null ? "Mempool laden…" : "Mempool ${join(reverse(map(range(ceil(len(str(int(mem.count))) / 3)), i => sub(str(int(mem.count)), max(0, len(str(int(mem.count))) - (i + 1) * 3), len(str(int(mem.count))) - i * 3))), '.')} tx · ${replace(fixed(mem.vsize / 1000000, 1), '.', ',')} vMB"; font: sans; fontSize: 12; color: #BAC7DB; maxLines: 1 }
     Row {
       fill: width
       gap: 8

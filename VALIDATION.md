@@ -1,3 +1,16 @@
+# Bitcoin Pulse 1.5.4 / versionCode 16
+
+Verified on 20 October 2026.
+
+- Added a compact 1 ↔ / 2 ↔ toggle beside refresh in both widget footers. Existing footer height and chart space are retained. The app setting remains available.
+- 55 ordinary tests passed, including actual RemoteViews count toggles at 400/480/640/840 dp with one and two charts. Toggling does not launch an activity, preserves interval choices, clears an open picker and changes no other widget's count. Existing geometry/metadata/growth checks remain green.
+- All four isolated OWL checks passed. Real count-button taps work at three phone widths and in the resize suite; counts and intervals survive switching back, the app is not opened, and normal cloud/period/zoom/refresh checks pass.
+- Full layout comparison retains eight anchors with maximum difference 0.25 dp. The footer was visually inspected. Release lint: zero errors, 167 warnings, without new suppressions.
+- APK and RSA upload-signed AAB built successfully. Official bundletool 1.18.3 validates versionName 1.5.4 / versionCode 16, API targets, signature and 16KB bundle/ZIP/ELF alignment.
+- No physical device/full-launcher test or Play Console publication was performed. Reimport OWL 4.4 once to receive the button; subsequent count changes can be made directly in the launcher widget.
+
+## Historical verification
+
 # Bitcoin Pulse 1.5.3 / versionCode 15
 
 Verified on 19 October 2026.

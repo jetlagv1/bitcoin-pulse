@@ -37,6 +37,10 @@ open class PulseWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == WidgetUpdates.REFRESH) WidgetUpdates.refresh(context)
+        if (intent.action == WidgetUpdates.COUNT) {
+            val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)
+            if(WidgetCharts.owned(context,id) && WidgetCharts.setCount(context,id,3-WidgetCharts.read(context,id).count)) WidgetUpdates.render(context)
+        }
         if (intent.action == WidgetUpdates.PICKER || intent.action == WidgetUpdates.PERIOD) {
             val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)
             val slot=intent.getIntExtra("slot",-1)
@@ -81,6 +85,7 @@ object WidgetUpdates {
     const val ZOOM = "com.buildapptest.bitcoinpulse.ZOOM"
     const val PICKER = "com.buildapptest.bitcoinpulse.PICKER"
     const val PERIOD = "com.buildapptest.bitcoinpulse.PERIOD"
+    const val COUNT = "com.buildapptest.bitcoinpulse.COUNT"
     private val minus=listOf(R.id.chart_minus_1,R.id.chart_minus_2)
     private val plus=listOf(R.id.chart_plus_1,R.id.chart_plus_2)
     internal fun zooms(context: Context,id: Int) = PERIODS.associate {
@@ -124,6 +129,11 @@ object WidgetUpdates {
                 views.setTextViewText(R.id.widget_price, if(small)Format.money(snapshot.quote?.price,snapshot.currency,true) else WidgetAppearance.price(snapshot.quote?.price,snapshot.currency))
                 views.setTextViewText(R.id.widget_next, if (small) "Next ${Format.fee(snapshot.fees.value?.next)} sat/vB" else "${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB")
                 if (!small) {
+                    views.setTextViewText(R.id.widget_graph_count,"${selection.count} ↔")
+                    views.setContentDescription(R.id.widget_graph_count,"${selection.count} grafiek(en). Tik voor ${3-selection.count} grafiek(en).")
+                    val countIntent=Intent(context,PulseWidget::class.java).setAction(COUNT).setData(Uri.parse("bitcoinpulse://widget/$id/count"))
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+                    views.setOnClickPendingIntent(R.id.widget_graph_count,PendingIntent.getBroadcast(context,id,countIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                     if(selection.count==1) {
                         val inset=((if(height<400)5 else 8)*context.resources.displayMetrics.density).toInt()
                         views.setViewPadding(R.id.widget_root,inset,inset,inset,inset)

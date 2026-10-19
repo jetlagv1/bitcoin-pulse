@@ -4,7 +4,7 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.5.3**, versionCode **15**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.5.4**, versionCode **16**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -12,9 +12,9 @@ Current version: **1.5.3**, versionCode **15**. Open this repository in Android 
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
 
-## Resizable widgets (1.5.3)
+## Resizable widgets (1.5.4)
 
-Choose one or two widget charts in the app's **Widgets** tab. The widget no longer has a graph-count row. This updates existing standard widgets and defaults for newly added widgets without changing their periods. For Omalauncher, choose the count and reimport OWL 4.3 from the app; imported OWL copies remain independent.
+Choose one or two widget charts in the app's **Widgets** tab or toggle the compact **1 ↔ / 2 ↔** button beside refresh inside an individual widget. The widget no longer has a graph-count row. The app setting updates existing standard widgets and defaults for newly added widgets. The widget button changes only its own count and remembers the selected periods. For Omalauncher, choose the count and reimport OWL 4.4 from the app; imported OWL copies remain independent.
 
 The graph widget starts at 4×5 cells and remains vertically and horizontally resizable, including 4×6. Actual cell dimensions depend on the launcher. A single chart receives all remaining height at every size while retaining median block fee, mempool, fee advice, source, candle status and cloud parameters. Both widget types use an inline period row, without opening an activity. Two-chart layouts retain their compact presentation. The Android minimum resize height is 320 dp; exceptionally short two-chart layouts omit the fee row. Larger layouts include median block fee and mempool data. The separate network-only widget is unchanged. Dashboard charts still support three Combi intervals and two-finger zoom.
 

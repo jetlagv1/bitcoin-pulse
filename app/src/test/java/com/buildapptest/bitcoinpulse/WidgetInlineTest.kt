@@ -29,6 +29,8 @@ class WidgetInlineTest {
         WidgetVisualFixture.seed(context,System.currentTimeMillis())
         val manager=AppWidgetManager.getInstance(context)
         manager.bindAppWidgetIdIfAllowed(71,ComponentName(context,PulseWidget::class.java))
+        manager.bindAppWidgetIdIfAllowed(72,ComponentName(context,PulseWidget::class.java))
+        WidgetCharts().save(context,72)
         val d=context.resources.displayMetrics.density
         for(count in 1..2) for(height in listOf(400,480,640,840)) {
             WidgetCharts(count=count).save(context,71)
@@ -69,6 +71,16 @@ class WidgetInlineTest {
                 click(second,R.id.chart_pick_2_4h)
                 assertEquals("4h",WidgetCharts.read(context,71).second)
             }
+            val saved=WidgetCharts.read(context,71)
+            click(render(),R.id.chart_label_1)
+            click(render(),R.id.widget_graph_count)
+            assertEquals(3-count,WidgetCharts.read(context,71).count)
+            assertEquals(saved.first,WidgetCharts.read(context,71).first)
+            assertEquals(saved.second,WidgetCharts.read(context,71).second)
+            assertEquals(-1,context.getSharedPreferences("widget-options",0).getInt("picker-71",-1))
+            click(render(),R.id.widget_graph_count)
+            assertEquals("Switching back restores both interval choices",saved,WidgetCharts.read(context,71))
+            assertEquals("Other widget counts remain independent",WidgetCharts(),WidgetCharts.read(context,72))
         }
     }
 }

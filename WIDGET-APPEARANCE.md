@@ -1,6 +1,6 @@
-# Widgetvormgeving — Bitcoin Pulse 1.5.3
+# Widgetvormgeving — Bitcoin Pulse 1.5.4
 
-Beide grote widgets gebruiken dezelfde kleuren, koersopbouw, compacte interval-/zoomknoppen, Ichimoku-cloud, blokkaart, feevelden en verversknop. De keuze voor één of twee grafieken staat uitsluitend in de app. Het tabblad Widgets toont het gekozen aantal in zijn voorbeeld; dit voorbeeld gebruikt de standaardintervallen 4 uur en 1 dag.
+Beide grote widgets gebruiken dezelfde kleuren, koersopbouw, compacte interval-/zoomknoppen, Ichimoku-cloud, blokkaart, feevelden en verversknop. De keuze voor één of twee grafieken staat in de app én op de compacte knop naast verversen in de widget. Het tabblad Widgets toont het gekozen aantal in zijn voorbeeld; dit voorbeeld gebruikt de standaardintervallen 4 uur en 1 dag.
 
 Bij één grafiek gebruiken beide widgets een flexibele grafiekhoogte, zonder omschakeling naar een vaste grafiek op grote formaten. Mediane blokfee, mempool, fees, bronlabels, cloudparameters en candle-status blijven op alle formaten zichtbaar. De onderstaande compacte vereenvoudigingen gelden uitsluitend voor twee grafieken. De titel en uitgebreide netwerkregels maken ruimte voor koers, candle/cloudgrafieken, blokhoogte, leeftijd, transacties en miner. Standaardwidgets kunnen vanaf 320 dp hoog worden verkleind. Onder 400 dp verdwijnt de fee-rij. Op grotere formaten worden mediane blokfee, mempool en bronlabels weer zichtbaar. 4×5 is de startmaat; 4×6 en grotere maten blijven mogelijk. Celmaten verschillen per launcher.
 

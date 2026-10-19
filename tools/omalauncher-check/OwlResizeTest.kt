@@ -92,6 +92,11 @@ class OwlResizeTest {
             tap("4 uur ▾");assertEquals("Picker must open",Num(0.0),inst.get("picker"));tap("1 week");assertEquals(Num(10080.0),inst.get("interval"))
             if(count==2) { tap("1 dag ▾");tap("4 uur");assertEquals(Num(240.0),inst.get("interval2")) }
             tap("↻");assertTrue(inst.actions.contains("refresh"))
+            val first=inst.get("interval");val second=inst.get("interval2")
+            tap("$count ↔");assertEquals(Num((3-count).toDouble()),inst.get("graphCount"));settle()
+            assertEquals(Num(-1.0),inst.get("picker"))
+            tap("${3-count} ↔");assertEquals(Num(count.toDouble()),inst.get("graphCount"));settle()
+            assertEquals(first,inst.get("interval"));assertEquals(second,inst.get("interval2"))
             assertFalse("Interval and zoom controls must stay in the launcher",inst.actions.contains("androidApp"))
             assertTrue(inst.problems.toString(),inst.problems.isEmpty())
             control.pause().stop().destroy()

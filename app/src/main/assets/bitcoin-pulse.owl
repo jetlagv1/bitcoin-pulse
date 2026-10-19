@@ -1,5 +1,5 @@
 widget "Bitcoin Pulse" {
-  meta { owl: 8; version: "4.3"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  meta { owl: 8; version: "4.4"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
   size: 4x5
   minSize: 4x5
   padding: 0
@@ -357,6 +357,17 @@ if !dense || single { Text { text: mem == null ? "Mempool laden…" : "Mempool $
         gap: 2
         Text { text: failed ? "Bron niet bereikbaar · vorige waarden" : stale ? "Oudere waarden · controleer met ↻" : "Gewijzigd ${fmtTime(lastChange, 'HH:mm')}"; font: sans; fontSize: dense ? 10 : 12; color: failed || stale ? #FFD166 : #BAC7DB; maxLines: 1 }
         if !dense || single { Text { text: single ? "Bitcoin Pulse · mempool.space · Kraken" : "mempool.space · Kraken"; font: sans; fontSize: single ? 9 : 11; color: #BAC7DB; maxLines: 1 } }
+      }
+      Box {
+        width: 40
+        height: 32
+        align: center
+        background: #243246
+        border: 1
+        borderColor: #38485F
+        radius: 9
+        onTap: { graphCount = graphCount == 1 ? 2 : 1; interval2 = graphCount == 2 && interval2 == interval ? (interval == 240 ? 1440 : 240) : interval2; picker = -1 }
+        Text { text: "${graphCount} ↔"; font: sans; fontSize: 12; color: #FF8A1F; align: center; maxLines: 1 }
       }
       Box {
         width: dense ? 40 : 48

@@ -222,9 +222,9 @@ class OwlRenderTest {
                 verifyCloud("USD",names.getValue(first));verifyCloud("USD",names.getValue(second),1)
             }
             capture("two-charts")
-            inst.set("graphCount",Num(1.0));assertEquals(Num(1.0),inst.get("graphCount"));settle();settle();verifyText()
+            tap("2 ↔");assertEquals(Num(1.0),inst.get("graphCount"));settle();settle();verifyText()
             assertEquals(1,textNodes().count { nodeText(it).endsWith(" ▾") && !nodeText(it).startsWith("USD") })
-            inst.set("graphCount",Num(2.0));assertEquals(Num(2.0),inst.get("graphCount"));settle();settle();verifyText()
+            tap("1 ↔");assertEquals(Num(2.0),inst.get("graphCount"));settle();settle();verifyText()
             val saved=(inst.get("histories") as Lst).items[1]
             inst.set("usdWeek",Obj(mapOf("ok" to FALSE)))
             program.triggers.forEach { it.action.run(inst.root,emptyList()) };settle()

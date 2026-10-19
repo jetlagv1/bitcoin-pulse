@@ -60,6 +60,7 @@
       <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:textSize="10sp"/>
       <TextView style="@style/WidgetLabel" android:text="Bitcoin Pulse · mempool.space · Kraken" android:textSize="9sp"/>
     </LinearLayout>
-    <TextView android:id="@+id/widget_refresh" style="@style/WidgetLabel" android:layout_width="40dp" android:layout_height="32dp" android:gravity="center" android:text="↻" android:textSize="22sp" android:textColor="#FF8A1F" android:background="@drawable/widget_refresh_frame" android:contentDescription="@string/refresh"/>
+    <TextView android:id="@+id/widget_graph_count" style="@style/WidgetLabel" android:layout_width="40dp" android:layout_height="32dp" android:layout_marginEnd="4dp" android:gravity="center" android:text="2 ↔" android:textColor="#FF8A1F" android:background="@drawable/widget_choice_frame" android:clickable="true" android:focusable="true" />
+        <TextView android:id="@+id/widget_refresh" style="@style/WidgetLabel" android:layout_width="40dp" android:layout_height="32dp" android:gravity="center" android:text="↻" android:textSize="22sp" android:textColor="#FF8A1F" android:background="@drawable/widget_refresh_frame" android:contentDescription="@string/refresh"/>
   </LinearLayout>
 </LinearLayout>

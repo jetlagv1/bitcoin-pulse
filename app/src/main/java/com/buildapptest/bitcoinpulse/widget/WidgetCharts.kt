@@ -44,7 +44,9 @@ data class WidgetCharts(val first: String="4h",val second: String="1d",val count
         }
         fun setCount(context: Context,id: Int,count: Int): Boolean {
             if(!owned(context,id) || count !in 1..2) return false
-            read(context,id).copy(count=count).save(context,id);return true
+            read(context,id).copy(count=count).save(context,id)
+            context.getSharedPreferences("widget-options",0).edit().remove("picker-$id").apply()
+            return true
         }
     }
 }

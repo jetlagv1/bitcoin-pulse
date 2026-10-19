@@ -54,9 +54,6 @@ object CandleBitmap {
         fun fillCloud(x0: Float,a0: Double,b0: Double,x1: Float,a1: Double,b1: Double,up: Boolean) {
             (if(up)greenFill else redFill).apply { moveTo(x0,y(a0));lineTo(x1,y(a1));lineTo(x1,y(b1));lineTo(x0,y(b0));close() }
         }
-        p.style=Paint.Style.FILL
-        p.color=Color.parseColor("#4243A047");canvas.drawPath(greenFill,p)
-        p.color=Color.parseColor("#42F23645");canvas.drawPath(redFill,p)
         cloud.zipWithNext().forEach { (a,b) ->
             val d=a.a-a.b;val e=b.a-b.b
             if(d*e<0) {
@@ -65,6 +62,10 @@ object CandleBitmap {
                 fillCloud(xc,cross,cross,x(b.index),b.a,b.b,e>=0)
             } else fillCloud(x(a.index),a.a,a.b,x(b.index),b.a,b.b,(if(d==0.0)e else d)>=0)
         }
+        // Build both paths completely before painting their translucent interiors.
+        p.style=Paint.Style.FILL
+        p.color=Color.parseColor("#4243A047");canvas.drawPath(greenFill,p)
+        p.color=Color.parseColor("#42F23645");canvas.drawPath(redFill,p)
         cloud.zipWithNext().forEach { (a,b) ->
             p.style=Paint.Style.STROKE;p.strokeWidth=scale
             p.color=Color.parseColor("#A5D6A7");canvas.drawLine(x(a.index),y(a.a),x(b.index),y(b.a),p)

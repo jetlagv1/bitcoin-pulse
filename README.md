@@ -4,7 +4,7 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.3.0**, versionCode **9**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.3.1**, versionCode **10**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -12,7 +12,9 @@ Current version: **1.3.0**, versionCode **9**. Open this repository in Android S
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
 
-## Ichimoku cloud (1.3.0)
+## Ichimoku cloud (1.3.1)
+
+Version 1.3.1 fixes missing cloud fill in the app and standard Android widgets: both colored paths are now populated before drawing. Omalauncher's independent OWL renderer was unaffected; existing OWL imports need no replacement for this fix.
 
 Every existing candle graph has a cloud on/off option, initially off: the app's switch applies to all selected intervals including Combi; each expanded Android widget has a separate Cloud button in its footer; the Omalauncher widget has a persistent Cloud button above the chart. Compact Android widgets have no candle graph and are unchanged. App and widget settings survive restarts. Existing widget-specific choices take precedence over the app default.
 

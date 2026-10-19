@@ -91,9 +91,7 @@ class WidgetChartTest {
         val root=layout("combi",580,state)
         for(id in listOf(R.id.chart_image_1,R.id.chart_image_2,R.id.chart_image_3)) {
             val image=(root.findViewById<ImageView>(id).drawable as android.graphics.drawable.BitmapDrawable).bitmap
-            var fill=0
-            for(y in 0 until image.height) for(x in 0 until image.width) if(android.graphics.Color.alpha(image.getPixel(x,y)) in 60..75)fill++
-            assertTrue("Each Combi chart needs its own cloud",fill>20)
+            assertTrue("Each Combi chart needs its own green cloud area",cloudFillPixels(image,true)>100)
         }
     }
 }

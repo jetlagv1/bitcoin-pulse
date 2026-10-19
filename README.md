@@ -4,13 +4,17 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.4.0**, versionCode **11**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.5.0**, versionCode **12**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## One or two widget charts (1.5.0)
+
+Expanded Android widgets and OWL 4.0 show at most two charts. Choose one/two at the top, then tap each period title to select 4-hour, daily or weekly candles. Each widget stores its own distinct pair, independent of the app; the app retains three-chart Combi and pinch zoom. Standard widgets migrate earlier selections to at most two. OWL now caches each currency/period separately and activates only the selected one/two candle feeds. Existing OWL imports need replacement. See [WIDGET-GRAPHS.md](WIDGET-GRAPHS.md).
 
 ## Horizontal zoom (1.4.0)
 

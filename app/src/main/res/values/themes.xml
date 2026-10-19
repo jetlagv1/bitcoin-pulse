@@ -6,4 +6,9 @@
         <item name="android:colorAccent">#FF8A1F</item>
         <item name="android:windowBackground">#0C1018</item>
     </style>
+    <style name="Theme.WidgetPicker" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">#FF8A1F</item>
+        <item name="android:windowBackground">#182230</item>
+        <item name="android:fontFamily">sans</item>
+    </style>
 </resources>

@@ -53,30 +53,25 @@ open class PulseWidget : AppWidgetProvider() {
                 WidgetUpdates.render(context)
             }
         }
-        if (intent.action == WidgetUpdates.PERIOD) {
-            val id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-            val mode = intent.getStringExtra("period")
-            val owned = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, PulseWidget::class.java))
-            if (id in owned && mode in listOf("4h", "1d", "1w", "combi")) {
-                context.getSharedPreferences("widget-options", Context.MODE_PRIVATE).edit().putString("period-$id", mode).apply()
-                WidgetUpdates.render(context)
-            }
+        if (intent.action == WidgetUpdates.COUNT) {
+            val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)
+            if(WidgetCharts.setCount(context,id,intent.getIntExtra("count",0))) WidgetUpdates.render(context)
         }
     }
     override fun onDeleted(context: Context, ids: IntArray) {
         val editor=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
-        ids.forEach { id -> editor.remove("period-$id");editor.remove("ichimoku-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
+        ids.forEach { id -> editor.remove("period-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
     }
 }
 class CompactWidget : PulseWidget()
 
 object WidgetUpdates {
     const val REFRESH = "com.buildapptest.bitcoinpulse.REFRESH"
-    const val PERIOD = "com.buildapptest.bitcoinpulse.PERIOD"
+    const val COUNT = "com.buildapptest.bitcoinpulse.COUNT"
     const val CLOUD = "com.buildapptest.bitcoinpulse.CLOUD"
     const val ZOOM = "com.buildapptest.bitcoinpulse.ZOOM"
-    private val minus=listOf(R.id.chart_minus_1,R.id.chart_minus_2,R.id.chart_minus_3)
-    private val plus=listOf(R.id.chart_plus_1,R.id.chart_plus_2,R.id.chart_plus_3)
+    private val minus=listOf(R.id.chart_minus_1,R.id.chart_minus_2)
+    private val plus=listOf(R.id.chart_plus_1,R.id.chart_plus_2)
     internal fun zooms(context: Context,id: Int) = PERIODS.associate {
         it.id to ChartZoom.clamp(context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).getInt("zoom-$id-${it.id}",ChartZoom.DEFAULT))
     }
@@ -115,7 +110,7 @@ object WidgetUpdates {
                 views.setTextViewText(R.id.widget_currency, if (small) "BTC/${snapshot.currency}" else "Bitcoin · ${snapshot.currency}")
                 views.setTextViewText(R.id.widget_price, Format.money(snapshot.quote?.price, snapshot.currency, small))
                 views.setTextViewText(R.id.widget_next, if (small) "Next ${Format.fee(snapshot.fees.value?.next)} sat/vB" else Format.fee(snapshot.fees.value?.next))
-                val mode=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).getString("period-$id",snapshot.chartMode) ?: "4h"
+                val selection=WidgetCharts.read(context,id,snapshot)
                 if (!small) {
                     views.setTextViewText(R.id.widget_half, Format.fee(snapshot.fees.value?.halfHour))
                     views.setTextViewText(R.id.widget_hour, Format.fee(snapshot.fees.value?.hour))
@@ -135,8 +130,12 @@ object WidgetUpdates {
                     val toggle=Intent(context,PulseWidget::class.java).setAction(CLOUD).setData(Uri.parse("bitcoinpulse://widget/$id/cloud"))
                         .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
                     views.setOnClickPendingIntent(R.id.widget_ichimoku,PendingIntent.getBroadcast(context,id,toggle,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                    charts(views,snapshot,mode,width,height,now,cloud,zooms(context,id))
-                    snapshot.chartPeriods(mode).forEachIndexed { i,period ->
+                    selection.save(context,id)
+                    charts(views,snapshot,selection,width,height,now,cloud,zooms(context,id))
+                    selection.periods.forEachIndexed { i,period ->
+                        val picker=Intent(context,WidgetChartPickerActivity::class.java).setData(Uri.parse("bitcoinpulse://widget/$id/pick/$i"))
+                            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i)
+                        views.setOnClickPendingIntent(if(i==0)R.id.chart_label_1 else R.id.chart_label_2,PendingIntent.getActivity(context,id,picker,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                         for((viewId,direction) in listOf(minus[i] to 1,plus[i] to -1)) {
                             val zoom=Intent(context,PulseWidget::class.java).setAction(ZOOM)
                                 .setData(Uri.parse("bitcoinpulse://widget/$id/zoom/${period.id}/$direction"))
@@ -144,21 +143,18 @@ object WidgetUpdates {
                             views.setOnClickPendingIntent(viewId,PendingIntent.getBroadcast(context,id,zoom,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                         }
                     }
-                    listOf(R.id.period_4h to "4h",R.id.period_1d to "1d",R.id.period_1w to "1w",R.id.period_combi to "combi").forEach { (viewId,period) ->
-                        views.setTextColor(viewId,Color.parseColor(if(period==mode)"#17120D" else "#BAC7DB"))
-                        views.setInt(viewId,"setBackgroundResource",if(period==mode)R.drawable.widget_period_selected else R.drawable.widget_inner)
-                        views.setContentDescription(viewId,"$period${if(period==mode) ", geselecteerd" else ""}")
-                        val action=Intent(context,PulseWidget::class.java).setAction(PERIOD)
-                            .setData(Uri.parse("bitcoinpulse://widget/$id/$period"))
-                            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("period",period)
+                    for((viewId,count) in listOf(R.id.widget_one_chart to 1,R.id.widget_two_charts to 2)) {
+                        val action=Intent(context,PulseWidget::class.java).setAction(COUNT)
+                            .setData(Uri.parse("bitcoinpulse://widget/$id/count/$count"))
+                            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("count",count)
                         views.setOnClickPendingIntent(viewId,PendingIntent.getBroadcast(context,id,action,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                     }
                 }
                 val required=mutableListOf(snapshot.prices.fetchedAt,snapshot.fees.fetchedAt)
-                if(!small) { required+=snapshot.block.fetchedAt; required+=snapshot.chartPeriods(mode).map { snapshot.history(it.id).fetchedAt } }
+                if(!small) { required+=snapshot.block.fetchedAt; required+=selection.periods.map { snapshot.history(it.id).fetchedAt } }
                 val oldest = required.minOrNull() ?: 0
                 val errors = if (small) snapshot.prices.error != null || snapshot.fees.error != null
-                    else snapshot.prices.error!=null || snapshot.fees.error!=null || snapshot.block.error!=null || snapshot.chartPeriods(mode).any { snapshot.history(it.id).error!=null }
+                    else snapshot.prices.error!=null || snapshot.fees.error!=null || snapshot.block.error!=null || selection.periods.any { snapshot.history(it.id).error!=null }
                 val status = when {
                     small && !compact -> "Vergroot tot 390 dp voor grafiek"
                     busy || snapshot.refreshing -> "Refreshing…"
@@ -178,17 +174,22 @@ object WidgetUpdates {
         }
     }
 
-    internal fun charts(views: RemoteViews, s: Snapshot, mode: String, width: Int, height: Int, now: Long, ichimoku: Boolean = s.ichimoku, zooms: Map<String,Int> = emptyMap()) {
-        val periods=s.chartPeriods(mode)
-        val needed=when(periods.size) { 3 -> 600; 2 -> 500; else -> 390 }
+    internal fun charts(views: RemoteViews, s: Snapshot, selection: WidgetCharts, width: Int, height: Int, now: Long, ichimoku: Boolean = s.ichimoku, zooms: Map<String,Int> = emptyMap()) {
+        val periods=selection.periods
+        val needed=if(periods.size==2)500 else 390
+        for((id,count) in listOf(R.id.widget_one_chart to 1,R.id.widget_two_charts to 2)) {
+            views.setTextColor(id,Color.parseColor(if(count==selection.count)"#17120D" else "#BAC7DB"))
+            views.setInt(id,"setBackgroundResource",if(count==selection.count)R.drawable.widget_period_selected else R.drawable.widget_inner)
+            views.setContentDescription(id,"$count grafiek(en)${if(count==selection.count)", geselecteerd" else ""}")
+        }
         val fits=height>=needed
-        val labels=listOf(R.id.chart_label_1,R.id.chart_label_2,R.id.chart_label_3)
-        val headers=listOf(R.id.chart_header_1,R.id.chart_header_2,R.id.chart_header_3)
-        val counts=listOf(R.id.chart_count_1,R.id.chart_count_2,R.id.chart_count_3)
-        val images=listOf(R.id.chart_image_1,R.id.chart_image_2,R.id.chart_image_3)
+        val labels=listOf(R.id.chart_label_1,R.id.chart_label_2)
+        val headers=listOf(R.id.chart_header_1,R.id.chart_header_2)
+        val counts=listOf(R.id.chart_count_1,R.id.chart_count_2)
+        val images=listOf(R.id.chart_image_1,R.id.chart_image_2)
         views.setViewVisibility(R.id.chart_hint,if(fits)View.GONE else View.VISIBLE)
         views.setTextViewText(R.id.chart_hint,"Vergroot tot $needed dp hoog voor ${periods.size} grafiek(en), of open de app. Kies één interval voor minder ruimte.")
-        for(i in 0..2) {
+        for(i in 0..1) {
             val period=periods.getOrNull(i)
             val show=fits && period!=null
             views.setViewVisibility(labels[i],if(show)View.VISIBLE else View.GONE)
@@ -207,7 +208,9 @@ object WidgetUpdates {
                 }
                 val status=when { source.value==null -> "geen data"; source.error!=null -> "cache ${Format.time(source.fetchedAt)}"; source.isStale(now) -> "oud ${Format.time(source.fetchedAt)}"; else -> Format.time(source.fetchedAt) }
                 val cloudHint=if(ichimoku && source.value.orEmpty().size<Ichimoku.required(visible)) " · cloud: vernieuw" else ""
-                views.setTextViewText(labels[i],"${period.label} · $status · UTC · in opbouw ●$cloudHint")
+                views.setTextViewText(labels[i],"${period.label} ▾$cloudHint")
+                views.setTextColor(labels[i],Color.parseColor(if(source.error!=null || source.isStale(now))"#FFD166" else "#F7FAFF"))
+                views.setContentDescription(labels[i],"Kies interval voor grafiek ${i+1}; ${period.label} · $status · UTC · in opbouw$cloudHint")
                 val w=(width.coerceIn(280,500)-24)*2
                 val h=((height.coerceAtMost(800)-286)/periods.size-40).coerceIn(40,300)*2
                 views.setImageViewBitmap(images[i],CandleBitmap.render(source.value.orEmpty(),s.currency,w,h,density=2f,ichimoku=ichimoku,visibleCount=zoom))

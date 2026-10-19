@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.buildapptest.bitcoinpulse.data.*
 import com.buildapptest.bitcoinpulse.widget.WidgetUpdates
+import com.buildapptest.bitcoinpulse.widget.WidgetCharts
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,15 +31,11 @@ class WidgetChartTest {
     }
     private val s=Snapshot(candles=PERIODS.associate { candleKey("EUR",it.id) to Source(candles,now) })
 
-    private fun layout(mode:String,height:Int,snapshot:Snapshot=s,zooms:Map<String,Int> = emptyMap()):View {
+    private fun layout(mode:String,height:Int,snapshot:Snapshot=s,zooms:Map<String,Int> = emptyMap(), selection:WidgetCharts?=null):View {
         val context=RuntimeEnvironment.getApplication()
         val views=RemoteViews(context.packageName,R.layout.widget_expanded)
-        WidgetUpdates.charts(views,snapshot,mode,320,height,now,zooms=zooms)
+        WidgetUpdates.charts(views,snapshot,selection ?: if(mode=="combi")WidgetCharts() else WidgetCharts(mode,PERIODS.first { it.id!=mode }.id,1),320,height,now,zooms=zooms)
         views.setTextViewText(R.id.widget_ichimoku,"Cloud\n${if(snapshot.ichimoku)"Aan" else "Uit"}")
-        listOf(R.id.period_4h to "4h",R.id.period_1d to "1d",R.id.period_1w to "1w",R.id.period_combi to "combi").forEach { (id,period) ->
-            views.setInt(id,"setBackgroundResource",if(period==mode)R.drawable.widget_period_selected else R.drawable.widget_inner)
-            views.setTextColor(id,android.graphics.Color.parseColor(if(period==mode)"#17120D" else "#BAC7DB"))
-        }
         views.setTextViewText(R.id.widget_price,"€ 96.420")
         views.setTextViewText(R.id.widget_change,"+2,40% vandaag UTC")
         views.setTextViewText(R.id.widget_block,"Blok 971.613")
@@ -57,7 +54,7 @@ class WidgetChartTest {
         val bitmap=Bitmap.createBitmap(320,height,Bitmap.Config.ARGB_8888)
         parent.draw(Canvas(bitmap))
         val output=File("build/reports/widget-previews").apply { mkdirs() }
-        File(output,"${if(zooms.isNotEmpty())"zoom-" else ""}$mode-$height.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
+        File(output,"${selection?.let { "${it.first}-${it.second}-" } ?: ""}${if(zooms.isNotEmpty())"zoom-" else ""}$mode-$height.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
         return root
     }
     @Test fun singleChartFitsMinimumAndContainsActualBitmap() {
@@ -66,10 +63,10 @@ class WidgetChartTest {
         assertEquals(View.GONE,root.findViewById<View>(R.id.chart_hint).visibility)
         assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("4 uur"))
     }
-    @Test fun comboUsesThreeIndependentChartsWhenTallEnough() {
-        val root=layout("combi",600)
-        assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_3).visibility)
-        assertTrue(root.findViewById<TextView>(R.id.chart_label_3).text.contains("1 week"))
+    @Test fun comboUsesOnlyTwoIndependentCharts() {
+        val root=layout("combi",500)
+        assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_2).visibility)
+        assertTrue(root.findViewById<TextView>(R.id.chart_label_2).text.contains("1 dag"))
     }
     @Test fun comboAtSmallSizeRequestsMoreSpaceInsteadOfClipping() {
         val root=layout("combi",360)
@@ -79,18 +76,18 @@ class WidgetChartTest {
     @Test fun failedCandleSourceKeepsItsTimestampAndShowsCache() {
         val cached=s.copy(candles=s.candles.mapValues { it.value.copy(error="Offline") })
         val root=layout("1d",390,cached)
-        assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("cache"))
+        assertTrue(root.findViewById<TextView>(R.id.chart_label_1).contentDescription.contains("cache"))
         assertNotNull(root.findViewById<ImageView>(R.id.chart_image_1).drawable)
     }
     @Test fun emptyHistoryStillInflatesWithAnHonestMissingDataState() {
         val root=layout("1w",390,Snapshot())
-        assertTrue(root.findViewById<TextView>(R.id.chart_label_1).text.contains("geen data"))
+        assertTrue(root.findViewById<TextView>(R.id.chart_label_1).contentDescription.contains("geen data"))
     }
     @Test fun cloudIsIncludedInEveryCombinationChart() {
         val history=(0 until 240).map { i -> Candle(1791576000+i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
         val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
-        val root=layout("combi",600,state)
-        for(id in listOf(R.id.chart_image_1,R.id.chart_image_2,R.id.chart_image_3)) {
+        val root=layout("combi",500,state)
+        for(id in listOf(R.id.chart_image_1,R.id.chart_image_2)) {
             val image=(root.findViewById<ImageView>(id).drawable as android.graphics.drawable.BitmapDrawable).bitmap
             assertTrue("Each Combi chart needs its own green cloud area",cloudFillPixels(image,true)>100)
         }
@@ -98,8 +95,8 @@ class WidgetChartTest {
     @Test fun compactZoomHeadersKeepIndependentCountsAndDisableLimits() {
         val history=(0 until 240).map { i -> Candle(i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
         val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
-        val root=layout("combi",600,state,mapOf("4h" to 24,"1d" to 90,"1w" to 60))
-        for((id,count) in listOf(R.id.chart_count_1 to "24",R.id.chart_count_2 to "90",R.id.chart_count_3 to "60"))
+        val root=layout("combi",500,state,mapOf("4h" to 24,"1d" to 90,"1w" to 60))
+        for((id,count) in listOf(R.id.chart_count_1 to "24",R.id.chart_count_2 to "90"))
             assertEquals(count,root.findViewById<TextView>(id).text.toString())
         assertFalse(root.findViewById<View>(R.id.chart_plus_1).isEnabled)
         assertFalse(root.findViewById<View>(R.id.chart_minus_2).isEnabled)
@@ -108,11 +105,22 @@ class WidgetChartTest {
         assertEquals("No separate control row",40,header.height)
         assertEquals(40,button.height)
         assertTrue(button.right<=root.width)
-        for(id in listOf(R.id.chart_minus_1,R.id.chart_plus_1,R.id.chart_minus_2,R.id.chart_plus_2,R.id.chart_minus_3,R.id.chart_plus_3)) {
+        for(id in listOf(R.id.chart_minus_1,R.id.chart_plus_1,R.id.chart_minus_2,R.id.chart_plus_2)) {
             val view=root.findViewById<View>(id)
             val bounds=android.graphics.Rect();view.getDrawingRect(bounds)
             (root as android.view.ViewGroup).offsetDescendantRectToMyCoords(view,bounds)
             assertTrue("Zoom control clipped: $id at $bounds",bounds.left>=12 && bounds.right<=root.width-12)
         }
+    }
+    @Test fun allIntervalPairsUseTwoPlotsAndSingleModeHidesSecond() {
+        for(first in PERIODS) for(second in PERIODS.filter { it!=first }) {
+            val root=layout("combi",500,selection=WidgetCharts(first.id,second.id))
+            assertEquals("${first.label} ▾",root.findViewById<TextView>(R.id.chart_label_1).text.toString())
+            assertEquals("${second.label} ▾",root.findViewById<TextView>(R.id.chart_label_2).text.toString())
+            assertEquals(View.VISIBLE,root.findViewById<View>(R.id.chart_image_2).visibility)
+        }
+        val single=layout("1w",390,selection=WidgetCharts("1w","1d",1))
+        assertEquals(View.GONE,single.findViewById<View>(R.id.chart_image_2).visibility)
+        assertEquals(View.GONE,single.findViewById<View>(R.id.chart_header_2).visibility)
     }
 }

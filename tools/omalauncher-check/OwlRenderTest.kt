@@ -44,6 +44,23 @@ import java.time.Duration
 @Config(sdk=[35], application=Application::class, qualifiers="w430dp-h900dp-xhdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class OwlRenderTest {
+    @Test fun missingAndFailedFeedsKeepCurrencyAndPeriodCachesSeparate() {
+        val source=RuntimeEnvironment.getApplication().assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() }
+        val program=Compiler.compile(source);val inst=WidgetInstance(program)
+        inst.set("now",Num(1000.0));inst.set("ichimoku",TRUE)
+        val response=Json.parseOrText(File("../../.tools/omalauncher-reference/data/eur4h.json").readText())
+        inst.set("eur4h",Obj(mapOf("ok" to TRUE,"out" to response)))
+        program.triggers.forEach { it.action.run(inst.root,emptyList()) }
+        fun sizes()=(inst.get("charts") as Lst).items.map { (it as Lst).items.size }
+        assertEquals(listOf(36,0),sizes())
+        val cached=inst.get("cacheeur4h");val stamp=inst.get("timeeur4h")
+        inst.set("now",Num(2000.0));inst.set("eur4h",Obj(mapOf("ok" to FALSE)))
+        program.triggers.forEach { it.action.run(inst.root,emptyList()) }
+        assertEquals(cached,inst.get("cacheeur4h"));assertEquals(stamp,inst.get("timeeur4h"))
+        inst.set("interval2",Num(10080.0));assertEquals(listOf(36,0),sizes())
+        inst.set("currency",Str("USD"));assertEquals(listOf(0,0),sizes())
+        assertTrue(inst.problems.isEmpty())
+    }
     @Test fun productionOwlRendersAtPhoneWidthsUsingUpstreamRenderer() {
         val context = RuntimeEnvironment.getApplication()
         val source = context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() }
@@ -66,16 +83,18 @@ class OwlRenderTest {
             control.setup().visible()
             activity.setContent {
                 Box(Modifier.fillMaxSize().background(Color.Magenta)) {
-                    WidgetContent(inst, Modifier.width(width.dp).height(620.dp), cells=6 to 10)
+                    WidgetContent(inst, Modifier.width(width.dp).height(840.dp), cells=6 to 13)
                 }
             }
             val decor = activity.window.decorView
             val density = context.resources.displayMetrics.density
+            val frame=Bitmap.createBitmap((width*density).toInt(),(870*density).toInt(),Bitmap.Config.ARGB_8888)
             fun settle() {
                 shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(250))
-                decor.measure(View.MeasureSpec.makeMeasureSpec((width*density).toInt(),View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec((650*density).toInt(),View.MeasureSpec.EXACTLY))
-                decor.layout(0,0,(width*density).toInt(),(650*density).toInt())
+                decor.measure(View.MeasureSpec.makeMeasureSpec((width*density).toInt(),View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec((870*density).toInt(),View.MeasureSpec.EXACTLY))
+                decor.layout(0,0,(width*density).toInt(),(870*density).toInt())
                 shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+                decor.draw(Canvas(frame))
             }
             settle(); settle()
             fun owner(v: View): SemanticsOwner? {
@@ -96,13 +115,13 @@ class OwlRenderTest {
                     node.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts)
                     for (layout in layouts) assertFalse("$width dp: clipped text '$text'",layout.hasVisualOverflow)
                     val b=node.boundsInRoot
-                    assertTrue("$width dp: text outside widget '$text': $b",b.left>=0 && b.right<=(width*density)+1 && b.bottom<=620*density+1)
+                    assertTrue("$width dp: text outside widget '$text': $b",b.left>=0 && b.right<=(width*density)+1 && b.bottom<=840*density+1)
                 }
                 assertTrue("Runtime errors: ${inst.problems}", inst.problems.isEmpty())
             }
             verifyText()
             fun capture(suffix: String) {
-                val bitmap=Bitmap.createBitmap((width*density).toInt(),(620*density).toInt(),Bitmap.Config.ARGB_8888)
+                val bitmap=Bitmap.createBitmap((width*density).toInt(),(840*density).toInt(),Bitmap.Config.ARGB_8888)
                 decor.draw(Canvas(bitmap))
                 val output=File("build/reports/omalauncher-native").apply { mkdirs() }
                 File(output,"omalauncher-$width-$suffix.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
@@ -125,14 +144,14 @@ class OwlRenderTest {
                 for(action in listOf(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP)) {
                     val e=MotionEvent.obtain(time,SystemClock.uptimeMillis(),action,b.center.x,b.center.y,0);decor.dispatchTouchEvent(e);e.recycle()
                 }
-                settle()
+                settle();settle()
             }
             tap("Cloud Uit");assertEquals(TRUE,inst.get("ichimoku"));settle();verifyText();capture("cloud")
-            fun verifyCloud(currency: String, sourceName: String) {
+            fun verifyCloud(currency: String, sourceName: String, slot: Int=0) {
                 val rows=com.buildapptest.bitcoinpulse.data.CandleParser.parse(File("../../.tools/omalauncher-reference/data/$sourceName.json").readText(),currency)
-                val count=inst.get("zoomCount").num()!!.toInt()
+                val count=(inst.get("zoomCounts") as Lst).items[slot].num()!!.toInt()
                 val expected=com.buildapptest.bitcoinpulse.data.Ichimoku.calculate(rows).filter { it.index>=rows.size-count }
-                val actual=(inst.get("cloudPoints") as Lst).items
+                val actual=((inst.get("clouds") as Lst).items[slot] as Lst).items
                 assertEquals(expected.size,actual.size)
                 expected.zip(actual).forEach { (p,value) ->
                     val fields=(value as Obj).fields
@@ -156,17 +175,31 @@ class OwlRenderTest {
             }
             inst.set("currency",Str("EUR"));inst.set("interval",Num(240.0));program.triggers.last().action.run(inst.root,emptyList());settle()
             tap("Cloud Aan");assertEquals(FALSE,inst.get("ichimoku"));settle()
-            assertTrue((inst.get("cloudPoints") as Lst).items.isEmpty())
+            assertTrue((inst.get("clouds") as Lst).items.all { (it as Lst).items.isEmpty() })
             tap("Cloud Uit")
             tap("EUR ▾"); assertEquals(Str("USD"),inst.get("currency"))
             program.triggers.last().action.run(inst.root, emptyList());settle();verifyText();capture("usd")
-            for ((label, interval) in listOf("1 dag" to 1440.0, "1 week" to 10080.0)) {
-                tap(label);assertEquals(Num(interval),inst.get("interval"))
-                program.triggers.last().action.run(inst.root, emptyList());settle();verifyText()
-                verifyCloud("USD",if(interval==1440.0)"usdDay" else "usdWeek")
+            tap("4 uur ▾");verifyText();assertEquals(Num(0.0),inst.get("picker"));capture("picker")
+            tap("1 week");assertEquals(Num(10080.0),inst.get("interval"));verifyCloud("USD","usdWeek")
+            tap("1 week ▾");assertEquals(Num(0.0),inst.get("picker"));tap("4 uur");assertEquals("First slot returns to four hours",Num(240.0),inst.get("interval"))
+            tap("1 dag ▾");assertEquals("Second picker opens",Num(1.0),inst.get("picker"));capture("second-picker");tap("1 week")
+            assertEquals(Num(10080.0),inst.get("interval2"));verifyCloud("USD","usdWeek",1)
+            for((first,second) in listOf(240.0 to 1440.0,240.0 to 10080.0,1440.0 to 10080.0)) {
+                inst.set("interval",Num(first));inst.set("interval2",Num(second));settle();verifyText()
+                val names=mapOf(240.0 to "usd4h",1440.0 to "usdDay",10080.0 to "usdWeek")
+                verifyCloud("USD",names.getValue(first));verifyCloud("USD",names.getValue(second),1)
             }
+            capture("two-charts")
+            tap("1 grafiek");assertEquals(Num(1.0),inst.get("graphCount"));settle();verifyText()
+            assertEquals(1,textNodes().count { nodeText(it).endsWith(" ▾") && !nodeText(it).startsWith("USD") })
+            tap("2 grafieken");assertEquals(Num(2.0),inst.get("graphCount"));settle();verifyText()
+            val saved=(inst.get("histories") as Lst).items[1]
+            inst.set("usdWeek",Obj(mapOf("ok" to FALSE)))
+            program.triggers.forEach { it.action.run(inst.root,emptyList()) };settle()
+            assertEquals("Failed weekly feed keeps only its own cache",saved,(inst.get("histories") as Lst).items[1])
+            assertTrue(inst.problems.isEmpty())
             tap("↻");assertTrue(inst.actions.contains("refresh"))
-            println("PASS upstream renderer at $width × 620 dp: text fits, footer visible, cloud toggle and bounds, all six cloud calculations match Kotlin, currency, periods and refresh")
+            println("PASS upstream renderer at $width × 840 dp: text fits, footer visible, one/two charts, per-slot period choices, cloud/zoom parity, cache isolation, currency and refresh")
             control.pause().stop().destroy()
         }
     }

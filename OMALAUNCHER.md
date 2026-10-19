@@ -4,21 +4,21 @@ Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalau
 
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.4.0 (versionCode 11)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.5.0 (versionCode 12)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets** → **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.
-5. Houd de widget ingedrukt om hem te verplaatsen of te vergroten. Begin met de volle breedte van 6 kolommen en 10 rijen. De geteste inhoudsmaten zijn 320–390 dp breed en 620 dp hoog. De launcher bepaalt de celmaten; vergroot de widget als de inhoud niet geheel past. Scrollen blijft beschikbaar bij weinig ruimte of grotere systeemtekst.
+5. Houd de widget ingedrukt om hem te verplaatsen of te vergroten. Begin met de volle breedte van 6 kolommen en 13 rijen. De geteste inhoudsmaten zijn 320–390 dp breed en 840 dp hoog. De launcher bepaalt de celmaten; vergroot de widget als de inhoud niet geheel past. Scrollen blijft beschikbaar bij weinig ruimte of grotere systeemtekst.
 
-De knop EUR/USD wisselt de valuta. Kies 4 uur, 1 dag of 1 week voor de candles. De laatste candle is nog niet afgesloten. De datums onder de grafiek gebruiken de tijdzone van je telefoon; de koersvergelijking blijft sinds middernacht UTC. Tik buiten de knoppen op de widget om Bitcoin Pulse te openen. Met ↻ vraag je de bronnen opnieuw op.
+De knop EUR/USD wisselt de valuta. Kies bovenaan één of twee grafieken. Tik op elke titel met ▾ om 4 uur, 1 dag of 1 week te kiezen. Dubbelen worden voorkomen. De laatste candle is nog niet afgesloten. De datums onder de grafiek gebruiken de tijdzone van je telefoon; de koersvergelijking blijft sinds middernacht UTC. Tik buiten de knoppen op de widget om Bitcoin Pulse te openen. Met ↻ vraag je de bronnen opnieuw op.
 
-Met de compacte **−/+** knoppen naast de grafiektitel kies je 24, 36, 60 of 90 candles; het getal ertussen is het zichtbare aantal. Elke periode onthoudt zijn eigen zoomstand. Dit is OWL-widget **3.1**.
+Met de compacte **−/+** knoppen naast de grafiektitel kies je 24, 36, 60 of 90 candles; het getal ertussen is het zichtbare aantal. Elke periode onthoudt zijn eigen zoomstand. Dit is OWL-widget **4.0**.
 
 De widget toont koers, wijziging sinds middernacht UTC, standaard 36 candles, blokhoogte, blokleeftijd, transactieaantal, minerpool, mediane gerealiseerde blokfee, fee-advies en mempoolomvang. Met **Cloud Aan/Uit** schakel je de Ichimoku-cloud (20/60/120/30) in of uit; standaard staat hij uit. Er worden 240 historische candles voor de berekening bewaard. Zie `ICHIMOKU.md`. Blokleeftijd rekent door vanuit de laatst bekende bloktijd; dat bewijst niet dat er geen nieuwer blok is.
 
 ## Verversen en privacy
 
-Koers- en netwerkbronnen vragen ongeveer elke minuut gegevens op; candles elke vijf minuten. Alleen de gekozen candlebron is actief. Omalauncher bepaalt wanneer de bronnen op zichtbare en naburige pagina's draaien. Er is geen achtergrondverversgarantie.
+Koers- en netwerkbronnen vragen ongeveer elke minuut gegevens op; candles elke vijf minuten. Alleen de één of twee gekozen candlebronnen voor de gekozen valuta zijn actief. Cache en tijdstempel worden per valuta en interval bewaard. Omalauncher bepaalt wanneer de bronnen op zichtbare en naburige pagina's draaien. Er is geen achtergrondverversgarantie.
 
 Laatst ontvangen waarden en instellingen worden door Omalauncher lokaal bewaard. Bij mislukte API-antwoorden blijven de eerdere waarden staan. De tijdregels tonen **waargenomen wijzigingen**: een identiek API-antwoord verandert de tijd niet. Een waarschuwing voor oudere gegevens is daarom bewust voorzichtig. Controleer bij twijfel met Vernieuwen of in Bitcoin Pulse.
 

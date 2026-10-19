@@ -15,6 +15,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".widget.WidgetChartPickerActivity" android:exported="false" android:excludeFromRecents="true" android:theme="@style/Theme.WidgetPicker" />
         <receiver android:name=".widget.PulseWidget" android:exported="false" android:label="@string/widget_expanded">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_expanded" />

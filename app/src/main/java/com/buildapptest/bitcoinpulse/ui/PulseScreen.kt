@@ -224,7 +224,7 @@ private fun <T> SourceStatus(label: String, source: Source<T>, now: Long) {
 private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRefresh: () -> Unit, onPin: (Boolean) -> Unit) {
     val context = LocalContext.current
     Text("Your home screen, at a glance", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-    Text("Widgets use your selected ${s.currency} currency. Change it on the Dashboard.", color = Muted, fontSize = 14.sp)
+    Text("Tik in de widget op EUR/USD om de valuta te wisselen. Grafieken, intervallen, cloud en zoom bedien je ook rechtstreeks in de widget.", color = Muted, fontSize = 14.sp)
     var widgetCount by remember { mutableIntStateOf(com.buildapptest.bitcoinpulse.widget.WidgetCharts.defaultCount(context)) }
     Text("Aantal grafieken in de widget",fontSize=16.sp)
     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {

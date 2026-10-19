@@ -3,17 +3,17 @@
     <TextView android:id="@+id/widget_price" style="@style/WidgetNumber" android:layout_width="0dp" android:layout_weight="1" android:textSize="26sp" android:textStyle="bold" android:text="—"/>
     <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:layout_width="60dp" android:layout_height="32dp" android:gravity="center" android:background="@drawable/widget_currency_frame" android:text="EUR ▾"/>
   </LinearLayout>
-  <LinearLayout android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical">
+  <LinearLayout android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="2dp">
     <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
       <TextView android:id="@+id/widget_change" style="@style/WidgetLabel" android:textSize="10sp"/>
       <TextView style="@style/WidgetLabel" android:text="Ichimoku 20 / 60 / 120 / 30" android:textSize="9sp"/>
     </LinearLayout>
     <TextView android:id="@+id/widget_ichimoku" style="@style/WidgetLabel" android:layout_width="76dp" android:layout_height="32dp" android:gravity="center" android:background="@drawable/widget_cloud_off" android:text="Cloud Uit"/>
   </LinearLayout>
-  <LinearLayout android:id="@+id/chart_header_1" android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+  <LinearLayout android:id="@+id/chart_header_1" android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="2dp">
     <TextView android:id="@+id/chart_label_1" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:background="@drawable/widget_choice_frame" android:layout_marginEnd="3dp" android:clickable="true" android:focusable="true"/>
     <TextView android:id="@+id/chart_minus_1" style="@style/ChartZoomButton" android:layout_width="36dp" android:layout_height="32dp" android:text="−"/>
-    <TextView android:id="@+id/chart_count_1" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp"/>
+    <TextView android:id="@+id/chart_count_1" style="@style/WidgetLabel" android:layout_width="26dp" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:gravity="center" android:textSize="11sp"/>
     <TextView android:id="@+id/chart_plus_1" style="@style/ChartZoomButton" android:layout_width="36dp" android:layout_height="32dp" android:text="+"/>
   </LinearLayout>
     <LinearLayout android:id="@+id/chart_picker_1" android:layout_width="match_parent" android:layout_height="32dp" android:layout_marginTop="2dp" android:orientation="horizontal" android:visibility="gone">
@@ -21,12 +21,12 @@
       <TextView android:id="@+id/chart_pick_1_1d" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 dag" android:clickable="true" android:focusable="true"/>
       <TextView android:id="@+id/chart_pick_1_1w" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 week" android:clickable="true" android:focusable="true"/>
     </LinearLayout>
-  <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:contentDescription="Candlegrafiek"/>
-  <TextView android:id="@+id/chart_status_1" style="@style/WidgetLabel" android:textSize="10sp"/>
-  <LinearLayout android:id="@+id/chart_header_2" android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+  <ImageView android:id="@+id/chart_image_1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="2dp" android:scaleType="fitXY" android:contentDescription="Candlegrafiek"/>
+  <TextView android:id="@+id/chart_status_1" style="@style/WidgetLabel" android:textSize="10sp" android:layout_marginTop="2dp"/>
+  <LinearLayout android:id="@+id/chart_header_2" android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="2dp">
     <TextView android:id="@+id/chart_label_2" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:background="@drawable/widget_choice_frame" android:layout_marginEnd="3dp" android:clickable="true" android:focusable="true"/>
     <TextView android:id="@+id/chart_minus_2" style="@style/ChartZoomButton" android:layout_width="36dp" android:layout_height="32dp" android:text="−"/>
-    <TextView android:id="@+id/chart_count_2" style="@style/WidgetLabel" android:layout_width="26dp" android:gravity="center" android:textSize="11sp"/>
+    <TextView android:id="@+id/chart_count_2" style="@style/WidgetLabel" android:layout_width="26dp" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:gravity="center" android:textSize="11sp"/>
     <TextView android:id="@+id/chart_plus_2" style="@style/ChartZoomButton" android:layout_width="36dp" android:layout_height="32dp" android:text="+"/>
   </LinearLayout>
     <LinearLayout android:id="@+id/chart_picker_2" android:layout_width="match_parent" android:layout_height="32dp" android:layout_marginTop="2dp" android:orientation="horizontal" android:visibility="gone">
@@ -34,10 +34,10 @@
       <TextView android:id="@+id/chart_pick_2_1d" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 dag" android:clickable="true" android:focusable="true"/>
       <TextView android:id="@+id/chart_pick_2_1w" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:layout_height="32dp" android:gravity="center" android:layout_marginEnd="3dp" android:background="@drawable/widget_choice_frame" android:text="1 week" android:clickable="true" android:focusable="true"/>
     </LinearLayout>
-  <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitXY" android:contentDescription="Candlegrafiek"/>
+  <ImageView android:id="@+id/chart_image_2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="2dp" android:scaleType="fitXY" android:contentDescription="Candlegrafiek"/>
   <TextView android:id="@+id/chart_status_2" style="@style/WidgetLabel" android:visibility="gone"/>
   <TextView android:id="@+id/chart_hint" style="@style/WidgetLabel" android:visibility="gone"/>
-  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="6dp" android:background="@drawable/widget_block_frame" android:layout_marginTop="4dp">
+  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="6dp" android:background="@drawable/widget_block_frame" android:layout_marginTop="2dp">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
       <TextView android:id="@+id/widget_block" style="@style/WidgetNumber" android:layout_width="0dp" android:layout_weight="1" android:textSize="13sp" android:textColor="#49CFFF"/>
       <TextView android:id="@+id/widget_age" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:gravity="end" android:textSize="11sp"/>
@@ -54,13 +54,13 @@
     <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView android:id="@+id/widget_half" style="@style/WidgetNumber" android:textSize="13sp"/><TextView style="@style/WidgetLabel" android:textSize="10sp" android:text="~30 min"/></LinearLayout>
     <LinearLayout style="@style/FeeColumn" android:gravity="start"><TextView android:id="@+id/widget_hour" style="@style/WidgetNumber" android:textSize="13sp"/><TextView style="@style/WidgetLabel" android:textSize="10sp" android:text="~1 uur"/></LinearLayout>
   </LinearLayout>
-  <TextView android:id="@+id/widget_mempool" style="@style/WidgetLabel" android:textSize="11sp" android:layout_marginTop="4dp"/>
-  <LinearLayout android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+  <TextView android:id="@+id/widget_mempool" style="@style/WidgetLabel" android:textSize="11sp" android:layout_marginTop="2dp"/>
+  <LinearLayout android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="2dp">
     <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
       <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:textSize="10sp"/>
       <TextView style="@style/WidgetLabel" android:text="Bitcoin Pulse · mempool.space · Kraken" android:textSize="9sp"/>
     </LinearLayout>
-    <TextView android:id="@+id/widget_graph_count" style="@style/WidgetLabel" android:layout_width="40dp" android:layout_height="32dp" android:layout_marginEnd="4dp" android:gravity="center" android:text="2 ↔" android:textColor="#FF8A1F" android:background="@drawable/widget_choice_frame" android:clickable="true" android:focusable="true" />
+    <TextView android:id="@+id/widget_graph_count" style="@style/WidgetLabel" android:layout_width="40dp" android:layout_height="32dp" android:layout_marginStart="4dp" android:layout_marginEnd="4dp" android:gravity="center" android:text="2 ↔" android:textColor="#FF8A1F" android:background="@drawable/widget_choice_frame" android:clickable="true" android:focusable="true" />
         <TextView android:id="@+id/widget_refresh" style="@style/WidgetLabel" android:layout_width="40dp" android:layout_height="32dp" android:gravity="center" android:text="↻" android:textSize="22sp" android:textColor="#FF8A1F" android:background="@drawable/widget_refresh_frame" android:contentDescription="@string/refresh"/>
   </LinearLayout>
 </LinearLayout>

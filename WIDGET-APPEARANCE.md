@@ -1,9 +1,11 @@
-# Widgetvormgeving — Bitcoin Pulse 1.5.4
+# Widgetvormgeving — Bitcoin Pulse 1.6.0
 
 Beide grote widgets gebruiken dezelfde kleuren, koersopbouw, compacte interval-/zoomknoppen, Ichimoku-cloud, blokkaart, feevelden en verversknop. De keuze voor één of twee grafieken staat in de app én op de compacte knop naast verversen in de widget. Het tabblad Widgets toont het gekozen aantal in zijn voorbeeld; dit voorbeeld gebruikt de standaardintervallen 4 uur en 1 dag.
 
 Bij één grafiek gebruiken beide widgets een flexibele grafiekhoogte, zonder omschakeling naar een vaste grafiek op grote formaten. Mediane blokfee, mempool, fees, bronlabels, cloudparameters en candle-status blijven op alle formaten zichtbaar. De onderstaande compacte vereenvoudigingen gelden uitsluitend voor twee grafieken. De titel en uitgebreide netwerkregels maken ruimte voor koers, candle/cloudgrafieken, blokhoogte, leeftijd, transacties en miner. Standaardwidgets kunnen vanaf 320 dp hoog worden verkleind. Onder 400 dp verdwijnt de fee-rij. Op grotere formaten worden mediane blokfee, mempool en bronlabels weer zichtbaar. 4×5 is de startmaat; 4×6 en grotere maten blijven mogelijk. Celmaten verschillen per launcher.
 
-Beide widgets tonen een inline intervalkeuzerij. De standaardwidget verwerkt de keuze via een broadcast; er opent geen activiteit en de app blijft gesloten. Een standaardwidget neemt de appvaluta over, terwijl Omalauncher EUR/USD zelfstandig bewaart. Omalauncher rekent de blokleeftijd door; standaardwidgets tonen de leeftijd bij de laatste render. Beide behouden bron- en foutstatus.
+Beide widgets tonen een inline intervalkeuzerij. De standaardwidget verwerkt de keuze via een broadcast; er opent geen activiteit en de app blijft gesloten. Beide widgets wisselen EUR/USD rechtstreeks en bewaren die keuze per widget. Een nieuwe widget begint met de appvaluta; een losse OWL-import begint met EUR. Omalauncher rekent de blokleeftijd door; standaardwidgets tonen de leeftijd bij de laatste render. Beide behouden bron- en foutstatus.
 
 De tests vergelijken de volledige weergave met hetzelfde synthetische gegevenspakket. Compacte standaardwidgets worden daarnaast op meerdere breedtes en hoogtes getekend; Omalauncher wordt met de officiële parser/renderer getest. Een fysieke telefooncontrole blijft nodig voor launcherranden, werkelijke celmaten en achtergrondplanning.
+
+De vergelijking gebruikt dezelfde testgegevens in de echte renderers. Acht ankerpunten in de uitgebreide weergave en acht formaatvarianten met één/twee grafieken worden gecontroleerd met een tolerantie van 2 dp. Beide widgets houden bij 120–270 candles het Cloud-aslabel weg om overlap met de laatste datum te voorkomen; cloud en vooruitgeschoven vlak blijven zichtbaar.

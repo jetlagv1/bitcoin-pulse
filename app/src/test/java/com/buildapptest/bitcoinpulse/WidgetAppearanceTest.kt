@@ -91,6 +91,13 @@ class WidgetAppearanceTest {
                 val bitmap=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);root.draw(Canvas(bitmap))
                 val folder=File("build/reports/widget-resize").apply { mkdirs() }
                 File(folder,"android-$width-$height-$count.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
+                val anchors=org.json.JSONObject()
+                for((name,id) in listOf("price" to R.id.widget_price,"currency" to R.id.widget_currency,"cloud" to R.id.widget_ichimoku,"first" to R.id.chart_label_1,"second" to R.id.chart_label_2,"block" to R.id.widget_block,"fee" to R.id.widget_next,"count" to R.id.widget_graph_count,"refresh" to R.id.widget_refresh)) {
+                    if(name=="second" && count==1) continue
+                    val v=root.findViewById<View>(id);val r=Rect();v.getDrawingRect(r);root.offsetDescendantRectToMyCoords(v,r)
+                    anchors.put(name,r.exactCenterY()/d)
+                }
+                File(folder,"android-$width-$height-$count.json").writeText(anchors.toString(2))
             }
         }
         for((a,b) in listOf(480 to 560,560 to 640,640 to 840)) assertEquals("Every added dp goes to the single chart",((b-a)*context.resources.displayMetrics.density).toInt(),singleHeights.getValue(b)-singleHeights.getValue(a))

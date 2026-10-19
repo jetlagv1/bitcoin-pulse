@@ -14,10 +14,10 @@ internal object WidgetVisualFixture {
             "pool" to """{"count":18420,"vsize":12800000}"""
         )
         for(code in listOf("EUR","USD")) for(period in PERIODS) {
-            val rows=(0..239).joinToString(",") { i ->
-                val base=(71500+i*4+750*sin(i*.09))*(if(code=="USD")1.08 else 1.0)
-                val close=base+100*sin(i*1.7)
-                "[${1792096320L-(239-i)*period.minutes*60L},$base,${maxOf(base,close)+90},${minOf(base,close)-80},$close,$close,1,1]"
+            val rows=(0..479).joinToString(",") { i ->
+                val base=(71500+(i-240)*4+750*sin((i-240)*.09))*(if(code=="USD")1.08 else 1.0)
+                val close=base+100*sin((i-240)*1.7)
+                "[${1792096320L-(479-i)*period.minutes*60L},$base,${maxOf(base,close)+90},${minOf(base,close)-80},$close,$close,1,1]"
             }
             val name=code.lowercase()+when(period.id){"4h"->"4h";"1d"->"Day";else->"Week"}
             data[name]="""{"error":[],"result":{"XXBTZ$code":[$rows]}}"""

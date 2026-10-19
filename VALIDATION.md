@@ -1,3 +1,17 @@
+# Bitcoin Pulse 1.6.0 / versionCode 17
+
+Verified on 20 October 2026.
+
+- Extended app pinch zoom and both widgets to 270 visible candles. Widget steps: 24/36/60/90/120/180/270. The cache retains 480 actual candles; complete 20/60/120/30 cloud coverage at maximum zoom needs 418. The projected cloud retains its 29-position displacement.
+- EUR/USD now toggles in each standard widget through an explicit broadcast, without opening an activity or changing app/other-widget currency. Refresh fetches the app's and active widgets' currencies; switching currency during a refresh queues a follow-up when required.
+- 56 ordinary JVM/Robolectric tests passed, covering cloud fill at all seven zooms, cache length, actual widget button taps up to 270, local currency and independent count/period choices. One-chart metadata and all-height growth remain covered.
+- Four isolated upstream OWL compiler/renderer checks passed, including maximum-zoom cloud values for EUR/USD and all three periods, currency/count/period/zoom/cloud/refresh interactions and eight resize variants. Actual test screenshots were visually compared.
+- Appearance comparison: eight full-layout anchors differ by at most 0.25 dp; eight single/two-chart resize variants differ by at most 1.75 dp. Dense zoom backgrounds, currency/count text colors and footer controls match the standard widget. Crowded Cloud axis labels are hidden at 120–270 while the projected cloud remains visible.
+- Release lint: zero errors, 169 warnings, without added suppressions. APK and RSA upload-signed AAB built. Official bundletool 1.18.3 checks version/API/signature and 16KB bundle/ZIP/ELF alignment.
+- No physical-device/full-launcher test or Play Console upload/publication was performed. Replace previously imported OWL copies once with version 4.5 using Widgets → Toevoegen aan Omalauncher.
+
+## Historical verification
+
 # Bitcoin Pulse 1.5.4 / versionCode 16
 
 Verified on 20 October 2026.

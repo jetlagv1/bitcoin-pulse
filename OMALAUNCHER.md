@@ -4,7 +4,7 @@ Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalau
 
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.5.4 (versionCode 16)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.6.0 (versionCode 17)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets**, kies één of twee grafieken en tik op **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.
@@ -12,9 +12,9 @@ Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalau
 
 De knop EUR/USD wisselt de valuta. Kies het eerste aantal in de app vóór het importeren. Daarna wissel je direct in de widget met **1 ↔ / 2 ↔** naast verversen. Tik op elke titel met ▾ om 4 uur, 1 dag of 1 week te kiezen. Dubbelen worden voorkomen. De laatste candle is nog niet afgesloten. De datums onder de grafiek gebruiken de tijdzone van je telefoon; de koersvergelijking blijft sinds middernacht UTC. Tik buiten de knoppen op de widget om Bitcoin Pulse te openen. Met ↻ vraag je de bronnen opnieuw op.
 
-Met de compacte **−/+** knoppen naast de grafiektitel kies je 24, 36, 60 of 90 candles; het getal ertussen is het zichtbare aantal. Elke periode onthoudt zijn eigen zoomstand. Dit is OWL-widget **4.4**.
+Met de compacte **−/+** knoppen naast de grafiektitel kies je 24, 36, 60, 90, 120, 180 of 270 candles; het getal ertussen is het zichtbare aantal. Elke periode onthoudt zijn eigen zoomstand. Dit is OWL-widget **4.5**.
 
-De widget toont koers, wijziging sinds middernacht UTC, standaard 36 candles, blokhoogte, blokleeftijd, transactieaantal, minerpool, mediane gerealiseerde blokfee, fee-advies en mempoolomvang. Met **Cloud Aan/Uit** schakel je de Ichimoku-cloud (20/60/120/30) in of uit; standaard staat hij uit. Er worden 240 historische candles voor de berekening bewaard. Zie `ICHIMOKU.md`. Blokleeftijd rekent door vanuit de laatst bekende bloktijd; dat bewijst niet dat er geen nieuwer blok is.
+De widget toont koers, wijziging sinds middernacht UTC, standaard 36 candles, blokhoogte, blokleeftijd, transactieaantal, minerpool, mediane gerealiseerde blokfee, fee-advies en mempoolomvang. Met **Cloud Aan/Uit** schakel je de Ichimoku-cloud (20/60/120/30) in of uit; standaard staat hij uit. Er worden 480 historische candles voor de berekening bewaard. Zie `ICHIMOKU.md`. Blokleeftijd rekent door vanuit de laatst bekende bloktijd; dat bewijst niet dat er geen nieuwer blok is.
 
 ## Verversen en privacy
 

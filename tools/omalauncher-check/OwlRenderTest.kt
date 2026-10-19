@@ -195,8 +195,10 @@ class OwlRenderTest {
             verifyCloud("EUR","eur4h")
             tap("−");assertEquals(Num(60.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h")
             tap("−");assertEquals(Num(90.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h");verifyText();capture("zoom-90")
-            tap("−");assertEquals(Num(90.0),inst.get("zoom4h"))
-            tap("+");tap("+");tap("+");assertEquals(Num(24.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h");verifyText();capture("zoom-24")
+            for(count in listOf(120,180,270)) { tap("−");assertEquals(Num(count.toDouble()),inst.get("zoom4h"));verifyCloud("EUR","eur4h") }
+            verifyText();capture("zoom-270")
+            tap("−");assertEquals(Num(270.0),inst.get("zoom4h"))
+            repeat(6) { tap("+") };assertEquals(Num(24.0),inst.get("zoom4h"));verifyCloud("EUR","eur4h");verifyText();capture("zoom-24")
             tap("+");assertEquals(Num(24.0),inst.get("zoom4h"))
             assertEquals(Num(36.0),inst.get("zoomDay"));assertEquals(Num(36.0),inst.get("zoomWeek"))
             tap("−");assertEquals(Num(36.0),inst.get("zoom4h"))
@@ -204,6 +206,9 @@ class OwlRenderTest {
                 inst.set("currency",Str(code));inst.set("interval",Num(interval))
                 program.triggers.last().action.run(inst.root,emptyList())
                 verifyCloud(code,code.lowercase()+name)
+                val zoomName=when(name){"4h"->"zoom4h";"Day"->"zoomDay";else->"zoomWeek"}
+                inst.set(zoomName,Num(270.0));verifyCloud(code,code.lowercase()+name)
+                inst.set(zoomName,Num(36.0))
             }
             inst.set("currency",Str("EUR"));inst.set("interval",Num(240.0));program.triggers.last().action.run(inst.root,emptyList());settle()
             tap("Cloud Aan");assertEquals(FALSE,inst.get("ichimoku"));settle()

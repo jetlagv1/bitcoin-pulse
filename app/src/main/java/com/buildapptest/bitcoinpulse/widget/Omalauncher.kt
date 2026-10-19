@@ -27,7 +27,8 @@ object Omalauncher {
     }
 
     fun install(context: Context) {
-        val source = configuredSource(context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() },WidgetCharts.defaultCount(context))
+        val currency=(context.applicationContext as com.buildapptest.bitcoinpulse.PulseApplication).repository.state.value.currency
+        val source = configuredSource(context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() },WidgetCharts.defaultCount(context),currency)
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(widgetLink(source))).setPackage("dev.omalauncher")
         try {
             context.startActivity(intent)
@@ -35,8 +36,10 @@ object Omalauncher {
             Toast.makeText(context, "Installeer of update Omalauncher om deze widget toe te voegen.", Toast.LENGTH_LONG).show()
         }
     }
-    fun configuredSource(source: String,count: Int): String {
+    fun configuredSource(source: String,count: Int,currency: String="EUR"): String {
         require(count in 1..2)
+        require(currency in listOf("EUR","USD"))
         return source.replace("state graphCount = 2 persist","state graphCount = $count persist")
+            .replace("state currency = \"EUR\" persist","state currency = \"$currency\" persist")
     }
 }

@@ -7,6 +7,11 @@ import java.util.Base64
 import java.util.zip.Inflater
 
 class OmalauncherTest {
+    @Test fun importStartsWithSelectedCountAndCurrency() {
+        val source="state graphCount = 2 persist\nstate currency = \"EUR\" persist"
+        assertEquals("state graphCount = 1 persist\nstate currency = \"USD\" persist",Omalauncher.configuredSource(source,1,"USD"))
+        assertEquals(source,Omalauncher.configuredSource(source,2))
+    }
     @Test fun importLinkUsesCompatibleRawDeflateAndUtf8() {
         val source = "widget \"Bitcoin €\" { Text { text: \"₿\" } }"
         val link = Omalauncher.widgetLink(source)

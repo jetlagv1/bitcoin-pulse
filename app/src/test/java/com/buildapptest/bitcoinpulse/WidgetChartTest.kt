@@ -89,7 +89,7 @@ class WidgetChartTest {
         assertTrue(root.findViewById<TextView>(R.id.chart_label_1).contentDescription.contains("geen data"))
     }
     @Test fun cloudIsIncludedInEveryCombinationChart() {
-        val history=(0 until 240).map { i -> Candle(1791576000+i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
+        val history=(0 until 480).map { i -> Candle(1791576000+i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==479) }
         val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
         val root=layout("combi",840,state)
         for(id in listOf(R.id.chart_image_1,R.id.chart_image_2)) {
@@ -98,10 +98,10 @@ class WidgetChartTest {
         }
     }
     @Test fun compactZoomHeadersKeepIndependentCountsAndDisableLimits() {
-        val history=(0 until 240).map { i -> Candle(i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==239) }
+        val history=(0 until 480).map { i -> Candle(i*14400L,70000.0+i*10,70100.0+i*10,69900.0+i*10,70050.0+i*10,1.0,i==479) }
         val state=s.copy(ichimoku=true,candles=PERIODS.associate { candleKey("EUR",it.id) to Source(history,now) })
-        val root=layout("combi",840,state,mapOf("4h" to 24,"1d" to 90,"1w" to 60))
-        for((id,count) in listOf(R.id.chart_count_1 to "24",R.id.chart_count_2 to "90"))
+        val root=layout("combi",840,state,mapOf("4h" to 24,"1d" to 270,"1w" to 60))
+        for((id,count) in listOf(R.id.chart_count_1 to "24",R.id.chart_count_2 to "270"))
             assertEquals(count,root.findViewById<TextView>(id).text.toString())
         assertFalse(root.findViewById<View>(R.id.chart_plus_1).isEnabled)
         assertFalse(root.findViewById<View>(R.id.chart_minus_2).isEnabled)

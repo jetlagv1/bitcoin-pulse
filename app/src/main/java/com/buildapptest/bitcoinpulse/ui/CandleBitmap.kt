@@ -102,7 +102,8 @@ object CandleBitmap {
             val offset = if(index==1) p.measureText(label)/2 else 0f
             text(label,x-offset,height-(if(short)3 else 7)*scale,index==2)
         }
-        if(cloud.isNotEmpty()) text("Cloud",right,height-(if(short)3 else 7)*scale,true)
+        // At wide time ranges the projected area is too narrow for two axis labels.
+        if(cloud.isNotEmpty() && candles.size<=90) text("Cloud",right,height-(if(short)3 else 7)*scale,true)
         text(currency,width-2*scale,height-(if(short)3 else 7)*scale,true)
         return bitmap
     }

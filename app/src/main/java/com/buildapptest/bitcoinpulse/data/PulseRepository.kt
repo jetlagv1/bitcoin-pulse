@@ -18,6 +18,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class PulseRepository(context: Context) {
+    private val appContext=context.applicationContext
     private val preferences = context.getSharedPreferences("pulse-data-v1", Context.MODE_PRIVATE)
     private val http = OkHttpClient.Builder().connectTimeout(12, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS).callTimeout(22, TimeUnit.SECONDS).build()
@@ -109,14 +110,14 @@ class PulseRepository(context: Context) {
                 }
                 val candles = async {
                     val updated = old.candles.toMutableMap()
-                    for (period in PERIODS) {
-                        val key = candleKey(old.currency, period.id)
+                    for (currency in com.buildapptest.bitcoinpulse.widget.WidgetCurrency.required(appContext,old.currency)) for (period in PERIODS) {
+                        val key = candleKey(currency, period.id)
                         val source = old.candles[key] ?: Source()
                         if (source.value == null || System.currentTimeMillis() - source.fetchedAt !in 0..90_000L) {
                             // Pace Kraken's public requests, and retain each currency independently.
                             delay(1100)
-                            updated[key] = fetch("candles-${old.currency}-${period.id}",
-                                "https://api.kraken.com/0/public/OHLC?pair=XBT${old.currency}&interval=${period.minutes}", source) { CandleParser.parse(it, old.currency) }
+                            updated[key] = fetch("candles-$currency-${period.id}",
+                                "https://api.kraken.com/0/public/OHLC?pair=XBT$currency&interval=${period.minutes}", source) { CandleParser.parse(it, currency) }
                         }
                     }
                     updated.toMap()

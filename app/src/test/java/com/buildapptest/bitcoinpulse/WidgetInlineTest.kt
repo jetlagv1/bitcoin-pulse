@@ -53,6 +53,17 @@ class WidgetInlineTest {
                 assertEquals(PulseWidget::class.java.name,intent.component?.className)
                 assertNull("Period controls must never open the app or a picker activity",shadowOf(context).nextStartedActivity)
             }
+            val currency=context.repository.state.value.currency
+            val initialCurrency=WidgetCurrency.read(context,71,currency)
+            click(render(),R.id.widget_currency)
+            val selectedCurrency=if(initialCurrency=="EUR")"USD" else "EUR"
+            assertEquals(selectedCurrency,WidgetCurrency.read(context,71,currency))
+            assertEquals("$selectedCurrency ▾",render().findViewById<TextView>(R.id.widget_currency).text.toString())
+            assertEquals(currency,context.repository.state.value.currency)
+            assertEquals(currency,WidgetCurrency.read(context,72,currency))
+            assertEquals(setOf("EUR","USD"),WidgetCurrency.required(context,currency))
+            click(render(),R.id.widget_currency)
+            assertEquals(initialCurrency,WidgetCurrency.read(context,71,currency))
             click(render(),R.id.chart_label_1)
             val open=render()
             assertEquals(View.VISIBLE,open.findViewById<View>(R.id.chart_picker_1).visibility)
@@ -72,6 +83,20 @@ class WidgetInlineTest {
                 assertEquals("4h",WidgetCharts.read(context,71).second)
             }
             val saved=WidgetCharts.read(context,71)
+            for(slot in 0 until count) {
+                val minus=if(slot==0)R.id.chart_minus_1 else R.id.chart_minus_2
+                val plus=if(slot==0)R.id.chart_plus_1 else R.id.chart_plus_2
+                val period=if(slot==0)saved.first else saved.second
+                for(target in listOf(60,90,120,180,270)) {
+                    click(render(),minus)
+                    assertEquals(target,WidgetUpdates.zooms(context,71).getValue(period))
+                }
+                assertFalse(render().findViewById<View>(minus).isEnabled)
+                for(target in listOf(180,120,90,60,36)) {
+                    click(render(),plus)
+                    assertEquals(target,WidgetUpdates.zooms(context,71).getValue(period))
+                }
+            }
             click(render(),R.id.chart_label_1)
             click(render(),R.id.widget_graph_count)
             assertEquals(3-count,WidgetCharts.read(context,71).count)

@@ -86,8 +86,16 @@ class OwlResizeTest {
             for(n in nodes()) assertTrue("$count charts at $heightDp dp clipped: ${text(n)} ${n.boundsInRoot}",n.boundsInRoot.bottom<=h+1)
             val folder=File("build/reports/widget-resize").apply { mkdirs() }
             File(folder,"omalauncher-320-$heightDp-$count.png").outputStream().use { frame.compress(Bitmap.CompressFormat.PNG,100,it) }
+            val anchors=org.json.JSONObject()
+            for((name,label) in listOf("price" to "€ 72.521,90","currency" to "EUR ▾","cloud" to "Cloud Aan","first" to "4 uur ▾","second" to "1 dag ▾","block" to "Blok #971.890","fee" to "3 sat/vB","count" to "$count ↔","refresh" to "↻")) {
+                if(name=="second" && count==1) continue
+                anchors.put(name,nodes().first { text(it)==label }.boundsInRoot.center.y/d)
+            }
+            File(folder,"omalauncher-320-$heightDp-$count.json").writeText(anchors.toString(2))
             tap("−");assertEquals(Num(60.0),inst.get("zoom4h"))
             tap("+");assertEquals(Num(36.0),inst.get("zoom4h"))
+            tap("EUR ▾");assertEquals(Str("USD"),inst.get("currency"))
+            tap("USD ▾");assertEquals(Str("EUR"),inst.get("currency"))
             tap("Cloud Aan");assertEquals(FALSE,inst.get("ichimoku"))
             tap("4 uur ▾");assertEquals("Picker must open",Num(0.0),inst.get("picker"));tap("1 week");assertEquals(Num(10080.0),inst.get("interval"))
             if(count==2) { tap("1 dag ▾");tap("4 uur");assertEquals(Num(240.0),inst.get("interval2")) }

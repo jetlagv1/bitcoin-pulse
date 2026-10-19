@@ -1,5 +1,5 @@
 widget "Bitcoin Pulse" {
-  meta { owl: 8; version: "4.4"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  meta { owl: 8; version: "4.5"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
   size: 4x5
   minSize: 4x5
   padding: 0
@@ -40,42 +40,42 @@ widget "Bitcoin Pulse" {
   state timeeur4h = null persist
   let rowseur4h = get(eur4h.out.result, "XXBTZEUR")
   on (eur4h ?? false) {
-    cacheeur4h = eur4h.ok && len(eur4h.out.error) == 0 && len(rowseur4h) > 0 ? reverse(take(reverse(rowseur4h), 240)) : cacheeur4h
+    cacheeur4h = eur4h.ok && len(eur4h.out.error) == 0 && len(rowseur4h) > 0 ? reverse(take(reverse(rowseur4h), 480)) : cacheeur4h
     timeeur4h = eur4h.ok && len(eur4h.out.error) == 0 && len(rowseur4h) > 0 ? now : timeeur4h
   }
   state cacheeurDay = [] persist
   state timeeurDay = null persist
   let rowseurDay = get(eurDay.out.result, "XXBTZEUR")
   on (eurDay ?? false) {
-    cacheeurDay = eurDay.ok && len(eurDay.out.error) == 0 && len(rowseurDay) > 0 ? reverse(take(reverse(rowseurDay), 240)) : cacheeurDay
+    cacheeurDay = eurDay.ok && len(eurDay.out.error) == 0 && len(rowseurDay) > 0 ? reverse(take(reverse(rowseurDay), 480)) : cacheeurDay
     timeeurDay = eurDay.ok && len(eurDay.out.error) == 0 && len(rowseurDay) > 0 ? now : timeeurDay
   }
   state cacheeurWeek = [] persist
   state timeeurWeek = null persist
   let rowseurWeek = get(eurWeek.out.result, "XXBTZEUR")
   on (eurWeek ?? false) {
-    cacheeurWeek = eurWeek.ok && len(eurWeek.out.error) == 0 && len(rowseurWeek) > 0 ? reverse(take(reverse(rowseurWeek), 240)) : cacheeurWeek
+    cacheeurWeek = eurWeek.ok && len(eurWeek.out.error) == 0 && len(rowseurWeek) > 0 ? reverse(take(reverse(rowseurWeek), 480)) : cacheeurWeek
     timeeurWeek = eurWeek.ok && len(eurWeek.out.error) == 0 && len(rowseurWeek) > 0 ? now : timeeurWeek
   }
   state cacheusd4h = [] persist
   state timeusd4h = null persist
   let rowsusd4h = get(usd4h.out.result, "XXBTZUSD")
   on (usd4h ?? false) {
-    cacheusd4h = usd4h.ok && len(usd4h.out.error) == 0 && len(rowsusd4h) > 0 ? reverse(take(reverse(rowsusd4h), 240)) : cacheusd4h
+    cacheusd4h = usd4h.ok && len(usd4h.out.error) == 0 && len(rowsusd4h) > 0 ? reverse(take(reverse(rowsusd4h), 480)) : cacheusd4h
     timeusd4h = usd4h.ok && len(usd4h.out.error) == 0 && len(rowsusd4h) > 0 ? now : timeusd4h
   }
   state cacheusdDay = [] persist
   state timeusdDay = null persist
   let rowsusdDay = get(usdDay.out.result, "XXBTZUSD")
   on (usdDay ?? false) {
-    cacheusdDay = usdDay.ok && len(usdDay.out.error) == 0 && len(rowsusdDay) > 0 ? reverse(take(reverse(rowsusdDay), 240)) : cacheusdDay
+    cacheusdDay = usdDay.ok && len(usdDay.out.error) == 0 && len(rowsusdDay) > 0 ? reverse(take(reverse(rowsusdDay), 480)) : cacheusdDay
     timeusdDay = usdDay.ok && len(usdDay.out.error) == 0 && len(rowsusdDay) > 0 ? now : timeusdDay
   }
   state cacheusdWeek = [] persist
   state timeusdWeek = null persist
   let rowsusdWeek = get(usdWeek.out.result, "XXBTZUSD")
   on (usdWeek ?? false) {
-    cacheusdWeek = usdWeek.ok && len(usdWeek.out.error) == 0 && len(rowsusdWeek) > 0 ? reverse(take(reverse(rowsusdWeek), 240)) : cacheusdWeek
+    cacheusdWeek = usdWeek.ok && len(usdWeek.out.error) == 0 && len(rowsusdWeek) > 0 ? reverse(take(reverse(rowsusdWeek), 480)) : cacheusdWeek
     timeusdWeek = usdWeek.ok && len(usdWeek.out.error) == 0 && len(rowsusdWeek) > 0 ? now : timeusdWeek
   }
   let quote = get(quotes, key)
@@ -105,7 +105,7 @@ widget "Bitcoin Pulse" {
   let lastChange = priceAt != null && blockAt != null ? min(priceAt, blockAt) : null
   let single = graphCount == 1
   let dense = single || tileHeight < 760
-  let plotSize = dense ? max((tileHeight - 248 - 36 * (graphCount - 1)) / graphCount, 40) : 116
+  let plotSize = dense ? max((tileHeight - 243 - 36 * (graphCount - 1)) / graphCount, 40) : 116
   Column {
     fill: true
     padding: dense ? 8 : 14
@@ -119,7 +119,7 @@ widget "Bitcoin Pulse" {
         height: 34
         align: center
         Text { weight: 1; text: priceText; font: sans; fontSize: 26; bold: true; color: #F7FAFF; maxLines: 1 }
-        Box { width: 60; height: 32; align: center; background: #243246; radius: 12; border: 1; borderColor: #38485F; onTap: currency = currency == "EUR" ? "USD" : "EUR"; Text { text: "${currency} ▾"; font: sans; fontSize: 12; color: #F7FAFF; align: center; maxLines: 1 } }
+        Box { width: 60; height: 32; align: center; background: #243246; radius: 12; border: 1; borderColor: #38485F; onTap: currency = currency == "EUR" ? "USD" : "EUR"; Text { text: "${currency} ▾"; font: sans; fontSize: 12; color: #BAC7DB; align: center; maxLines: 1 } }
       }
       Row {
         fill: width
@@ -152,7 +152,7 @@ widget "Bitcoin Pulse" {
         borderColor: #38485F
         radius: 12
         onTap: currency = currency == "EUR" ? "USD" : "EUR"
-        Text { text: "${currency} ▾"; font: sans; fontSize: 13; color: #F7FAFF; align: center; maxLines: 1 }
+        Text { text: "${currency} ▾"; font: sans; fontSize: 13; color: #BAC7DB; align: center; maxLines: 1 }
       }
     }
     Text { text: change == null ? "Kraken · wacht op koers" : "${replace(fixed(change, 2), '.', ',')}% vandaag (UTC) · Kraken"; font: sans; fontSize: 12; color: change < 0 ? #FF647C : #35E89A; maxLines: 1 }
@@ -213,23 +213,25 @@ widget "Bitcoin Pulse" {
         height: dense ? 32 : 40
         align: center
         onTap: {
-          zoom4h = period == 240 ? (zoom4h < 36 ? 36 : zoom4h < 60 ? 60 : 90) : zoom4h
-          zoomDay = period == 1440 ? (zoomDay < 36 ? 36 : zoomDay < 60 ? 60 : 90) : zoomDay
-          zoomWeek = period == 10080 ? (zoomWeek < 36 ? 36 : zoomWeek < 60 ? 60 : 90) : zoomWeek
+          zoom4h = period == 240 ? (zoom4h < 36 ? 36 : zoom4h < 60 ? 60 : zoom4h < 90 ? 90 : zoom4h < 120 ? 120 : zoom4h < 180 ? 180 : 270) : zoom4h
+          zoomDay = period == 1440 ? (zoomDay < 36 ? 36 : zoomDay < 60 ? 60 : zoomDay < 90 ? 90 : zoomDay < 120 ? 120 : zoomDay < 180 ? 180 : 270) : zoomDay
+          zoomWeek = period == 10080 ? (zoomWeek < 36 ? 36 : zoomWeek < 60 ? 60 : zoomWeek < 90 ? 90 : zoomWeek < 120 ? 120 : zoomWeek < 180 ? 180 : 270) : zoomWeek
         }
-        Box { width: 30; height: 30; align: center; radius: 8; opacity: zoomCount >= 90 ? 0.3 : 1; background: #243246; border: 1; borderColor: #38485F; Text { text: "−"; font: sans; fontSize: 20; color: #FF8A1F; align: center } }
+        Box { width: dense ? 26 : 30; height: dense ? 22 : 30; radius: 8; opacity: zoomCount >= 270 ? 0.3 : 1; background: #243246; border: 1; borderColor: #38485F }
+        Text { text: "−"; font: sans; fontSize: 20; color: #FF8A1F; opacity: zoomCount >= 270 ? 0.3 : 1; align: center }
       }
-      Text { width: 26; text: str(len(chart)); font: sans; fontSize: 11; color: #F7FAFF; align: center; maxLines: 1 }
+      Text { width: 26; text: str(len(chart)); font: sans; fontSize: 11; color: #BAC7DB; align: center; maxLines: 1 }
       Box {
         width: dense ? 36 : 40
         height: dense ? 32 : 40
         align: center
         onTap: {
-          zoom4h = period == 240 ? (zoom4h > 60 ? 60 : zoom4h > 36 ? 36 : 24) : zoom4h
-          zoomDay = period == 1440 ? (zoomDay > 60 ? 60 : zoomDay > 36 ? 36 : 24) : zoomDay
-          zoomWeek = period == 10080 ? (zoomWeek > 60 ? 60 : zoomWeek > 36 ? 36 : 24) : zoomWeek
+          zoom4h = period == 240 ? (zoom4h > 180 ? 180 : zoom4h > 120 ? 120 : zoom4h > 90 ? 90 : zoom4h > 60 ? 60 : zoom4h > 36 ? 36 : 24) : zoom4h
+          zoomDay = period == 1440 ? (zoomDay > 180 ? 180 : zoomDay > 120 ? 120 : zoomDay > 90 ? 90 : zoomDay > 60 ? 60 : zoomDay > 36 ? 36 : 24) : zoomDay
+          zoomWeek = period == 10080 ? (zoomWeek > 180 ? 180 : zoomWeek > 120 ? 120 : zoomWeek > 90 ? 90 : zoomWeek > 60 ? 60 : zoomWeek > 36 ? 36 : 24) : zoomWeek
         }
-        Box { width: 30; height: 30; align: center; radius: 8; opacity: zoomCount <= 24 ? 0.3 : 1; background: #243246; border: 1; borderColor: #38485F; Text { text: "+"; font: sans; fontSize: 20; color: #FF8A1F; align: center } }
+        Box { width: dense ? 26 : 30; height: dense ? 22 : 30; radius: 8; opacity: zoomCount <= 24 ? 0.3 : 1; background: #243246; border: 1; borderColor: #38485F }
+        Text { text: "+"; font: sans; fontSize: 20; color: #FF8A1F; opacity: zoomCount <= 24 ? 0.3 : 1; align: center }
       }
     }
     if picker == slot {
@@ -295,14 +297,14 @@ widget "Bitcoin Pulse" {
         }
         if cloudReady {
           text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + (len(chart) - 0.5) * step, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: center, color: #BAC7DB)
-          text("Cloud", 3 + plotWidth, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
+          if len(chart) <= 90 { text("Cloud", 3 + plotWidth, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB) }
         } else {
           text(fmtTime(num(last(chart)[0]), "d MMM"), 3 + plotWidth, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
         }
         text(currency, width - 2, height - (height < 90 ? 3 : 11), size: height < 90 ? 9 : 11, align: end, color: #BAC7DB)
       }
       if !dense || single {
-      Text { text: ichimoku && !cloudReady ? "Cloud: ${cloudRequired} candles nodig · vernieuw" : ohlc.ok == false ? "Cache · vernieuwen mislukt · ${fmtTime(candleAt, 'HH:mm')}" : "Laatste candle loopt nog · ${fmtTime(candleAt, 'HH:mm')}"; font: sans; fontSize: 11; color: ohlc.ok == false || now - candleAt > 660 ? #FFD166 : #BAC7DB; maxLines: 1 }
+      Text { text: ichimoku && !cloudReady ? "Cloud: ${cloudRequired} candles nodig · vernieuw" : ohlc.ok == false ? "Cache · vernieuwen mislukt · ${fmtTime(candleAt, 'HH:mm')}" : "Laatste candle loopt nog · ${fmtTime(candleAt, 'HH:mm')}"; font: sans; fontSize: single ? 10 : 11; color: ohlc.ok == false || now - candleAt > 660 ? #FFD166 : #BAC7DB; maxLines: 1 }
       }
     } else {
       Box {
@@ -324,24 +326,24 @@ widget "Bitcoin Pulse" {
         fill: width
         gap: 6
         Text { text: "Blok #${heightText}"; weight: 1; font: sans; fontSize: dense ? 13 : 15; bold: true; color: #49CFFF; maxLines: 1 }
-        Text { text: block == null ? "—" : "${fmtDuration(max(now - block.timestamp, 0))} geleden"; weight: 1; font: sans; fontSize: 12; color: #F7FAFF; align: end; maxLines: 1 }
+        Text { text: block == null ? "—" : "${fmtDuration(max(now - block.timestamp, 0))} geleden"; weight: 1; font: sans; fontSize: dense ? 11 : 12; color: #F7FAFF; align: end; maxLines: 1 }
       }
-      Text { text: "${txText} transacties · ${block.extras.pool.name ?? 'Onbekende pool'}"; font: sans; fontSize: single ? 11 : 12; color: #BAC7DB; maxLines: 1 }
+      Text { text: "${txText} transacties · ${block.extras.pool.name ?? 'Onbekende pool'}"; font: sans; fontSize: dense ? 11 : 12; color: #BAC7DB; maxLines: 1 }
       if !dense || single { Text { text: block.extras.medianFee == null ? "Mediaan blokfee —" : "Mediaan blokfee ${replace(fixed(block.extras.medianFee, 1), '.', ',')} sat/vB"; font: sans; fontSize: single ? 11 : 12; color: #BAC7DB; maxLines: 1 } }
     }
     Column {
       fill: width
       gap: 4
-      if !dense || single { Text { text: "Fee-advies · schatting"; font: sans; fontSize: single ? 10 : 11; color: #BAC7DB; maxLines: 1 } }
+      if !dense || single { Text { text: "Fee-advies · schatting"; font: sans; fontSize: single ? 9 : 11; color: #BAC7DB; maxLines: 1 } }
       Row {
         fill: width
         gap: 6
         for f, i in [advice.fastestFee, advice.halfHourFee, advice.hourFee] {
           Column {
             weight: 1
-            gap: 1
+            gap: dense ? 0 : 1
             Text { text: f == null ? "— sat/vB" : "${replace(str(num(f)), '.', ',')} sat/vB"; font: sans; fontSize: dense ? 13 : 16; bold: true; color: i == 0 ? #FF8A1F : #F7FAFF; maxLines: 1 }
-            Text { text: i == 0 ? "Volgend blok" : i == 1 ? "~30 min" : "~1 uur"; font: sans; fontSize: single ? 10 : 11; color: #BAC7DB; maxLines: 1 }
+            Text { text: i == 0 ? "Volgend blok" : i == 1 ? "~30 min" : "~1 uur"; font: sans; fontSize: dense ? 10 : 11; color: #BAC7DB; maxLines: 1 }
           }
         }
       }
@@ -350,7 +352,7 @@ widget "Bitcoin Pulse" {
 if !dense || single { Text { text: mem == null ? "Mempool laden…" : "Mempool ${join(reverse(map(range(ceil(len(str(int(mem.count))) / 3)), i => sub(str(int(mem.count)), max(0, len(str(int(mem.count))) - (i + 1) * 3), len(str(int(mem.count))) - i * 3))), '.')} tx · ${replace(fixed(mem.vsize / 1000000, 1), '.', ',')} vMB"; font: sans; fontSize: single ? 11 : 12; color: #BAC7DB; maxLines: 1 } }
     Row {
       fill: width
-      gap: 8
+      gap: 4
       align: center
       Column {
         weight: 1
@@ -363,8 +365,6 @@ if !dense || single { Text { text: mem == null ? "Mempool laden…" : "Mempool $
         height: 32
         align: center
         background: #243246
-        border: 1
-        borderColor: #38485F
         radius: 9
         onTap: { graphCount = graphCount == 1 ? 2 : 1; interval2 = graphCount == 2 && interval2 == interval ? (interval == 240 ? 1440 : 240) : interval2; picker = -1 }
         Text { text: "${graphCount} ↔"; font: sans; fontSize: 12; color: #FF8A1F; align: center; maxLines: 1 }

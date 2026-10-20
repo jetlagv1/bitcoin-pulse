@@ -61,9 +61,9 @@ fun PulseScreen(repository: PulseRepository, onRefresh: () -> Unit, onCurrency: 
                 }
                 if (snapshot.refreshing) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Orange, trackColor = Raised)
                 if (!snapshot.hasAnyData && !snapshot.refreshing) {
-                    Text("Connect to the internet and tap refresh to load Bitcoin data.", color = Amber, fontSize = 14.sp)
+                    Text("Maak verbinding met internet en tik op vernieuwen om Bitcoin-gegevens te laden.", color = Amber, fontSize = 14.sp)
                 } else if (snapshot.hasErrors) {
-                    Text("Some sources could not refresh. Available values are kept below with their original update times.", color = Amber, fontSize = 14.sp)
+                    Text("Sommige bronnen konden niet worden vernieuwd. De laatst opgehaalde waarden blijven zichtbaar met hun oorspronkelijke tijdstempels.", color = Amber, fontSize = 14.sp)
                 }
                 if (widgets) {
                     WidgetPage(snapshot, repository, now, onRefresh, onPin)
@@ -73,10 +73,10 @@ fun PulseScreen(repository: PulseRepository, onRefresh: () -> Unit, onCurrency: 
                     NetworkCard(snapshot, now)
                     FilledTonalButton(onClick = { widgets = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), shape = RoundedCornerShape(24.dp)) {
                         Icon(Icons.Outlined.Widgets, contentDescription = null)
-                        Spacer(Modifier.width(10.dp)); Text("Add to home screen")
+                        Spacer(Modifier.width(10.dp)); Text("Toevoegen aan startscherm")
                     }
                 }
-                Text("App refreshes about every 30 seconds while open. Widgets request background updates every 15 minutes; Android may delay them to save battery.",
+                Text("De app vernieuwt ongeveer elke 30 seconden zolang deze openstaat. Widgets vragen elke 15 minuten een achtergrondverversing aan; Android kan die uitstellen om de batterij te sparen.",
                     color = Muted, fontSize = 12.sp, lineHeight = 18.sp)
                 SourceLinks()
                 Spacer(Modifier.height(16.dp))
@@ -143,7 +143,7 @@ private fun FeesCard(s: Snapshot, now: Long) {
     Panel {
         Text("Network fees", fontSize = 18.sp, fontWeight = FontWeight.Medium)
         FeeRow(s)
-        Text("sat/vB · confirmation times are estimates", color = Muted, fontSize = 12.sp)
+        Text("sat/vB · bevestigingstijden zijn schattingen", color = Muted, fontSize = 12.sp)
         val sats = s.fees.value?.next?.times(250)
         Text("Voorbeeld · 250 vB: ${Format.fee(sats)} sat ≈ ${Format.preciseMoney(sats?.let { it / 100_000_000 * (s.quote?.price ?: 0.0) }?.takeIf { s.quote != null }, s.currency)}", color = Muted, fontSize = 12.sp)
         SourceStatus("mempool.space", s.fees, now)
@@ -262,7 +262,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
         }
     }
     OutlinedButton(onClick = { onPin(true) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add compact widget") }
-    Text("These previews show your actual latest data. You can also long-press your home screen, choose Widgets, then Bitcoin Pulse. Widget sizes depend on your launcher.", color = Muted, fontSize = 12.sp, lineHeight = 18.sp)
+    Text("Deze voorbeelden tonen je laatst opgehaalde gegevens. Je kunt ook je startscherm ingedrukt houden, Widgets kiezen en vervolgens Bitcoin Pulse. De widgetmaten hangen af van je launcher.", color = Muted, fontSize = 12.sp, lineHeight = 18.sp)
     Panel {
         Text("Omalauncher", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = Cyan)
         Text("Voeg de speciale OWL-widget toe met koers, candles en blokgegevens. Werkt zonder Linux. Kies EUR/USD en de candleperiode in de widget zelf.", color = Muted, fontSize = 14.sp)

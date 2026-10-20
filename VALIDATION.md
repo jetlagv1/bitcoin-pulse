@@ -1,3 +1,15 @@
+# Bitcoin Pulse 1.6.1 / versionCode 18
+
+Verified on 20 October 2026.
+
+- Translated the English explanatory paragraphs about app/widget refreshing, fee confirmation estimates, widget previews, connectivity and source-refresh failures into Dutch. Widget installation instructions and repository error explanations are also Dutch.
+- Translated Add to home screen as Toevoegen aan startscherm, as specifically requested. Other headings, buttons, navigation, short status labels, technical terminology and number/date formatting remain unchanged.
+- The production change affects explanatory strings only. 56 existing Android tests passed; release lint reports zero errors and 169 warnings. No extra label-mirroring tests were added.
+- APK and upload-signed AAB built for version 1.6.1 / 18. Bundletool 1.18.3 verifies version, API levels, RSA signature and 16KB bundle/ZIP/ELF alignment.
+- The OWL asset is byte-for-byte unchanged from 1.6.0 (OWL 4.5); no widget reimport is required for this app text update. No physical-device test or Play Console upload/publication was performed.
+
+## Historical verification
+
 # Bitcoin Pulse 1.6.0 / versionCode 17
 
 Verified on 20 October 2026.

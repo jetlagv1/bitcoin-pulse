@@ -26,7 +26,7 @@ class PulseRepository(context: Context) {
     private fun <T> cached(key: String, parser: (String) -> T): Source<T> = try {
         val raw = preferences.getString(key, null)
         Source(raw?.let(parser), preferences.getLong("$key-time", 0), preferences.getString("$key-error", null))
-    } catch (_: Exception) { Source(error = "Stored data needs a refresh") }
+    } catch (_: Exception) { Source(error = "Opgeslagen gegevens moeten worden vernieuwd") }
 
     private val mutable = MutableStateFlow(Snapshot(
         cached("prices", Parse::prices), cached("fees", Parse::fees),
@@ -89,7 +89,7 @@ class PulseRepository(context: Context) {
             Source(value, now)
         } catch (cancel: CancellationException) { throw cancel }
         catch (_: Exception) {
-            val message = "Could not refresh. Check your connection and try again."
+            val message = "Vernieuwen mislukt. Controleer je verbinding en probeer opnieuw."
             preferences.edit().putString("$key-error", message).apply()
             old.copy(error = message)
         }

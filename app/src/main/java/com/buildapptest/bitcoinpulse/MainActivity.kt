@@ -49,6 +49,6 @@ class MainActivity : ComponentActivity() {
         } else showWidgetInstructions()
     }
     private fun showWidgetInstructions() {
-        Toast.makeText(this, "Long-press your home screen, choose Widgets, then Bitcoin Pulse.", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Houd je startscherm ingedrukt, kies Widgets en vervolgens Bitcoin Pulse.", Toast.LENGTH_LONG).show()
     }
 }

@@ -4,7 +4,7 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.6.1**, versionCode **18**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.6.2**, versionCode **19**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -12,7 +12,11 @@ Current version: **1.6.1**, versionCode **18**. Open this repository in Android 
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
 
-## Interface language (1.6.1)
+## Interface language (1.6.2)
+
+The specifically marked network section now reads Netwerkactiviteit, Laatste blok, Blokleeftijd and Blokken. Other existing headings and labels remain as requested.
+
+## Explanatory text (1.6.1)
 
 English explanatory paragraphs, empty/error-state explanations and widget-installation instructions are now in Dutch. The Add to home screen button is translated as Toevoegen aan startscherm; other headings, buttons, short labels, chart terminology, numeric/date formatting and widget design are retained. OWL remains version 4.5 and does not need reimporting for this text-only app update.
 

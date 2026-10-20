@@ -1,3 +1,14 @@
+# Bitcoin Pulse 1.6.2 / versionCode 19
+
+Verified on 20 October 2026.
+
+- Translated only the newly marked network section: Network activity → Netwerkactiviteit, Latest block → Laatste blok, Block age → Blokleeftijd, and Blocks → Blokken. Other headings, labels, explanations and widget assets remain unchanged from 1.6.1.
+- 56 existing Android tests passed. Release lint: zero errors and 169 warnings. No label-mirroring tests were added for this text-only change.
+- APK and upload-signed AAB built for version 1.6.2 / 19. Bundletool 1.18.3 checks version, API levels, RSA signature and 16KB alignment.
+- No physical-device test or Play Console upload/publication was performed. OWL remains 4.5; no reimport is required.
+
+## Historical verification
+
 # Bitcoin Pulse 1.6.1 / versionCode 18
 
 Verified on 20 October 2026.

@@ -165,12 +165,12 @@ private fun FeeRow(s: Snapshot) {
 @Composable
 private fun NetworkCard(s: Snapshot, now: Long) {
     Panel {
-        Text("Network activity", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = Cyan)
+        Text("Netwerkactiviteit", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = Cyan)
         Row(Modifier.fillMaxWidth()) {
-            Metric("Latest block", Format.number(s.block.value?.height), Modifier.weight(1f))
-            Metric("Block age", Format.blockAge(s.block.value, now), Modifier.weight(1f))
+            Metric("Laatste blok", Format.number(s.block.value?.height), Modifier.weight(1f))
+            Metric("Blokleeftijd", Format.blockAge(s.block.value, now), Modifier.weight(1f))
         }
-        SourceStatus("Blocks", s.block, now)
+        SourceStatus("Blokken", s.block, now)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Metric("Transacties", Format.number(s.block.value?.transactions), Modifier.weight(1f), 15)
             Metric("Minerpool", s.block.value?.pool ?: "Onbekend", Modifier.weight(1f), 15)

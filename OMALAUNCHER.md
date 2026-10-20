@@ -4,7 +4,7 @@ Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalau
 
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.6.1 (versionCode 18)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.6.2 (versionCode 19)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets**, kies één of twee grafieken en tik op **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.

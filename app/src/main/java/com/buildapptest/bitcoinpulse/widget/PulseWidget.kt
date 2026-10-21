@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Build
 import android.widget.RemoteViews
 import android.view.View
 import android.net.Uri
@@ -33,7 +34,18 @@ open class PulseWidget : AppWidgetProvider() {
     override fun onDisabled(context: Context) {
         if (!WidgetUpdates.hasWidgets(context)) WorkManager.getInstance(context).cancelUniqueWork("pulse-periodic")
     }
-    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) { WidgetUpdates.render(context) }
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
+        val prefs=context.getSharedPreferences("widget-options",0)
+        val wasNetwork=prefs.getBoolean("resize-network-$id",false)
+        val network=WidgetSizing.hasNetworkSize(context,id)
+        prefs.edit().remove("picker-$id").putBoolean("resize-network-$id",network).apply()
+        WidgetUpdates.render(context)
+        if(network && !wasNetwork) {
+            val snapshot=(context.applicationContext as PulseApplication).repository.state.value
+            val currency=WidgetCurrency.read(context,id,snapshot.currency)
+            if(PERIODS.any { snapshot.copy(currency=currency).history(it.id).isStale(System.currentTimeMillis()) })WidgetUpdates.refresh(context,followUp=true)
+        }
+    }
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == WidgetUpdates.REFRESH) WidgetUpdates.refresh(context)
@@ -72,7 +84,7 @@ open class PulseWidget : AppWidgetProvider() {
         }
         if (intent.action == WidgetUpdates.CLOUD) {
             val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,AppWidgetManager.INVALID_APPWIDGET_ID)
-            val owned=AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java))
+            val owned=WidgetSizing.ids(context)
             if(id in owned) {
                 val prefs=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE)
                 val fallback=(context.applicationContext as PulseApplication).repository.state.value.ichimoku
@@ -83,7 +95,7 @@ open class PulseWidget : AppWidgetProvider() {
     }
     override fun onDeleted(context: Context, ids: IntArray) {
         val editor=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
-        ids.forEach { id -> editor.remove("currency-$id");editor.remove("period-$id");editor.remove("picker-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
+        ids.forEach { id -> editor.remove("currency-$id");editor.remove("resize-network-$id");editor.remove("period-$id");editor.remove("picker-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
     }
 }
 class CompactWidget : PulseWidget()
@@ -102,13 +114,13 @@ object WidgetUpdates {
         it.id to ChartZoom.clamp(context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).getInt("zoom-$id-${it.id}",ChartZoom.DEFAULT))
     }
     internal fun changeZoom(context: Context,id: Int,period: String,out: Boolean): Boolean {
-        val owned=AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java))
+        val owned=WidgetSizing.ids(context)
         if(id !in owned || PERIODS.none { it.id==period }) return false
         context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
             .putInt("zoom-$id-$period",ChartZoom.step(zooms(context,id).getValue(period),out)).apply()
         return true
     }
-    private val providers = listOf(PulseWidget::class.java, CompactWidget::class.java, MiniWidget::class.java)
+    private val providers = WidgetSizing.providers
     fun hasWidgets(context: Context): Boolean = providers.any {
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, it)).isNotEmpty()
     }
@@ -127,104 +139,106 @@ object WidgetUpdates {
         val manager = AppWidgetManager.getInstance(context)
         val now = System.currentTimeMillis()
         providers.forEach { provider ->
-            val compact = provider == CompactWidget::class.java
-            manager.getAppWidgetIds(ComponentName(context, provider)).forEach widget@ { id ->
-                if(provider==MiniWidget::class.java) {
-                    val snapshot=appSnapshot.copy(currency=WidgetCurrency.read(context,id,"EUR"))
-                    val options=manager.getAppWidgetOptions(id)
-                    manager.updateAppWidget(id,MiniWidget.views(context,id,snapshot,
-                        options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,80),
-                        options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,88),now,busy))
-                    return@widget
-                }
-                val snapshot=appSnapshot.copy(currency=WidgetCurrency.read(context,id,appSnapshot.currency))
-                val options=manager.getAppWidgetOptions(id)
-                val height=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,WidgetAppearance.SINGLE_HEIGHT)
-                val width=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,320)
-                val small=compact
-                val selection=WidgetCharts.read(context,id,snapshot)
-                val dense=!small && WidgetAppearance.dense(height,selection.count)
-                val views = RemoteViews(context.packageName, if (small) R.layout.widget_compact else if(selection.count==1) R.layout.widget_single else if(dense) R.layout.widget_expanded_dense else R.layout.widget_expanded)
-                views.setTextViewText(R.id.widget_currency, if (small) "BTC/${snapshot.currency}" else "${snapshot.currency} ▾")
-                val currencyIntent=Intent(context,provider).setAction(CURRENCY).setData(Uri.parse("bitcoinpulse://widget/$id/currency"))
-                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
-                views.setOnClickPendingIntent(R.id.widget_currency,PendingIntent.getBroadcast(context,id,currencyIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                views.setContentDescription(R.id.widget_currency,"Valuta ${snapshot.currency}. Tik voor ${if(snapshot.currency=="EUR")"USD" else "EUR"} in deze widget.")
-                views.setTextViewText(R.id.widget_price, if(small)Format.money(snapshot.quote?.price,snapshot.currency,true) else WidgetAppearance.price(snapshot.quote?.price,snapshot.currency))
-                views.setTextViewText(R.id.widget_next, if (small) "Next ${Format.fee(snapshot.fees.value?.next)} sat/vB" else "${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB")
-                if (!small) {
-                    views.setTextViewText(R.id.widget_graph_count,"${selection.count} ↔")
-                    views.setContentDescription(R.id.widget_graph_count,"${selection.count} grafiek(en). Tik voor ${3-selection.count} grafiek(en).")
-                    val countIntent=Intent(context,PulseWidget::class.java).setAction(COUNT).setData(Uri.parse("bitcoinpulse://widget/$id/count"))
-                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
-                    views.setOnClickPendingIntent(R.id.widget_graph_count,PendingIntent.getBroadcast(context,id,countIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                    if(dense) {
-                        val inset=((if(height<400)if(selection.count==1)5 else 4 else 8)*context.resources.displayMetrics.density).toInt()
-                        views.setViewPadding(R.id.widget_root,inset,inset,inset,inset)
-                    }
-                    if(dense) views.setViewVisibility(R.id.widget_fee_row,if(selection.count==2 && height<400)View.GONE else View.VISIBLE)
-                    views.setTextViewText(R.id.widget_half, "${WidgetAppearance.fee(snapshot.fees.value?.halfHour)} sat/vB")
-                    views.setTextViewText(R.id.widget_hour, "${WidgetAppearance.fee(snapshot.fees.value?.hour)} sat/vB")
-                    views.setTextViewText(R.id.widget_block, "Blok #${WidgetAppearance.number(snapshot.block.value?.height)}")
-                    views.setTextViewTextSize(R.id.widget_price,android.util.TypedValue.COMPLEX_UNIT_SP,if(dense)26f else if(width<340)28f else 32f)
-                    views.setTextViewText(R.id.widget_mempool,snapshot.mempool.value?.let { "Mempool ${WidgetAppearance.number(it.count)} tx · ${WidgetAppearance.fixed(it.virtualBytes/1000000.0,1)} vMB" } ?: "Mempool laden…")
-                    views.setTextColor(R.id.widget_block, Color.parseColor("#49CFFF"))
-                    views.setTextViewText(R.id.widget_change, "${snapshot.quote?.let { WidgetAppearance.fixed(it.todayPercent,2) } ?: "—"}% vandaag (UTC) · Kraken")
-                    views.setTextColor(R.id.widget_change, Color.parseColor(if ((snapshot.quote?.todayPercent ?: 0.0) < 0) "#FF647C" else "#35E89A"))
-                    views.setTextViewText(R.id.widget_age, "${WidgetAppearance.age(snapshot.block.value?.timestamp, now)} geleden")
-                    views.setContentDescription(R.id.widget_age,"Blokleeftijd op moment van weergave: ${Format.blockAge(snapshot.block.value,now)} om ${Format.time(now)}; geen afteller")
-                    views.setTextViewText(R.id.widget_tx, "${WidgetAppearance.number(snapshot.block.value?.transactions)} transacties · ")
-                    views.setTextViewText(R.id.widget_pool, snapshot.block.value?.pool ?: "Onbekend")
-                    views.setTextViewText(R.id.widget_median, "Mediaan blokfee ${WidgetAppearance.fixed(snapshot.block.value?.medianFee,1)} sat/vB")
-                    val cloud=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).getBoolean("ichimoku-$id",snapshot.ichimoku)
-                    views.setTextViewText(R.id.widget_ichimoku,"Cloud ${if(cloud)"Aan" else "Uit"}")
-                    views.setTextColor(R.id.widget_ichimoku,Color.parseColor(if(cloud)"#FF8A1F" else "#BAC7DB"))
-                    views.setInt(R.id.widget_ichimoku,"setBackgroundResource",if(cloud)R.drawable.widget_cloud_on else R.drawable.widget_cloud_off)
-                    views.setContentDescription(R.id.widget_ichimoku,"Ichimoku cloud ${if(cloud)"aan" else "uit"}; 20 / 60 / 120 / 30. Tik om te wisselen.")
-                    val toggle=Intent(context,PulseWidget::class.java).setAction(CLOUD).setData(Uri.parse("bitcoinpulse://widget/$id/cloud"))
-                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
-                    views.setOnClickPendingIntent(R.id.widget_ichimoku,PendingIntent.getBroadcast(context,id,toggle,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                    selection.save(context,id)
-                    val picker=context.getSharedPreferences("widget-options",0).getInt("picker-$id",-1).takeIf { it in 0 until selection.count } ?: -1
-                    charts(views,snapshot,selection,width,height,now,cloud,zooms(context,id),picker)
-                    selection.periods.forEachIndexed { i,period ->
-                        val pick=Intent(context,PulseWidget::class.java).setAction(PICKER).setData(Uri.parse("bitcoinpulse://widget/$id/pick/$i"))
-                            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i)
-                        views.setOnClickPendingIntent(if(i==0)R.id.chart_label_1 else R.id.chart_label_2,PendingIntent.getBroadcast(context,id,pick,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                        PERIODS.forEachIndexed { j,choice ->
-                            val choose=Intent(context,PulseWidget::class.java).setAction(PERIOD).setData(Uri.parse("bitcoinpulse://widget/$id/select/$i/${choice.id}"))
-                                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i).putExtra("period",choice.id)
-                            views.setOnClickPendingIntent(pickerChoices[i][j],PendingIntent.getBroadcast(context,id,choose,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                        }
-                        for((viewId,direction) in listOf(minus[i] to 1,plus[i] to -1)) {
-                            val zoom=Intent(context,PulseWidget::class.java).setAction(ZOOM)
-                                .setData(Uri.parse("bitcoinpulse://widget/$id/zoom/${period.id}/$direction"))
-                                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("period",period.id).putExtra("direction",direction)
-                            views.setOnClickPendingIntent(viewId,PendingIntent.getBroadcast(context,id,zoom,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
-                        }
-                    }
-                }
-                val required=mutableListOf(snapshot.prices.fetchedAt,snapshot.fees.fetchedAt)
-                if(!small) { required+=snapshot.block.fetchedAt; required+=snapshot.mempool.fetchedAt; required+=selection.periods.map { snapshot.history(it.id).fetchedAt } }
-                val oldest = required.minOrNull() ?: 0
-                val errors = if (small) snapshot.prices.error != null || snapshot.fees.error != null
-                    else snapshot.prices.error!=null || snapshot.fees.error!=null || snapshot.block.error!=null || snapshot.mempool.error!=null || selection.periods.any { snapshot.history(it.id).error!=null }
-                val status = when {
-                    busy || snapshot.refreshing -> "Refreshing…"
-                    oldest == 0L -> "Waiting for data · tap refresh"
-                    errors -> "Cached · oldest ${Format.time(oldest)}"
-                    now < oldest || now - oldest > 20 * 60_000L -> "Older data · ${Format.time(oldest)}"
-                    else -> "Bijgewerkt ${Format.time(oldest)}"
-                }
-                views.setTextViewText(R.id.widget_updated, status)
-                views.setTextColor(R.id.widget_updated, Color.parseColor(if (errors || oldest == 0L || now - oldest > 20 * 60_000L) "#FFD166" else "#BAC7DB"))
-                val open = PendingIntent.getActivity(context, id, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                views.setOnClickPendingIntent(R.id.widget_root, open)
-                val refresh = PendingIntent.getBroadcast(context, id, Intent(context, provider).setAction(REFRESH), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                views.setOnClickPendingIntent(R.id.widget_refresh, refresh)
-                manager.updateAppWidget(id, views)
+            manager.getAppWidgetIds(ComponentName(context, provider)).forEach { id ->
+                val snapshot=appSnapshot.copy(currency=WidgetCurrency.read(context,id,if(provider==MiniWidget::class.java)"EUR" else appSnapshot.currency))
+                WidgetCurrency.set(context,id,snapshot.currency)
+                val views=viewsForWidget(context,id,provider,snapshot,now,busy)
+                manager.updateAppWidget(id,views)
             }
         }
+    }
+
+    internal fun viewsForWidget(context: Context,id: Int,provider: Class<out PulseWidget>,snapshot: Snapshot,now: Long,busy: Boolean=false): RemoteViews {
+        val variants=WidgetSizing.sizes(context,id).associateWith { size -> sizedViews(context,id,provider,snapshot,size.width.toInt(),size.height.toInt(),now,busy) }
+        return if(variants.size==1)variants.values.first()
+            else if(Build.VERSION.SDK_INT>=31)RemoteViews(variants)
+            else RemoteViews(variants.values.last(),variants.values.first())
+    }
+
+    private fun sizedViews(context: Context,id: Int,provider: Class<out PulseWidget>,snapshot: Snapshot,width: Int,height: Int,now: Long,busy: Boolean): RemoteViews {
+        when(WidgetSizing.mode(width,height)) {
+            WidgetMode.MINI -> return MiniWidget.views(context,id,snapshot,width,height,now,busy)
+            WidgetMode.COMPACT -> return CompactViews.views(context,id,snapshot,width,height,now,busy)
+            WidgetMode.NETWORK -> Unit
+        }
+        val selection=WidgetCharts.read(context,id,snapshot)
+        val dense=WidgetAppearance.dense(height,selection.count)
+        val views = RemoteViews(context.packageName, if(selection.count==1) R.layout.widget_single else if(dense) R.layout.widget_expanded_dense else R.layout.widget_expanded)
+        views.setTextViewText(R.id.widget_currency, "${snapshot.currency} ▾")
+        val currencyIntent=Intent(context,provider).setAction(CURRENCY).setData(Uri.parse("bitcoinpulse://widget/$id/currency"))
+            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+        views.setOnClickPendingIntent(R.id.widget_currency,PendingIntent.getBroadcast(context,id,currencyIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+        views.setContentDescription(R.id.widget_currency,"Valuta ${snapshot.currency}. Tik voor ${if(snapshot.currency=="EUR")"USD" else "EUR"} in deze widget.")
+        views.setTextViewText(R.id.widget_price, WidgetAppearance.price(snapshot.quote?.price,snapshot.currency))
+        views.setTextViewText(R.id.widget_next, "${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB")
+        views.setTextViewText(R.id.widget_graph_count,"${selection.count} ↔")
+        views.setContentDescription(R.id.widget_graph_count,"${selection.count} grafiek(en). Tik voor ${3-selection.count} grafiek(en).")
+        val countIntent=Intent(context,PulseWidget::class.java).setAction(COUNT).setData(Uri.parse("bitcoinpulse://widget/$id/count"))
+            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+        views.setOnClickPendingIntent(R.id.widget_graph_count,PendingIntent.getBroadcast(context,id,countIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+        if(dense) {
+            val inset=((if(height<400)if(selection.count==1)5 else 4 else 8)*context.resources.displayMetrics.density).toInt()
+            views.setViewPadding(R.id.widget_root,inset,inset,inset,inset)
+        }
+        if(dense) views.setViewVisibility(R.id.widget_fee_row,if(selection.count==2 && height<400)View.GONE else View.VISIBLE)
+        views.setTextViewText(R.id.widget_half, "${WidgetAppearance.fee(snapshot.fees.value?.halfHour)} sat/vB")
+        views.setTextViewText(R.id.widget_hour, "${WidgetAppearance.fee(snapshot.fees.value?.hour)} sat/vB")
+        views.setTextViewText(R.id.widget_block, "Blok #${WidgetAppearance.number(snapshot.block.value?.height)}")
+        views.setTextViewTextSize(R.id.widget_price,android.util.TypedValue.COMPLEX_UNIT_SP,if(dense)26f else if(width<340)28f else 32f)
+        views.setTextViewText(R.id.widget_mempool,snapshot.mempool.value?.let { "Mempool ${WidgetAppearance.number(it.count)} tx · ${WidgetAppearance.fixed(it.virtualBytes/1000000.0,1)} vMB" } ?: "Mempool laden…")
+        views.setTextColor(R.id.widget_block, Color.parseColor("#49CFFF"))
+        views.setTextViewText(R.id.widget_change, "${snapshot.quote?.let { WidgetAppearance.fixed(it.todayPercent,2) } ?: "—"}% vandaag (UTC) · Kraken")
+        views.setTextColor(R.id.widget_change, Color.parseColor(if ((snapshot.quote?.todayPercent ?: 0.0) < 0) "#FF647C" else "#35E89A"))
+        views.setTextViewText(R.id.widget_age, "${WidgetAppearance.age(snapshot.block.value?.timestamp, now)} geleden")
+        views.setContentDescription(R.id.widget_age,"Blokleeftijd op moment van weergave: ${Format.blockAge(snapshot.block.value,now)} om ${Format.time(now)}; geen afteller")
+        views.setTextViewText(R.id.widget_tx, "${WidgetAppearance.number(snapshot.block.value?.transactions)} transacties · ")
+        views.setTextViewText(R.id.widget_pool, snapshot.block.value?.pool ?: "Onbekend")
+        views.setTextViewText(R.id.widget_median, "Mediaan blokfee ${WidgetAppearance.fixed(snapshot.block.value?.medianFee,1)} sat/vB")
+        val cloud=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).getBoolean("ichimoku-$id",snapshot.ichimoku)
+        views.setTextViewText(R.id.widget_ichimoku,"Cloud ${if(cloud)"Aan" else "Uit"}")
+        views.setTextColor(R.id.widget_ichimoku,Color.parseColor(if(cloud)"#FF8A1F" else "#BAC7DB"))
+        views.setInt(R.id.widget_ichimoku,"setBackgroundResource",if(cloud)R.drawable.widget_cloud_on else R.drawable.widget_cloud_off)
+        views.setContentDescription(R.id.widget_ichimoku,"Ichimoku cloud ${if(cloud)"aan" else "uit"}; 20 / 60 / 120 / 30. Tik om te wisselen.")
+        val toggle=Intent(context,PulseWidget::class.java).setAction(CLOUD).setData(Uri.parse("bitcoinpulse://widget/$id/cloud"))
+            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+        views.setOnClickPendingIntent(R.id.widget_ichimoku,PendingIntent.getBroadcast(context,id,toggle,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+        selection.save(context,id)
+        val picker=context.getSharedPreferences("widget-options",0).getInt("picker-$id",-1).takeIf { it in 0 until selection.count } ?: -1
+        charts(views,snapshot,selection,width,height,now,cloud,zooms(context,id),picker)
+        selection.periods.forEachIndexed { i,period ->
+            val pick=Intent(context,PulseWidget::class.java).setAction(PICKER).setData(Uri.parse("bitcoinpulse://widget/$id/pick/$i"))
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i)
+            views.setOnClickPendingIntent(if(i==0)R.id.chart_label_1 else R.id.chart_label_2,PendingIntent.getBroadcast(context,id,pick,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            PERIODS.forEachIndexed { j,choice ->
+                val choose=Intent(context,PulseWidget::class.java).setAction(PERIOD).setData(Uri.parse("bitcoinpulse://widget/$id/select/$i/${choice.id}"))
+                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("slot",i).putExtra("period",choice.id)
+                views.setOnClickPendingIntent(pickerChoices[i][j],PendingIntent.getBroadcast(context,id,choose,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            }
+            for((viewId,direction) in listOf(minus[i] to 1,plus[i] to -1)) {
+                val zoom=Intent(context,PulseWidget::class.java).setAction(ZOOM)
+                    .setData(Uri.parse("bitcoinpulse://widget/$id/zoom/${period.id}/$direction"))
+                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).putExtra("period",period.id).putExtra("direction",direction)
+                views.setOnClickPendingIntent(viewId,PendingIntent.getBroadcast(context,id,zoom,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            }
+        }
+        val required=mutableListOf(snapshot.prices.fetchedAt,snapshot.fees.fetchedAt)
+        required+=snapshot.block.fetchedAt; required+=snapshot.mempool.fetchedAt; required+=selection.periods.map { snapshot.history(it.id).fetchedAt }
+        val oldest = required.minOrNull() ?: 0
+        val errors = snapshot.prices.error!=null || snapshot.fees.error!=null || snapshot.block.error!=null || snapshot.mempool.error!=null || selection.periods.any { snapshot.history(it.id).error!=null }
+        val status = when {
+            busy || snapshot.refreshing -> "Refreshing…"
+            oldest == 0L -> "Waiting for data · tap refresh"
+            errors -> "Cached · oldest ${Format.time(oldest)}"
+            now < oldest || now - oldest > 20 * 60_000L -> "Older data · ${Format.time(oldest)}"
+            else -> "Bijgewerkt ${Format.time(oldest)}"
+        }
+        views.setTextViewText(R.id.widget_updated, status)
+        views.setTextColor(R.id.widget_updated, Color.parseColor(if (errors || oldest == 0L || now - oldest > 20 * 60_000L) "#FFD166" else "#BAC7DB"))
+        val open = PendingIntent.getActivity(context, id, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        views.setOnClickPendingIntent(R.id.widget_root, open)
+        val refresh = PendingIntent.getBroadcast(context, id, Intent(context, provider).setAction(REFRESH), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        views.setOnClickPendingIntent(R.id.widget_refresh, refresh)
+        return views
     }
 
     private val pickerRows=listOf(R.id.chart_picker_1,R.id.chart_picker_2)

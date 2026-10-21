@@ -1,3 +1,17 @@
+# Bitcoin Pulse 1.8.0 / versionCode 22
+
+Verified on 21 October 2026.
+
+- All three Android providers now choose mini, compact or network from the available content size. Mini text grows within bounds; compact progressively adds change, block age/transactions/pool, 30-minute/hour fee estimates, median block fee and mempool. Network starts at the existing 250×320 dp minimum. All providers can resize back to 40dp, while retaining identity and settings.
+- Android 12+ uses exact-size RemoteViews maps for launcher-provided sizes, including portrait/landscape. Legacy size ranges produce paired orientation layouts. A framework selection test applies the actual generated layout at mini/compact/network sizes. History fetching includes currencies of any possible network size. Resizing requests missing history on entry to network, rather than queuing a job for every drag step.
+- 65 ordinary Android JVM/Robolectric tests passed with zero failures/skips. Added coverage includes real provider resize sequences, retained visible currency/intervals/count/cloud/270 zoom, promoted mini/compact controls, large system text, exact-size layout selection, candle-fetch currency scope and actual compact/mini app import links with selected initial settings. The final resize tests were rerun after aligning their screenshot settings.
+- Six isolated official OWL compiler/renderer checks passed: the existing three render/data cases, resize case, mini case and adaptive case. All three imports now use the same OWL 5.0 program and differ only in name/start size/default dimensions. Adaptive tests cover all three assets, active candle requests only in network mode, real currency/period/cloud/refresh taps, shrink/grow persistence and compact/mini overflow checks. Normal text scaling is covered in OWL; the full installed launcher and its font settings still require phone testing.
+- Existing network appearance comparison passed: eight anchors differ by at most 0.25 dp, and eight one/two-chart resize variants by at most 1.75 dp. Actual adaptive render sequences were visually compared; exported contact sheets contain example data. The app's compact preview now uses actual RemoteViews; mini settings follow compact settings and Omalauncher remains last.
+- Release lint: zero errors and 180 warnings. The two added warnings are KTX style suggestions. APK and RSA upload-signed AAB built for 1.8.0 / 22; bundletool 1.18.3 verified version/API/signature, universal APK generation and 16KB bundle/ZIP/ELF alignment.
+- No physical-device/full-launcher test or Play Console upload/publication was performed. Existing native widgets update with the app. Previously imported OWL copies must be replaced once with OWL 5.0.
+
+## Historical verification
+
 # Bitcoin Pulse 1.7.1 / versionCode 21
 
 Verified on 21 October 2026.

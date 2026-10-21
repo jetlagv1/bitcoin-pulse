@@ -1,12 +1,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root"
     android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical"
-    android:padding="12dp" android:background="@drawable/widget_background" android:contentDescription="@string/open_app">
-    <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:text="BTC/EUR" />
-    <TextView android:id="@+id/widget_price" style="@style/WidgetNumber" android:textSize="26sp" android:text="—" />
-    <TextView android:id="@+id/widget_next" style="@style/WidgetLabel" android:textColor="#FF8A1F" android:background="@drawable/widget_inner" android:padding="8dp" android:layout_marginTop="4dp" android:text="Next fee — sat/vB" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="48dp" android:orientation="horizontal" android:gravity="center_vertical">
-        <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_weight="1" android:maxLines="2" android:text="Tap refresh" />
-        <ImageButton android:id="@+id/widget_refresh" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp"
-            android:background="@drawable/widget_inner" android:src="@drawable/ic_refresh" android:contentDescription="@string/refresh" />
+    android:padding="10dp" android:background="@drawable/widget_background" android:contentDescription="@string/open_app">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/widget_currency" style="@style/WidgetLabel" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center_vertical" android:text="BTC/EUR ▾"/>
+        <ImageButton android:id="@+id/widget_refresh" android:layout_width="48dp" android:layout_height="48dp" android:padding="10dp"
+            android:background="@drawable/widget_inner" android:src="@drawable/ic_refresh" android:contentDescription="@string/refresh"/>
+    </LinearLayout>
+    <TextView android:id="@+id/widget_price" style="@style/WidgetNumber" android:layout_width="match_parent" android:textSize="26sp" android:text="—"/>
+    <TextView android:id="@+id/compact_block" style="@style/WidgetNumber" android:layout_width="match_parent" android:layout_marginTop="2dp" android:textColor="#49CFFF" android:textSize="15sp" android:text="Blok —"/>
+    <TextView android:id="@+id/widget_next" style="@style/WidgetNumber" android:layout_width="match_parent" android:layout_marginTop="2dp" android:textColor="#FF8A1F" android:textSize="14sp" android:text="— sat/vB"/>
+    <TextView android:id="@+id/compact_change" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="2dp" android:visibility="gone"/>
+    <TextView android:id="@+id/compact_age" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="4dp" android:visibility="gone"/>
+    <TextView android:id="@+id/compact_tx" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="2dp" android:visibility="gone"/>
+    <TextView android:id="@+id/compact_median" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="4dp" android:visibility="gone"/>
+    <TextView android:id="@+id/compact_mempool" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="2dp" android:visibility="gone"/>
+    <TextView android:id="@+id/compact_half" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="4dp" android:visibility="gone"/>
+    <TextView android:id="@+id/compact_hour" style="@style/WidgetLabel" android:layout_width="match_parent" android:layout_marginTop="2dp" android:visibility="gone"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom" android:minHeight="14dp">
+        <TextView android:id="@+id/widget_updated" style="@style/WidgetLabel" android:layout_width="match_parent" android:textSize="11sp"/>
     </LinearLayout>
 </LinearLayout>

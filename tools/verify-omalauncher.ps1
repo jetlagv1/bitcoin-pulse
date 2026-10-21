@@ -64,4 +64,6 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Resizable OWL render validation failed.' }
     & $pulseGradle :app:testDebugUnitTest --tests 'com.buildapptest.bitcoinpulse.owlcheck.OwlMiniTest' -I $pulseInitPath --offline --console=plain
     if ($LASTEXITCODE -ne 0) { throw 'Mini OWL render validation failed.' }
+    & $pulseGradle :app:testDebugUnitTest --tests 'com.buildapptest.bitcoinpulse.owlcheck.OwlAdaptiveTest' -I $pulseInitPath --offline --console=plain
+    if ($LASTEXITCODE -ne 0) { throw 'Adaptive OWL render validation failed.' }
 } finally { Pop-Location }

@@ -27,7 +27,7 @@ internal fun MiniWidgetsPanel(snapshot: Snapshot,now: Long) {
     val context=LocalContext.current
     var revision by remember { mutableIntStateOf(0) }
     // The screen clock also refreshes this list after returning from the launcher's pin dialog.
-    val ids=remember(now,revision) { MiniWidget.ids(context).sorted() }
+    val ids=remember(now,revision) { com.buildapptest.bitcoinpulse.widget.WidgetSizing.ids(context).filter { it in MiniWidget.ids(context) || com.buildapptest.bitcoinpulse.widget.WidgetSizing.mode(context,it)==com.buildapptest.bitcoinpulse.widget.WidgetMode.MINI }.sorted() }
     Surface(color=Color(0xFF182230),shape=RoundedCornerShape(24.dp),modifier=Modifier.fillMaxWidth()) {
         Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Text("Miniwidget · 1×1",fontSize=18.sp)

@@ -4,7 +4,7 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.7.1**, versionCode **21**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.8.0**, versionCode **22**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -12,9 +12,15 @@ Current version: **1.7.1**, versionCode **21**. Open this repository in Android 
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
 
+## Adaptive widgets (1.8.0)
+
+Mini, compact and network are now starting sizes of the same adaptive behavior, in standard Android and Omalauncher. Resizing changes the content stage while retaining the same instance's currency, intervals, chart count, cloud and zoom. Compact adds information progressively; network appears at 250×320 dp. Mini settings are below compact settings in the app, and the Omalauncher section remains last. See [ADAPTIVE-WIDGETS.md](ADAPTIVE-WIDGETS.md).
+
+The three OWL 5.0 imports share one canonical program. After editing bitcoin-pulse.owl, run python tools/sync-owl-variants.py. Replace previously imported OWL copies once; an APK update cannot replace Omalauncher's independent stored copy.
+
 ## Miniwidget (1.7.0)
 
-A new 1×1 widget shows the full block height, next-block fee estimate in sat/vB and a compact BTC price when space permits. Add multiple instances from the app's Widgets tab or your launcher's widget picker; select EUR or USD independently for each in the app. The miniwidget uses the existing cache and background updater. See [MINIWIDGET.md](MINIWIDGET.md) for installation, resizing and currency settings. The same miniwidget is available for Omalauncher as an independent OWL 1.0 widget: choose its starting currency in the app and tap an imported tile to switch only that instance. Existing chart widgets and the OWL 4.5 chart widget retain their behavior. Feature and appearance changes must ship for both launcher implementations together; see AGENTS.md.
+A new 1×1 widget shows the full block height, next-block fee estimate in sat/vB and a compact BTC price when space permits. Add multiple instances from the app's Widgets tab or your launcher's widget picker; select EUR or USD independently for each in the app. The miniwidget uses the existing cache and background updater. See [MINIWIDGET.md](MINIWIDGET.md) for installation, resizing and currency settings. The same miniwidget is available for Omalauncher as an independent OWL 1.0 widget: choose its starting currency in the app and tap an imported tile to switch only that instance. The adaptive OWL 5.0 update described above supersedes the original fixed-size behavior. Feature and appearance changes must ship for both launcher implementations together; see AGENTS.md.
 
 ## Interface language (1.6.2)
 

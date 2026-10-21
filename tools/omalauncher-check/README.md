@@ -20,3 +20,6 @@ The appearance comparator also checks eight single/two-chart resize variants (40
 
 
 Mini 1×1: OwlMiniTest loads the actual bitcoin-pulse-mini.owl through the official compiler/renderer at 40×40, 56×56, 64×64, 80×72, 80×88 and 120×120 dp. It checks full block/fee text, price and label visibility, text bounds/overflow, independent EUR/USD instances, real touch switching, failed-feed cache retention and missing-value dashes. Captures are under app/build/reports/miniwidget/owl-*.png. The ordinary OwlMiniImportTest checks the app's actual import intents and decoded initial currencies. The native 1×1 layout is covered by MiniWidgetTest; both normal-size captures are retained in docs/design.
+
+
+Adaptive OWL 5.0: OwlAdaptiveTest follows the same instance through mini, enlarged mini, compact, richer compact, network, and back again, for all three import variants. It verifies retained currency/periods/count/cloud/zoom, real in-widget taps, selected candle-source activation only in network mode, and fitting compact/mini text. The three variants are generated from bitcoin-pulse.owl with python tools/sync-owl-variants.py. Native AdaptiveWidgetTest additionally verifies all provider types, large system text, Android exact-size RemoteViews selection and history-fetch scope for multiple orientation sizes. Test captures are in app/build/reports/adaptive-widget.

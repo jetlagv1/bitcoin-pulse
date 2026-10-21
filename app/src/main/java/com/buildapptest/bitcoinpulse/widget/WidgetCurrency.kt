@@ -18,5 +18,5 @@ object WidgetCurrency {
         context.getSharedPreferences("widget-options",0).edit().putString("currency-$id",currency).apply()
         return true
     }
-    fun required(context: Context,fallback: String) = (listOf(fallback)+ids(context).map { read(context,it,fallback) }).toSet()
+    fun required(context: Context,fallback: String) = (listOf(fallback)+WidgetSizing.ids(context).filter { WidgetSizing.hasNetworkSize(context,it) }.map { read(context,it,if(it in MiniWidget.ids(context))"EUR" else fallback) }).toSet()
 }

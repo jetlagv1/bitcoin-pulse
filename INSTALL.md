@@ -1,16 +1,13 @@
 # Install Bitcoin Pulse
 
-1. Open **Dropbox → Bitcoin Pulse → Bitcoin-Pulse-1.2-debug.apk** on your phone, or transfer it from the deliverables folder. You can install it over version 1.0 or 1.1 without uninstalling; this build uses the same signing certificate and preserves your preferences.
-2. Open the APK on Android 8.0 or newer. If prompted, allow the browser or file manager you are using to install this APK.
-3. Open **Bitcoin Pulse** with an internet connection. The dashboard retrieves live prices from Kraken and network data from mempool.space.
-4. Select **EUR** or **USD** on the dashboard. This setting applies to both widget types.
-5. Select **Widgets**, then **Add network widget** or **Add compact widget**. Confirm placement in your launcher. Alternatively, long-press your home screen, choose Widgets, and select Bitcoin Pulse.
+1. Open **Dropbox → Bitcoin Pulse → Bitcoin-Pulse-1.8.0-debug.apk** on your phone, or transfer it from deliverables. Install it as an update of the directly installed APK to retain preferences.
+2. Open the APK on Android 8.0 or newer. If prompted, allow your browser or file manager to install this APK.
+3. Open Bitcoin Pulse with an internet connection. Prices come from Kraken; blockchain and fee data come from mempool.space.
+4. In **Widgets**, choose network, compact or mini as the starting size. Confirm placement in your launcher, or use the launcher's widget picker. Mini settings are below compact settings. Mini currency is selected per instance in the app; compact/network offer their own currency controls.
+5. Resize any instance: mini text grows, compact appears at 160×160 dp, and network with charts appears at 250×320 dp. Compact adds more details as height increases. Shrinking preserves currency, periods, chart count, cloud and zoom. Actual cell sizes vary by launcher.
+6. For Omalauncher, use its section at the bottom of the Widgets tab. It offers the same three start sizes, all OWL 5.0. Replace previously imported copies once; updating the APK does not replace Omalauncher's stored copies. See [OMALAUNCHER.md](OMALAUNCHER.md).
 
-The expanded network widget targets 4 columns by 5 rows, with a minimum 280×360dp area. Exact grid sizes depend on your launcher. Resize an existing 1.0 widget to at least 360dp high to show the new chart, or remove and re-add it. Below that height it keeps a compact price/fee view and asks you to enlarge it. The separate compact widget remains 2×2.
-
-Choose **4 uur**, **1 dag**, **1 week**, or **Combi** using the widget buttons. Each widget remembers its own interval. In the app, Combi lets you choose any two or all three intervals; that selection is shared by the widgets. A two-chart widget needs at least 460dp height, three charts 580dp. Otherwise it asks for more space, and you can choose a single interval or open the app.
-
-Intervals describe the duration of each candle. Charts show up to 36 recent observations, have independent price axes, and show UTC dates. Rising candles are hollow, falling candles filled; a dot marks the final candle, which is still in progress. In the app, tap a candle or use **Vorige**, **Volgende**, and **Laatste** to inspect OHLC values, BTC volume, and its exact UTC opening time.
+In network mode, choose one or two charts, intervals (4 hours, 1 day or 1 week), Ichimoku cloud and zoom directly in the widget. Zoom reaches 270 candles. The app dashboard can display all three Combi intervals and uses two-finger zoom. See [ADAPTIVE-WIDGETS.md](ADAPTIVE-WIDGETS.md) for current sizing and behavior.
 
 Latest-block details include transaction count, recognized mining pool, median paid fee, weight-based fullness, fee range, total fees, and reward including fees when available. Unknown values show a dash or “Onbekend”. Actual block fees are separate from current recommendations. Difficulty change is an estimate. The 250vB transaction example is only a size-based fee illustration.
 

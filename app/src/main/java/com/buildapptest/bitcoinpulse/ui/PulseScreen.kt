@@ -225,7 +225,6 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
     val context = LocalContext.current
     Text("Your home screen, at a glance", fontSize = 18.sp, fontWeight = FontWeight.Medium)
     Text("Tik in de widget op EUR/USD om de valuta te wisselen. Grafieken, intervallen, cloud en zoom bedien je ook rechtstreeks in de widget.", color = Muted, fontSize = 14.sp)
-    MiniWidgetsPanel(s,now)
     var widgetCount by remember { mutableIntStateOf(com.buildapptest.bitcoinpulse.widget.WidgetCharts.defaultCount(context)) }
     Text("Aantal grafieken in de widget",fontSize=16.sp)
     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -254,15 +253,13 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
     }
     Button(onClick = { onPin(false) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add network widget") }
     Text("De grafiekwidget schaalt mee, ook op 4×5. Kies hierboven één of twee grafieken, of wissel in de widget met 1 ↔ / 2 ↔ naast verversen. Tik in de widget op de grafiektitel voor 4 uur, 1 dag of 1 week. De −/+ knoppen zoomen per grafiek; het getal ertussen is het aantal candles. Bij één grafiek blijft alle informatie zichtbaar en groeit de grafiek mee. Bij twee grafieken is de netwerkinfo compacter. De intervalkeuze blijft binnen de widget.",color=Muted,fontSize=12.sp)
-    Surface(color = Card, shape = RoundedCornerShape(28.dp), modifier = Modifier.width(200.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("BTC/${s.currency}", color = Muted, fontSize = 12.sp)
-            Text(Format.money(s.quote?.price, s.currency, true), style = Numeric, fontSize = 26.sp)
-            Text("Next ${Format.fee(s.fees.value?.next)} sat/vB", color = Orange, fontSize = 14.sp)
-            WidgetFooter(s, true, now, onRefresh)
-        }
-    }
+    androidx.compose.ui.viewinterop.AndroidView(
+        factory={ ctx -> com.buildapptest.bitcoinpulse.widget.CompactViews.views(ctx,android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID,s,200,200,now).apply(ctx,android.widget.FrameLayout(ctx)) },
+        update={ view -> com.buildapptest.bitcoinpulse.widget.CompactViews.views(context,android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID,s,200,200,now).reapply(context,view) },
+        modifier=Modifier.size(200.dp,200.dp))
     OutlinedButton(onClick = { onPin(true) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add compact widget") }
+    Text("Alle widgets groeien automatisch van mini naar compact naar network zodra er genoeg breedte en hoogte is. Verkleinen behoudt je valuta en grafiekkeuzes.",color=Muted,fontSize=12.sp)
+    MiniWidgetsPanel(s,now)
     Text("Deze voorbeelden tonen je laatst opgehaalde gegevens. Je kunt ook je startscherm ingedrukt houden, Widgets kiezen en vervolgens Bitcoin Pulse. De widgetmaten hangen af van je launcher.", color = Muted, fontSize = 12.sp, lineHeight = 18.sp)
     Panel {
         Text("Omalauncher", fontSize = 18.sp, fontWeight = FontWeight.Medium, color = Cyan)
@@ -271,6 +268,8 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
             Text("Toevoegen aan Omalauncher")
         }
         Text("Omalauncher toont eerst een importcontrole. Bevestig daar om de widget toe te voegen. Deze widget haalt zelf openbare gegevens op bij Kraken en mempool.space; instellingen staan los van de Android-widgets.", color = Muted, fontSize = 12.sp)
+        OutlinedButton(onClick={ com.buildapptest.bitcoinpulse.widget.Omalauncher.installCompact(context) },modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) { Text("Compactwidget toevoegen aan Omalauncher") }
+        Text("Mini, compact en network gebruiken dezelfde automatische indeling op basis van de beschikbare ruimte. Vergroten of verkleinen bewaart je instellingen.",color=Muted,fontSize=12.sp)
         HorizontalDivider(color=Color(0xFF38485F))
         Text("Miniwidget · 1×1",fontSize=18.sp)
         Text("Dezelfde compacte weergave met blokhoogte, fee-advies en BTC-prijs als die past.",color=Muted,fontSize=13.sp)

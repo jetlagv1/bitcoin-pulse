@@ -52,7 +52,7 @@ class OwlMiniTest {
             return inst
         }
         val other=instance("USD")
-        assertEquals(Str("$ 78,3k"),other.get("priceText"))
+        assertEquals(Str("$ 78,3k"),other.get("miniPriceText"))
         for((w,h) in listOf(40 to 40,56 to 56,64 to 64,80 to 72,80 to 88,120 to 120)) {
             val inst=instance("EUR");inst.setTile(1,1,w.toDouble(),h.toDouble())
             val control=Robolectric.buildActivity(ComponentActivity::class.java)
@@ -86,7 +86,7 @@ class OwlMiniTest {
             for(a in listOf(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP)) { val e=MotionEvent.obtain(time,time,a,width/2f,height/2f,0);decor.dispatchTouchEvent(e);e.recycle() }
             androidx.compose.runtime.snapshots.Snapshot.sendApplyNotifications();settle()
             assertEquals(Str("USD"),inst.get("currency"));assertEquals(Str("USD"),other.get("currency"))
-            assertEquals(Str("$ 78,3k"),inst.get("priceText"))
+            assertEquals(Str("$ 78,3k"),inst.get("miniPriceText"))
             inst.set("currency",Str("EUR"));assertEquals(Str("USD"),other.get("currency"))
             val cached=inst.get("block")
             inst.set("blocks",Obj(mapOf("ok" to FALSE)));inst.program.triggers.forEach { it.action.run(inst.root,emptyList()) }
@@ -95,7 +95,7 @@ class OwlMiniTest {
             control.pause().stop().destroy()
         }
         val empty=WidgetInstance(Compiler.compile(source));empty.setTile(1,1,80.0,88.0)
-        assertEquals(Str("—"),empty.get("heightText"));assertEquals(Str("— sat/vB"),empty.get("feeText"));assertEquals(Str("€ —"),empty.get("priceText"))
+        assertEquals(Str("—"),empty.get("heightText"));assertEquals(Str("— sat/vB"),empty.get("feeText"));assertEquals(Str("€ —"),empty.get("miniPriceText"))
         assertTrue(empty.problems.isEmpty())
     }
 }

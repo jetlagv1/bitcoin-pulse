@@ -2,6 +2,8 @@
 
 Beschikbaar vanaf Bitcoin Pulse **1.7.0 (versionCode 20)**.
 
+Vanaf **1.8.0 (versionCode 22)** groeit de miniwidget mee naar compact en network. Ook de tekst groeit gecontroleerd mee. Verkleinen behoudt de instellingen. De miniwidget-instellingen staan onder de compactwidget-instellingen. Dit geldt voor standaard Android en Omalauncher OWL 5.0; zie [ADAPTIVE-WIDGETS.md](ADAPTIVE-WIDGETS.md).
+
 ## Toevoegen en valuta instellen
 
 1. Open Bitcoin Pulse → **Widgets** → **Miniwidget · 1×1**.
@@ -27,7 +29,7 @@ De miniwidget deelt de bestaande gegevenscache en achtergrondtaak met de andere 
 
 Vanaf **1.7.1 (versionCode 21)** is dezelfde miniwidget ook beschikbaar voor Omalauncher. Open het onderdeel **Omalauncher** onderaan het tabblad Widgets, kies EUR of USD en tik op **Miniwidget toevoegen aan Omalauncher**. Voeg elk exemplaar apart toe. Tik later op een geïmporteerde miniwidget om alleen zijn valuta te wisselen; Omalauncher bewaart die instellingen zelf. Zie [OMALAUNCHER.md](OMALAUNCHER.md).
 
-De bestaande grote en compacte widgets blijven beschikbaar; de Omalauncher-grafiekwidget blijft OWL 4.5. Wijzigingen worden voortaan voor beide launcheruitvoeringen samen uitgewerkt.
+De bestaande grote en compacte widgets blijven beschikbaar; alle Omalauncher-startformaten gebruiken nu OWL 5.0. Oude geïmporteerde OWL-kopieën moeten hiervoor eenmaal worden vervangen. Wijzigingen worden voortaan voor beide launcheruitvoeringen samen uitgewerkt.
 
 ## Voorbeelden uit de Android-layout
 

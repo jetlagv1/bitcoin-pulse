@@ -5,8 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Paint
-import android.graphics.Typeface
 import android.net.Uri
 import android.util.TypedValue
 import android.view.View
@@ -46,19 +44,15 @@ class MiniWidget : PulseWidget() {
             val scale=context.resources.configuration.fontScale.coerceAtLeast(.5f)
             val density=context.resources.displayMetrics.density
             val inset=if(minOf(width,height)<60)4 else 6
-            val available=(width-2*inset-1).coerceAtLeast(1)*density
-            val paint=Paint().apply { typeface=Typeface.create("sans-serif-medium",Typeface.NORMAL);fontFeatureSettings="tnum" }
-            fun fit(text: String,desired: Float): Float {
-                paint.textSize=desired*density*scale
-                return (desired*minOf(1f,available/paint.measureText(text).coerceAtLeast(1f))).coerceAtLeast(1f)
-            }
+            fun fit(text: String,desired: Float) = WidgetText.fit(context,text,desired,width-2*inset)
             val block=WidgetAppearance.number(snapshot.block.value?.height)
             val fee="${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB"
             val quote=price(snapshot.quote?.price,snapshot.currency)
-            val blockSize=fit(block,if(width<76)14f else 15f)
-            val feeSize=fit(fee,if(width<76)11f else 12f)
-            val priceSize=fit(quote,12f)
-            val labelSize=if(width<76)9f else 10f
+            val growth=(minOf(width,height)/80f).coerceIn(1f,1.5f)
+            val blockSize=fit(block,(if(width<76)14f else 15f)*growth)
+            val feeSize=fit(fee,(if(width<76)11f else 12f)*growth)
+            val priceSize=fit(quote,12f*growth)
+            val labelSize=(if(width<76)9f else 10f)*growth
             val showPrice=width>=76 && height>=2*inset+(labelSize+blockSize+feeSize+priceSize)*scale*1.2f+6
             val showLabel=height>=2*inset+(labelSize+blockSize+feeSize)*scale*1.2f+4
             val sources=listOf(snapshot.block,snapshot.fees)+if(showPrice)listOf(snapshot.prices)else emptyList()

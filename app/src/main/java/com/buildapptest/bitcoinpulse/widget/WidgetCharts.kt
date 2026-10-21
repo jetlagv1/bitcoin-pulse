@@ -22,13 +22,13 @@ data class WidgetCharts(val first: String="4h",val second: String="1d",val count
         fun configureCount(context: Context,count: Int) {
             require(count in 1..2)
             context.getSharedPreferences("widget-options",0).edit().putInt("default-chart-count",count).apply()
-            AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java)).forEach { id ->
+            WidgetSizing.ids(context).forEach { id ->
                 read(context,id).copy(count=count).save(context,id)
                 context.getSharedPreferences("widget-options",0).edit().remove("picker-$id").apply()
             }
             WidgetUpdates.render(context)
         }
-        fun owned(context: Context,id: Int) = id in AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context,PulseWidget::class.java))
+        fun owned(context: Context,id: Int) = id in WidgetSizing.ids(context)
         fun read(context: Context,id: Int,snapshot: Snapshot=Snapshot()): WidgetCharts {
             val prefs=context.getSharedPreferences("widget-options",0)
             val saved=prefs.getString("charts-$id",null)?.split(",")?.filter { p -> PERIODS.any { it.id==p } }?.distinct()

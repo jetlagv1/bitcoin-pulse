@@ -11,8 +11,8 @@ android {
         applicationId = "com.buildapptest.bitcoinpulse"
         minSdk = 26
         targetSdk = 36
-        versionCode = 21
-        versionName = "1.7.1"
+        versionCode = 22
+        versionName = "1.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true }

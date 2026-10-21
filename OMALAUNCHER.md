@@ -2,11 +2,25 @@
 
 Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalauncher`, met OWL-taalversie 8. De widget is een apart OWL-bestand en vereist geen Linux-installatie.
 
-De nieuwe 1×1-miniwidget is een extra standaard Android-widget. De bestaande OWL-widget blijft versie 4.5; bij een update vanaf 1.6.0 of hoger hoef je hem hiervoor niet opnieuw te importeren.
+De **Mini 1×1** is nu ook beschikbaar als aparte OWL-widget (versie 1.0). De bestaande grafiekwidget blijft OWL 4.5 en hoeft hiervoor niet opnieuw geïmporteerd te worden.
+
+## Mini 1×1 toevoegen
+
+1. Open Bitcoin Pulse → **Widgets** en ga naar het onderdeel **Omalauncher** onderaan.
+2. Kies bij **Miniwidget · 1×1** de beginvaluta **€ EUR / $ USD**.
+3. Tik op **Miniwidget toevoegen aan Omalauncher** en bevestig de import.
+4. Voeg op dezelfde manier nog een exemplaar toe met de andere valuta. Elk exemplaar heeft eigen, door Omalauncher bewaarde instellingen.
+5. Tik op een geplaatste miniwidget om alleen dat exemplaar tussen EUR en USD te wisselen. Er zijn geen extra knoppen nodig.
+
+De kleur, afgeronde vorm en informatievolgorde zijn gelijk aan de standaard miniwidget: volledige blokhoogte in cyaan, fee-advies voor het volgende blok in oranje en een compacte BTC-prijs in wit als die past. Bij weinig ruimte verdwijnt de prijs; in het kleinste formaat ook het label Blok. Omalauncher bepaalt de werkelijke celafmetingen en schaalt zijn eigen lettertypen.
+
+De beginvaluta wordt in de app ingesteld. Bestaande OWL-exemplaren bewaart Omalauncher in zijn eigen proces; de app kan die niet uitlezen of wijzigen. Daarom gebeurt later wisselen direct met een tik op de betreffende miniwidget. Dit verandert geen andere miniwidget of appinstelling. De miniwidget haalt alleen ticker-, blok- en feegegevens op en gebruikt geen candlebronnen.
+
+De gegevensbronnen worden ongeveer elke minuut opgevraagd wanneer Omalauncher de widget actief houdt. Bij fouten blijven de laatste waarden staan; waar ruimte is verschijnt Blok · oud. Deze tijdstempels weerspiegelen waargenomen bronwijzigingen, zoals bij de grafiekwidget. De launcher bepaalt de achtergrondplanning.
 
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.7.0 (versionCode 20)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.7.1 (versionCode 21)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets**, kies één of twee grafieken en tik op **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.
@@ -28,7 +42,7 @@ De widget maakt rechtstreeks HTTPS-verzoeken naar `api.kraken.com` en `mempool.s
 
 ## Techniek en controle
 
-- OWL-bron: `app/src/main/assets/bitcoin-pulse.owl`.
+- OWL-bronnen: `app/src/main/assets/bitcoin-pulse.owl` (grafieken, 4.5) en `app/src/main/assets/bitcoin-pulse-mini.owl` (Mini 1×1, 1.0).
 - Import: UTF-8 → raw DEFLATE → base64url zonder padding, in het fragment van de officiële `https://simonschubert.github.io/omarchy-widgets/w#owl1.…`-link. De code wordt hiervoor niet naar een server geüpload.
 - Gecontroleerd met de officiële OWL-compiler en echte openbare API-antwoorden voor alle zes combinaties van valuta en interval. De controles omvatten eerste laden, correcte koers- en candlevelden, candlebereik, offline cache en scheiding tussen perioden. De compiler meldt geen waarschuwingen en geen Linux-afhankelijkheid.
 - De Android-tests controleren ook het verliesvrij coderen van Unicode in de importlink.

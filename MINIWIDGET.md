@@ -25,7 +25,9 @@ Ontbrekende gegevens verschijnen als —, nooit als een verzonnen nulwaarde. Bij
 
 De miniwidget deelt de bestaande gegevenscache en achtergrondtaak met de andere Android-widgets. De app vraagt bij openen en ongeveer elke 30 seconden een update; widgets vragen achtergrondupdates ongeveer elke 15 minuten. Android kan die uitstellen om de batterij te sparen. Open de app om actuele gegevens op te vragen. EUR en USD komen uit de bestaande tickerbron; er zijn geen extra accounts of toestemmingen nodig.
 
-Dit is een standaard Android-widget. De onafhankelijke Omalauncher-widget blijft OWL 4.5. De bestaande grote en compacte widgets blijven beschikbaar.
+Vanaf **1.7.1 (versionCode 21)** is dezelfde miniwidget ook beschikbaar voor Omalauncher. Open het onderdeel **Omalauncher** onderaan het tabblad Widgets, kies EUR of USD en tik op **Miniwidget toevoegen aan Omalauncher**. Voeg elk exemplaar apart toe. Tik later op een geïmporteerde miniwidget om alleen zijn valuta te wisselen; Omalauncher bewaart die instellingen zelf. Zie [OMALAUNCHER.md](OMALAUNCHER.md).
+
+De bestaande grote en compacte widgets blijven beschikbaar; de Omalauncher-grafiekwidget blijft OWL 4.5. Wijzigingen worden voortaan voor beide launcheruitvoeringen samen uitgewerkt.
 
 ## Voorbeelden uit de Android-layout
 

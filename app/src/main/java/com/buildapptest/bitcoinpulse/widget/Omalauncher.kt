@@ -29,6 +29,17 @@ object Omalauncher {
     fun install(context: Context) {
         val currency=(context.applicationContext as com.buildapptest.bitcoinpulse.PulseApplication).repository.state.value.currency
         val source = configuredSource(context.assets.open("bitcoin-pulse.owl").bufferedReader().use { it.readText() },WidgetCharts.defaultCount(context),currency)
+        open(context,source)
+    }
+    fun installMini(context: Context,currency: String) {
+        val source=configuredMiniSource(context.assets.open("bitcoin-pulse-mini.owl").bufferedReader().use { it.readText() },currency)
+        open(context,source)
+    }
+    fun configuredMiniSource(source: String,currency: String): String {
+        require(currency in listOf("EUR","USD"))
+        return source.replace("state currency = \"EUR\" persist","state currency = \"$currency\" persist")
+    }
+    private fun open(context: Context,source: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(widgetLink(source))).setPackage("dev.omalauncher")
         try {
             context.startActivity(intent)

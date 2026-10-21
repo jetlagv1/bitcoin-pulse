@@ -271,6 +271,17 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
             Text("Toevoegen aan Omalauncher")
         }
         Text("Omalauncher toont eerst een importcontrole. Bevestig daar om de widget toe te voegen. Deze widget haalt zelf openbare gegevens op bij Kraken en mempool.space; instellingen staan los van de Android-widgets.", color = Muted, fontSize = 12.sp)
+        HorizontalDivider(color=Color(0xFF38485F))
+        Text("Miniwidget · 1×1",fontSize=18.sp)
+        Text("Dezelfde compacte weergave met blokhoogte, fee-advies en BTC-prijs als die past.",color=Muted,fontSize=13.sp)
+        var miniCurrency by rememberSaveable { mutableStateOf("EUR") }
+        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            listOf("EUR","USD").forEach { code ->
+                FilterChip(selected=miniCurrency==code,onClick={ miniCurrency=code },label={ Text(if(code=="EUR")"€ EUR" else "$ USD") })
+            }
+        }
+        Button(onClick={ com.buildapptest.bitcoinpulse.widget.Omalauncher.installMini(context,miniCurrency) },modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) { Text("Miniwidget toevoegen aan Omalauncher") }
+        Text("Kies hier de valuta en voeg elk exemplaar apart toe. Tik later op de miniwidget om alleen dat exemplaar tussen EUR en USD te wisselen. Omalauncher bewaart zijn instellingen zelf.",color=Muted,fontSize=12.sp)
     }
 }
 

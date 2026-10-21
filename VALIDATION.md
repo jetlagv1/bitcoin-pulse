@@ -1,3 +1,15 @@
+# Bitcoin Pulse 1.7.1 / versionCode 21
+
+Verified on 21 October 2026.
+
+- Added the matching Omalauncher Mini 1×1 as a separate OWL 1.0 asset. The app's bottom Omalauncher panel imports a new instance with the selected EUR/USD currency. A real tap changes only that imported instance; standard Android per-instance controls remain in the app. Existing OWL instances live in Omalauncher's independent storage, which the app cannot enumerate or change.
+- The miniwidgets share information order, colors, rounded background, full block height, next-block fee estimate and conditional compact price. The official OWL compiler/renderer passed six size variants from 40×40 to 120×120 dp, no text overflow, real taps, independent instances, missing values and cached values after failed feeds. The normal-size native and OWL captures were visually compared. Omalauncher uses its renderer's own sans-serif font weights and text scaling.
+- All 61 ordinary Android tests passed, with no failures/skips, plus the isolated OwlMiniTest. The new ordinary import test decodes actual app-generated OWL links and verifies independent starting currencies. Release lint remains at zero errors and 178 warnings.
+- APK and RSA upload-signed AAB built; bundletool 1.18.3 validated version 1.7.1 / 21, API levels, signature and 16KB bundle/ZIP/ELF alignment. Both actual OWL sources are included unchanged in the APK/AAB. The existing chart OWL 4.5 is unchanged and needs no reimport.
+- Project AGENTS.md records the user's standing instruction to implement and verify changes for standard Android and Omalauncher together. No physical-device/full-launcher test or Play Console upload/publication was performed.
+
+## Historical verification
+
 # Bitcoin Pulse 1.7.0 / versionCode 20
 
 Verified on 21 October 2026.

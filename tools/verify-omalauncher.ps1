@@ -62,4 +62,6 @@ try {
     # full-size interaction suite and the independent compact interaction suite.
     & $pulseGradle :app:testDebugUnitTest --tests 'com.buildapptest.bitcoinpulse.owlcheck.OwlResizeTest' -I $pulseInitPath --offline --console=plain
     if ($LASTEXITCODE -ne 0) { throw 'Resizable OWL render validation failed.' }
+    & $pulseGradle :app:testDebugUnitTest --tests 'com.buildapptest.bitcoinpulse.owlcheck.OwlMiniTest' -I $pulseInitPath --offline --console=plain
+    if ($LASTEXITCODE -ne 0) { throw 'Mini OWL render validation failed.' }
 } finally { Pop-Location }

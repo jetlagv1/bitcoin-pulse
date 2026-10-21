@@ -85,9 +85,16 @@ class OwlMiniTest {
             val time=SystemClock.uptimeMillis()
             for(a in listOf(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP)) { val e=MotionEvent.obtain(time,time,a,width/2f,height/2f,0);decor.dispatchTouchEvent(e);e.recycle() }
             androidx.compose.runtime.snapshots.Snapshot.sendApplyNotifications();settle()
-            assertEquals(Str("USD"),inst.get("currency"));assertEquals(Str("USD"),other.get("currency"))
-            assertEquals(Str("$ 78,3k"),inst.get("miniPriceText"))
-            inst.set("currency",Str("EUR"));assertEquals(Str("USD"),other.get("currency"))
+            assertEquals(TRUE,inst.get("miniShowPrice"));assertEquals(Str("EUR"),inst.get("currency"));assertEquals(Str("USD"),other.get("currency"))
+            assertTrue("Price must be visible even in a tiny tile",labels().contains("€ 72,5k"));assertTrue(labels().contains("3 sat/vB"))
+            assertEquals(Str("€ 72,5k"),inst.get("miniPrimary"))
+            for(n in nodes()) {
+                val layouts=mutableListOf<TextLayoutResult>();n.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts)
+                assertTrue("Price-state overflow at $w x $h",layouts.all { !it.hasVisualOverflow })
+            }
+            for(a in listOf(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP)) { val e=MotionEvent.obtain(time,time,a,width/2f,height/2f,0);decor.dispatchTouchEvent(e);e.recycle() }
+            androidx.compose.runtime.snapshots.Snapshot.sendApplyNotifications();settle()
+            assertEquals(FALSE,inst.get("miniShowPrice"));assertEquals(Str("971.890"),inst.get("miniPrimary"));assertEquals(Str("EUR"),inst.get("currency"))
             val cached=inst.get("block")
             inst.set("blocks",Obj(mapOf("ok" to FALSE)));inst.program.triggers.forEach { it.action.run(inst.root,emptyList()) }
             assertEquals(cached,inst.get("block"));assertEquals(TRUE,inst.get("oldBlock"))

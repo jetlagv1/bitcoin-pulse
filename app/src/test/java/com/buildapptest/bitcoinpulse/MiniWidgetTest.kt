@@ -96,15 +96,39 @@ class MiniWidgetTest {
         assertFalse(context.getSharedPreferences("widget-options",0).contains("currency-51"))
         assertEquals("EUR",WidgetCurrency.read(context,52,"EUR"))
     }
-    @Test fun eachTileOpensWidgetSettingsWithItsOwnId() {
+    @Test fun tapsSwapBlockAndPriceLocallyAndRetainCurrencyAndOtherWidgets() {
         val context=RuntimeEnvironment.getApplication() as PulseApplication
-        for(id in listOf(61,62)) {
-            val root=render(context,Snapshot(),80,88,id)
-            assertTrue(root.performClick())
-            val intent=shadowOf(context).nextStartedActivity
-            assertEquals(MainActivity::class.java.name,intent.component!!.className)
-            assertTrue(intent.getBooleanExtra(MiniWidget.OPEN_WIDGETS,false))
-            assertEquals(id,intent.getIntExtra(MiniWidget.WIDGET_ID,-1))
+        WidgetVisualFixture.seed(context,System.currentTimeMillis())
+        val manager=AppWidgetManager.getInstance(context)
+        for(id in listOf(61,62))manager.bindAppWidgetIdIfAllowed(id,ComponentName(context,MiniWidget::class.java))
+        WidgetCurrency.set(context,61,"USD");WidgetUpdates.render(context)
+        assertFalse(MiniWidget.toggle(context,999))
+        fun tap(id:Int) {
+            assertTrue(shadowOf(manager).getViewFor(id).performClick())
+            val intent=shadowOf(context).broadcastIntents.last { it.action==WidgetUpdates.MINI_DISPLAY }
+            assertEquals(id,intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1))
+            PulseWidget().onReceive(context,intent)
         }
+        tap(61)
+        assertTrue(MiniWidget.showingPrice(context,61));assertFalse(MiniWidget.showingPrice(context,62))
+        assertEquals("$ 78,3k",shadowOf(manager).getViewFor(61).findViewById<TextView>(R.id.mini_height).text.toString())
+        assertEquals("971.890",shadowOf(manager).getViewFor(62).findViewById<TextView>(R.id.mini_height).text.toString())
+        assertEquals("971.890",shadowOf(manager).getViewFor(61).findViewById<TextView>(R.id.mini_price).text.toString())
+        for((w,h) in listOf(40 to 40,64 to 64,80 to 88,120 to 120)) {
+            val root=render(context,context.repository.state.value.copy(currency="USD"),w,h,61)
+            val primary=root.findViewById<TextView>(R.id.mini_height)
+            assertEquals("$ 78,3k",primary.text.toString())
+            assertTrue(primary.paint.measureText(primary.text.toString())<=primary.width+1)
+            assertEquals("3 sat/vB",root.findViewById<TextView>(R.id.mini_fee).text.toString())
+        }
+        for((w,h) in listOf(200 to 240,320 to 480,80 to 88)) {
+            manager.updateAppWidgetOptions(61,Bundle().apply { putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,w);putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,h) })
+            WidgetUpdates.render(context)
+        }
+        assertEquals("$ 78,3k",shadowOf(manager).getViewFor(61).findViewById<TextView>(R.id.mini_height).text.toString())
+        tap(61)
+        assertFalse(MiniWidget.showingPrice(context,61));assertEquals("971.890",shadowOf(manager).getViewFor(61).findViewById<TextView>(R.id.mini_height).text.toString())
+        assertEquals("USD",WidgetCurrency.read(context,61,"EUR"));assertEquals("EUR",WidgetCurrency.read(context,62,"EUR"))
+        assertNull("Taps stay in the widget",shadowOf(context).nextStartedActivity)
     }
 }

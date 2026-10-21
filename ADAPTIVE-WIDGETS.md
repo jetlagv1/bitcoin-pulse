@@ -1,4 +1,4 @@
-# Meegroeiende widgets — 1.8.0 / 22
+# Meegroeiende widgets — 1.8.1 / 23
 
 Mini, compact en network zijn startformaten. Je kunt elk geplaatst exemplaar vergroten of verkleinen zonder een andere widget toe te voegen. Dit werkt in standaard Android-launchers en Omalauncher. De launcher bepaalt de celmaten en de beschikbare resizegrepen.
 
@@ -32,7 +32,7 @@ Android 12 en hoger krijgen afzonderlijke layouts voor de door de launcher gemel
 
 De miniwidget-instellingen staan onder de compactwidget-instellingen. Het Omalauncher-onderdeel blijft onderaan en biedt network-, compact- en mini-imports. Alle drie starten met hetzelfde programma en onthouden hun eigen instellingen.
 
-Installeer versie 1.8.0. De gewone Android-widgets krijgen het gedrag via de app-update. **Vervang eerder geïmporteerde OWL-widgets één keer met versie 5.0** via de app: Omalauncher bewaart zelfstandige kopieën. Daarna verandert het formaat direct in de launcher, zonder opnieuw importeren.
+Installeer versie 1.8.1. De gewone Android-widgets krijgen het gedrag via de app-update. **Vervang eerder geïmporteerde OWL-widgets één keer met versie 5.1** via de app: Omalauncher bewaart zelfstandige kopieën. Daarna verandert het formaat direct in de launcher, zonder opnieuw importeren.
 
 ## Bronnen en onderhoud
 

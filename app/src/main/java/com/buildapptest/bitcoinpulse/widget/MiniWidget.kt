@@ -10,7 +10,6 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
-import com.buildapptest.bitcoinpulse.MainActivity
 import com.buildapptest.bitcoinpulse.R
 import com.buildapptest.bitcoinpulse.data.Format
 import com.buildapptest.bitcoinpulse.data.Snapshot
@@ -25,6 +24,12 @@ class MiniWidget : PulseWidget() {
         fun ids(context: Context): IntArray = AppWidgetManager.getInstance(context)
             .getAppWidgetIds(ComponentName(context,MiniWidget::class.java))
 
+        internal fun showingPrice(context: Context,id: Int) = context.getSharedPreferences("widget-options",0).getBoolean("mini-show-price-$id",false)
+        internal fun toggle(context: Context,id: Int): Boolean {
+            if(id !in WidgetSizing.ids(context) || WidgetSizing.sizes(context,id).none { WidgetSizing.mode(it.width.toInt(),it.height.toInt())==WidgetMode.MINI })return false
+            context.getSharedPreferences("widget-options",0).edit().putBoolean("mini-show-price-$id",!showingPrice(context,id)).apply()
+            return true
+        }
         fun pin(context: Context) {
             val manager=AppWidgetManager.getInstance(context)
             if(manager.isRequestPinAppWidgetSupported && manager.requestPinAppWidget(ComponentName(context,MiniWidget::class.java),null,null)) return
@@ -48,30 +53,36 @@ class MiniWidget : PulseWidget() {
             val block=WidgetAppearance.number(snapshot.block.value?.height)
             val fee="${WidgetAppearance.fee(snapshot.fees.value?.next)} sat/vB"
             val quote=price(snapshot.quote?.price,snapshot.currency)
+            val showingPrice=showingPrice(context,id)
+            val primary=if(showingPrice)quote else block
+            val secondary=if(showingPrice)block else quote
             val growth=(minOf(width,height)/80f).coerceIn(1f,1.5f)
-            val blockSize=fit(block,(if(width<76)14f else 15f)*growth)
+            val blockSize=fit(primary,(if(width<76)14f else 15f)*growth)
             val feeSize=fit(fee,(if(width<76)11f else 12f)*growth)
-            val priceSize=fit(quote,12f*growth)
-            val labelSize=(if(width<76)9f else 10f)*growth
+            val priceSize=fit(secondary,12f*growth)
+            val labelSize=fit(if(showingPrice)"BTC/${snapshot.currency} · oud" else "Blok · oud",(if(width<76)9f else 10f)*growth)
             val showPrice=width>=76 && height>=2*inset+(labelSize+blockSize+feeSize+priceSize)*scale*1.2f+6
             val showLabel=height>=2*inset+(labelSize+blockSize+feeSize)*scale*1.2f+4
-            val sources=listOf(snapshot.block,snapshot.fees)+if(showPrice)listOf(snapshot.prices)else emptyList()
+            val sources=listOf(snapshot.fees)+(if(showingPrice)listOf(snapshot.prices)else listOf(snapshot.block))+(if(showPrice)if(showingPrice)listOf(snapshot.block)else listOf(snapshot.prices)else emptyList())
             val old=sources.any { it.value!=null && (it.error!=null || it.isStale(now)) }
             views.setViewPadding(R.id.mini_root,(inset*density).toInt(),(inset*density).toInt(),(inset*density).toInt(),(inset*density).toInt())
-            views.setTextViewText(R.id.mini_label,if(old)"Blok · oud" else "Blok")
-            views.setTextViewText(R.id.mini_height,block)
+            val label=if(showingPrice)"BTC/${snapshot.currency}" else "Blok"
+            views.setTextViewText(R.id.mini_label,if(old)"$label · oud" else label)
+            views.setTextViewText(R.id.mini_height,primary)
+            views.setTextColor(R.id.mini_height,android.graphics.Color.parseColor(if(showingPrice)"#F7FAFF" else "#49CFFF"))
             views.setTextViewText(R.id.mini_fee,fee)
-            views.setTextViewText(R.id.mini_price,quote)
+            views.setTextViewText(R.id.mini_price,secondary)
+            views.setTextColor(R.id.mini_price,android.graphics.Color.parseColor(if(showingPrice)"#49CFFF" else "#F7FAFF"))
             for((view,size) in listOf(R.id.mini_label to labelSize,R.id.mini_height to blockSize,R.id.mini_fee to feeSize,R.id.mini_price to priceSize))
                 views.setTextViewTextSize(view,TypedValue.COMPLEX_UNIT_SP,size)
             views.setViewVisibility(R.id.mini_price,if(showPrice)View.VISIBLE else View.GONE)
             views.setViewVisibility(R.id.mini_label,if(showLabel)View.VISIBLE else View.GONE)
             val status=when { busy || snapshot.refreshing->"Gegevens worden vernieuwd";old->"Opgeslagen of oudere gegevens";else->"Laatst bijgewerkt ${Format.time(sources.minOf { it.fetchedAt })}" }
-            views.setContentDescription(R.id.mini_root,"Blok $block. Geschat tarief voor het volgende blok: $fee. Bitcoin-prijs ${Format.preciseMoney(snapshot.quote?.price,snapshot.currency)}. $status. Tik voor de miniwidget-instellingen.")
+            views.setContentDescription(R.id.mini_root,"Blok $block. Geschat tarief voor het volgende blok: $fee. Bitcoin-prijs ${Format.preciseMoney(snapshot.quote?.price,snapshot.currency)}. $status. Tik om ${if(showingPrice)"de blokhoogte" else "de BTC-prijs"} bovenaan te tonen.")
             if(id!=AppWidgetManager.INVALID_APPWIDGET_ID) {
-                val open=Intent(context,MainActivity::class.java).setData(Uri.parse("bitcoinpulse://mini-widget/$id"))
-                    .putExtra(OPEN_WIDGETS,true).putExtra(WIDGET_ID,id)
-                views.setOnClickPendingIntent(R.id.mini_root,PendingIntent.getActivity(context,id,open,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                val toggle=Intent(context,PulseWidget::class.java).setAction(WidgetUpdates.MINI_DISPLAY).setData(Uri.parse("bitcoinpulse://widget/$id/mini-display"))
+                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+                views.setOnClickPendingIntent(R.id.mini_root,PendingIntent.getBroadcast(context,id,toggle,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             }
             return views
         }

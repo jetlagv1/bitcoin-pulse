@@ -1,11 +1,11 @@
 # Install Bitcoin Pulse
 
-1. Open **Dropbox → Bitcoin Pulse → Bitcoin-Pulse-1.8.0-debug.apk** on your phone, or transfer it from deliverables. Install it as an update of the directly installed APK to retain preferences.
+1. Open **Dropbox → Bitcoin Pulse → Bitcoin-Pulse-1.8.1-debug.apk** on your phone, or transfer it from deliverables. Install it as an update of the directly installed APK to retain preferences.
 2. Open the APK on Android 8.0 or newer. If prompted, allow your browser or file manager to install this APK.
 3. Open Bitcoin Pulse with an internet connection. Prices come from Kraken; blockchain and fee data come from mempool.space.
 4. In **Widgets**, choose network, compact or mini as the starting size. Confirm placement in your launcher, or use the launcher's widget picker. Mini settings are below compact settings. Mini currency is selected per instance in the app; compact/network offer their own currency controls.
 5. Resize any instance: mini text grows, compact appears at 160×160 dp, and network with charts appears at 250×320 dp. Compact adds more details as height increases. Shrinking preserves currency, periods, chart count, cloud and zoom. Actual cell sizes vary by launcher.
-6. For Omalauncher, use its section at the bottom of the Widgets tab. It offers the same three start sizes, all OWL 5.0. Replace previously imported copies once; updating the APK does not replace Omalauncher's stored copies. See [OMALAUNCHER.md](OMALAUNCHER.md).
+6. For Omalauncher, use its section at the bottom of the Widgets tab. It offers the same three start sizes, all OWL 5.1. Replace previously imported copies once; updating the APK does not replace Omalauncher's stored copies. See [OMALAUNCHER.md](OMALAUNCHER.md).
 
 In network mode, choose one or two charts, intervals (4 hours, 1 day or 1 week), Ichimoku cloud and zoom directly in the widget. Zoom reaches 270 candles. The app dashboard can display all three Combi intervals and uses two-finger zoom. See [ADAPTIVE-WIDGETS.md](ADAPTIVE-WIDGETS.md) for current sizing and behavior.
 

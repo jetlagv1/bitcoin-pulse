@@ -280,7 +280,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
             }
         }
         Button(onClick={ com.buildapptest.bitcoinpulse.widget.Omalauncher.installMini(context,miniCurrency) },modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)) { Text("Miniwidget toevoegen aan Omalauncher") }
-        Text("Kies hier de valuta en voeg elk exemplaar apart toe. Tik later op de miniwidget om alleen dat exemplaar tussen EUR en USD te wisselen. Omalauncher bewaart zijn instellingen zelf.",color=Muted,fontSize=12.sp)
+        Text("Kies hier de valuta en voeg elk exemplaar apart toe. Tik op de miniwidget om blokhoogte en BTC-prijs te wisselen. Omalauncher bewaart zijn instellingen zelf.",color=Muted,fontSize=12.sp)
     }
 }
 

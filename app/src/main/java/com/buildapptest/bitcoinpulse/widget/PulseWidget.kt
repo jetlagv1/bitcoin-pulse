@@ -49,6 +49,9 @@ open class PulseWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == WidgetUpdates.REFRESH) WidgetUpdates.refresh(context)
+        if(intent.action==WidgetUpdates.MINI_DISPLAY) {
+            if(MiniWidget.toggle(context,intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)))WidgetUpdates.render(context)
+        }
         if (intent.action == WidgetUpdates.CURRENCY) {
             val id=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,-1)
             val snapshot=(context.applicationContext as PulseApplication).repository.state.value
@@ -95,7 +98,7 @@ open class PulseWidget : AppWidgetProvider() {
     }
     override fun onDeleted(context: Context, ids: IntArray) {
         val editor=context.getSharedPreferences("widget-options",Context.MODE_PRIVATE).edit()
-        ids.forEach { id -> editor.remove("currency-$id");editor.remove("resize-network-$id");editor.remove("period-$id");editor.remove("picker-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
+        ids.forEach { id -> editor.remove("currency-$id");editor.remove("mini-show-price-$id");editor.remove("resize-network-$id");editor.remove("period-$id");editor.remove("picker-$id");editor.remove("ichimoku-$id");editor.remove("charts-$id");editor.remove("chart-count-$id");PERIODS.forEach { editor.remove("zoom-$id-${it.id}") } }; editor.apply()
     }
 }
 class CompactWidget : PulseWidget()
@@ -107,6 +110,7 @@ object WidgetUpdates {
     const val PICKER = "com.buildapptest.bitcoinpulse.PICKER"
     const val PERIOD = "com.buildapptest.bitcoinpulse.PERIOD"
     const val COUNT = "com.buildapptest.bitcoinpulse.COUNT"
+    const val MINI_DISPLAY = "com.buildapptest.bitcoinpulse.MINI_DISPLAY"
     const val CURRENCY = "com.buildapptest.bitcoinpulse.CURRENCY"
     private val minus=listOf(R.id.chart_minus_1,R.id.chart_minus_2)
     private val plus=listOf(R.id.chart_plus_1,R.id.chart_plus_2)

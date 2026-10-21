@@ -1,3 +1,15 @@
+# Bitcoin Pulse 1.8.1 / versionCode 23
+
+Verified on 21 October 2026.
+
+- Changed only mini-mode tapping: the primary slot alternates block height and compact BTC price, while the fee stays visible and currency is retained. If the secondary slot fits, it shows the other value. Android uses an owned-widget broadcast and per-instance persisted choice; the app is not opened. OWL 5.1 uses an independent persisted miniShowPrice state instead of toggling currency.
+- All 65 ordinary Android tests passed, with zero failures/errors/skips. The updated actual-click test checks two independent IDs, currency retention, no activity launch, tiny-tile price fitting, second-tap restoration and the choice surviving compact/network resize and return to mini.
+- The official OWL compiler/renderer mini test passed at six sizes (40×40 through 120×120 dp), including real first/second taps, visible price and unchanged fee/currency, no text overflow, independent instances and missing/failed feeds. Compact/network branches and resizing logic were not otherwise changed.
+- Release lint: zero errors and 183 warnings. APK and upload-signed AAB built for 1.8.1 / 23. Official bundletool 1.18.3 verified version/API/signature, universal APK generation and 16KB bundle/ZIP/ELF alignment. All three OWL assets match their packaged APK/AAB copies.
+- No physical-device/full-launcher test or Play Console publication was performed. Imported Omalauncher copies must be replaced once with OWL 5.1 to receive the new tap action.
+
+## Historical verification
+
 # Bitcoin Pulse 1.8.0 / versionCode 22
 
 Verified on 21 October 2026.

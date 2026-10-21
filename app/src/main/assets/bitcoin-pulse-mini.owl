@@ -1,9 +1,10 @@
 widget "Bitcoin Pulse · Mini 1×1" {
-  meta { owl: 8; version: "5.0"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
+  meta { owl: 8; version: "5.1"; description: "Bitcoin price, candles and mainnet blocks. Public data from Kraken and mempool.space; no Linux required." }
   size: 1x1
   minSize: 1x1
   padding: 0
   state currency = "EUR" persist
+  state miniShowPrice = false persist
   state interval = 240 persist
   state interval2 = 1440 persist
   state graphCount = 2 persist
@@ -120,15 +121,18 @@ widget "Bitcoin Pulse · Mini 1×1" {
   let inset = min(w, h) < 60 ? 4 : 6
   let available = max(w - 2 * inset - 1, 1)
   let miniGrowth = min(max(min(w, h) / 80, 1), 1.5)
-  let blockSize = min((w < 76 ? 14 : 15) * miniGrowth, available / max(len(heightText) * 0.6, 1))
+  let miniPrimary = miniShowPrice ? miniPriceText : heightText
+  let miniSecondary = miniShowPrice ? heightText : miniPriceText
+  let miniLabel = miniShowPrice ? "BTC/${currency}" : "Blok"
+  let blockSize = min((w < 76 ? 14 : 15) * miniGrowth, available / max(len(miniPrimary) * 0.6, 1))
   let feeSize = min((w < 76 ? 11 : 12) * miniGrowth, available / max(len(feeText) * 0.6, 1))
-  let priceSize = min(12 * miniGrowth, available / max(len(miniPriceText) * 0.6, 1))
-  let labelSize = (w < 76 ? 9 : 10) * miniGrowth
+  let priceSize = min(12 * miniGrowth, available / max(len(miniSecondary) * 0.6, 1))
+  let labelSize = min((w < 76 ? 9 : 10) * miniGrowth, available / max(len(miniLabel + " · oud") * 0.55, 1))
   let showPrice = w >= 76 && h >= 2 * inset + (labelSize + blockSize + feeSize + priceSize) * 1.2 + 6
   let showLabel = h >= 48 && h >= 2 * inset + (labelSize + blockSize + feeSize) * 1.2 + 4
   let oldBlock = block != null && (blocks.ok == false || blockAt == null || now - blockAt > 1200)
   let oldFees = advice != null && (fees.ok == false || feesAt == null || now - feesAt > 1200)
-  let oldPrice = showPrice && quotes != null && (ticker.ok == false || priceAt == null || now - priceAt > 1200)
+  let oldPrice = (showPrice || miniShowPrice) && quotes != null && (ticker.ok == false || priceAt == null || now - priceAt > 1200)
   let compactChange = adaptiveHeight >= 220
   let compactEstimates = adaptiveHeight >= 280
   let compactMore = adaptiveHeight >= 240
@@ -151,11 +155,11 @@ widget "Bitcoin Pulse · Mini 1×1" {
     radius: 16
     gap: 2
     justify: center
-    onTap: currency = currency == "EUR" ? "USD" : "EUR"
-    if showLabel { Text { text: oldBlock || oldFees || oldPrice ? "Blok · oud" : "Blok"; font: sans; fontSize: labelSize; color: #BAC7DB; maxLines: 1 } }
-    Text { text: heightText; font: sans; fontSize: blockSize; bold: true; color: #49CFFF; maxLines: 1 }
+    onTap: miniShowPrice = !miniShowPrice
+    if showLabel { Text { text: "${miniLabel}${oldFees || (!miniShowPrice || showPrice) && oldBlock || (miniShowPrice || showPrice) && oldPrice ? ' · oud' : ''}"; font: sans; fontSize: labelSize; color: #BAC7DB; maxLines: 1 } }
+    Text { text: miniPrimary; font: sans; fontSize: blockSize; bold: true; color: miniShowPrice ? #F7FAFF : #49CFFF; maxLines: 1 }
     Text { text: feeText; font: sans; fontSize: feeSize; bold: true; color: #FF8A1F; maxLines: 1 }
-    if showPrice { Text { text: miniPriceText; font: sans; fontSize: priceSize; bold: true; color: #F7FAFF; maxLines: 1 } }
+    if showPrice { Text { text: miniSecondary; font: sans; fontSize: priceSize; bold: true; color: miniShowPrice ? #49CFFF : #F7FAFF; maxLines: 1 } }
   }
   } else if viewMode == "compact" {
   Column {

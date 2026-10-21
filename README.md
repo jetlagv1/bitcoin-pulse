@@ -4,13 +4,17 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.8.0**, versionCode **22**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.8.1**, versionCode **23**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## Mini tap (1.8.1)
+
+Tapping a mini tile swaps block height and BTC price in the primary slot, keeping the fee estimate and the instance's currency unchanged. If there is room for the secondary value, it swaps into that slot. The price can therefore be viewed even on the smallest tile. This works in Android and OWL 5.1; compact/network behavior and resizing are unchanged.
 
 ## Adaptive widgets (1.8.0)
 

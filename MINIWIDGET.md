@@ -4,6 +4,8 @@ Beschikbaar vanaf Bitcoin Pulse **1.7.0 (versionCode 20)**.
 
 Vanaf **1.8.0 (versionCode 22)** groeit de miniwidget mee naar compact en network. Ook de tekst groeit gecontroleerd mee. Verkleinen behoudt de instellingen. De miniwidget-instellingen staan onder de compactwidget-instellingen. Dit geldt voor standaard Android en Omalauncher OWL 5.0; zie [ADAPTIVE-WIDGETS.md](ADAPTIVE-WIDGETS.md).
 
+In **1.8.1** wisselt een tik de bovenste waarde tussen blokhoogte en BTC-prijs. Het fee-advies blijft staan. Waar de tweede waarde past, wisselen beide waarden van plaats. Dit verandert de valuta niet en opent de app niet.
+
 ## Toevoegen en valuta instellen
 
 1. Open Bitcoin Pulse → **Widgets** → **Miniwidget · 1×1**.
@@ -11,7 +13,7 @@ Vanaf **1.8.0 (versionCode 22)** groeit de miniwidget mee naar compact en networ
 3. Ga terug naar de app. Onder **Je miniwidgets** staat elk toegevoegd exemplaar met een eigen keuze **€ EUR / $ USD**.
 4. Voeg opnieuw een miniwidget toe voor een tweede exemplaar. Zo kun je tegelijk één in euro's en één in dollars tonen.
 
-Elke nieuwe miniwidget begint in EUR. De keuze wordt lokaal per widget-ID bewaard en verandert de appvaluta of andere widgets niet. Tik op een miniwidget om het tabblad Widgets te openen. Verwijderen van een miniwidget ruimt alleen de instellingen van dat exemplaar op.
+Elke nieuwe miniwidget begint in EUR. De keuze wordt lokaal per widget-ID bewaard en verandert de appvaluta of andere widgets niet. Tik op een miniwidget om blokhoogte en BTC-prijs bovenaan te wisselen; het fee-advies blijft staan. Dit blijft binnen de widget en verandert de valuta niet. Verwijderen van een miniwidget ruimt alleen de instellingen van dat exemplaar op.
 
 ## Wat wordt getoond?
 
@@ -27,9 +29,9 @@ Ontbrekende gegevens verschijnen als —, nooit als een verzonnen nulwaarde. Bij
 
 De miniwidget deelt de bestaande gegevenscache en achtergrondtaak met de andere Android-widgets. De app vraagt bij openen en ongeveer elke 30 seconden een update; widgets vragen achtergrondupdates ongeveer elke 15 minuten. Android kan die uitstellen om de batterij te sparen. Open de app om actuele gegevens op te vragen. EUR en USD komen uit de bestaande tickerbron; er zijn geen extra accounts of toestemmingen nodig.
 
-Vanaf **1.7.1 (versionCode 21)** is dezelfde miniwidget ook beschikbaar voor Omalauncher. Open het onderdeel **Omalauncher** onderaan het tabblad Widgets, kies EUR of USD en tik op **Miniwidget toevoegen aan Omalauncher**. Voeg elk exemplaar apart toe. Tik later op een geïmporteerde miniwidget om alleen zijn valuta te wisselen; Omalauncher bewaart die instellingen zelf. Zie [OMALAUNCHER.md](OMALAUNCHER.md).
+Vanaf **1.7.1 (versionCode 21)** is dezelfde miniwidget ook beschikbaar voor Omalauncher. Open het onderdeel **Omalauncher** onderaan het tabblad Widgets, kies EUR of USD en tik op **Miniwidget toevoegen aan Omalauncher**. Voeg elk exemplaar apart toe. Tik later op een geïmporteerde miniwidget om blokhoogte en BTC-prijs bovenaan te wisselen. De valuta blijft de vóór het toevoegen gekozen valuta; Omalauncher bewaart die instellingen zelf. Zie [OMALAUNCHER.md](OMALAUNCHER.md).
 
-De bestaande grote en compacte widgets blijven beschikbaar; alle Omalauncher-startformaten gebruiken nu OWL 5.0. Oude geïmporteerde OWL-kopieën moeten hiervoor eenmaal worden vervangen. Wijzigingen worden voortaan voor beide launcheruitvoeringen samen uitgewerkt.
+De bestaande grote en compacte widgets blijven beschikbaar; alle Omalauncher-startformaten gebruiken nu OWL 5.1. Oude geïmporteerde OWL-kopieën moeten hiervoor eenmaal worden vervangen. Wijzigingen worden voortaan voor beide launcheruitvoeringen samen uitgewerkt.
 
 ## Voorbeelden uit de Android-layout
 

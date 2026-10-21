@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
             PulseScreen(repository,
                 onRefresh = { lifecycleScope.launch { repository.refresh(); WidgetUpdates.render(this@MainActivity) } },
                 onCurrency = { code -> lifecycleScope.launch { repository.setCurrency(code); WidgetUpdates.render(this@MainActivity); repository.refresh(); WidgetUpdates.render(this@MainActivity) } },
-                onPin = ::pinWidget)
+                onPin = ::pinWidget,initialWidgets=intent.getBooleanExtra(com.buildapptest.bitcoinpulse.widget.MiniWidget.OPEN_WIDGETS,false))
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

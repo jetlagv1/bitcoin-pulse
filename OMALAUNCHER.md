@@ -2,9 +2,11 @@
 
 Dit is ondersteuning voor **Omalauncher van Simon Schubert**, pakket `dev.omalauncher`, met OWL-taalversie 8. De widget is een apart OWL-bestand en vereist geen Linux-installatie.
 
+De nieuwe 1×1-miniwidget is een extra standaard Android-widget. De bestaande OWL-widget blijft versie 4.5; bij een update vanaf 1.6.0 of hoger hoef je hem hiervoor niet opnieuw te importeren.
+
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.6.2 (versionCode 19)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.7.0 (versionCode 20)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets**, kies één of twee grafieken en tik op **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.

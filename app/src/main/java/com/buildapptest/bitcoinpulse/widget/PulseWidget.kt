@@ -108,7 +108,7 @@ object WidgetUpdates {
             .putInt("zoom-$id-$period",ChartZoom.step(zooms(context,id).getValue(period),out)).apply()
         return true
     }
-    private val providers = listOf(PulseWidget::class.java, CompactWidget::class.java)
+    private val providers = listOf(PulseWidget::class.java, CompactWidget::class.java, MiniWidget::class.java)
     fun hasWidgets(context: Context): Boolean = providers.any {
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, it)).isNotEmpty()
     }
@@ -128,7 +128,15 @@ object WidgetUpdates {
         val now = System.currentTimeMillis()
         providers.forEach { provider ->
             val compact = provider == CompactWidget::class.java
-            manager.getAppWidgetIds(ComponentName(context, provider)).forEach { id ->
+            manager.getAppWidgetIds(ComponentName(context, provider)).forEach widget@ { id ->
+                if(provider==MiniWidget::class.java) {
+                    val snapshot=appSnapshot.copy(currency=WidgetCurrency.read(context,id,"EUR"))
+                    val options=manager.getAppWidgetOptions(id)
+                    manager.updateAppWidget(id,MiniWidget.views(context,id,snapshot,
+                        options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,80),
+                        options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,88),now,busy))
+                    return@widget
+                }
                 val snapshot=appSnapshot.copy(currency=WidgetCurrency.read(context,id,appSnapshot.currency))
                 val options=manager.getAppWidgetOptions(id)
                 val height=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,WidgetAppearance.SINGLE_HEIGHT)

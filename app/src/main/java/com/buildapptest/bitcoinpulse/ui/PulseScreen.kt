@@ -42,9 +42,9 @@ private val Cyan = Color(0xFF49CFFF)
 private val Numeric = TextStyle(fontFeatureSettings = "tnum", fontWeight = FontWeight.SemiBold)
 
 @Composable
-fun PulseScreen(repository: PulseRepository, onRefresh: () -> Unit, onCurrency: (String) -> Unit, onPin: (Boolean) -> Unit) {
+fun PulseScreen(repository: PulseRepository, onRefresh: () -> Unit, onCurrency: (String) -> Unit, onPin: (Boolean) -> Unit,initialWidgets: Boolean=false) {
     val snapshot by repository.state.collectAsStateWithLifecycle()
-    var widgets by rememberSaveable { mutableStateOf(false) }
+    var widgets by rememberSaveable { mutableStateOf(initialWidgets) }
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     LaunchedEffect(Unit) { while (true) { now = System.currentTimeMillis(); delay(1000) } }
     MaterialTheme(colorScheme = darkColorScheme(primary = Orange, onPrimary = Color(0xFF17120D), background = Back,
@@ -225,6 +225,7 @@ private fun WidgetPage(s: Snapshot, repository: PulseRepository, now: Long, onRe
     val context = LocalContext.current
     Text("Your home screen, at a glance", fontSize = 18.sp, fontWeight = FontWeight.Medium)
     Text("Tik in de widget op EUR/USD om de valuta te wisselen. Grafieken, intervallen, cloud en zoom bedien je ook rechtstreeks in de widget.", color = Muted, fontSize = 14.sp)
+    MiniWidgetsPanel(s,now)
     var widgetCount by remember { mutableIntStateOf(com.buildapptest.bitcoinpulse.widget.WidgetCharts.defaultCount(context)) }
     Text("Aantal grafieken in de widget",fontSize=16.sp)
     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {

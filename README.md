@@ -4,13 +4,17 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.6.2**, versionCode **19**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.7.0**, versionCode **20**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## Miniwidget (1.7.0)
+
+A new 1×1 widget shows the full block height, next-block fee estimate in sat/vB and a compact BTC price when space permits. Add multiple instances from the app's Widgets tab or your launcher's widget picker; select EUR or USD independently for each in the app. The miniwidget uses the existing cache and background updater. See [MINIWIDGET.md](MINIWIDGET.md) for installation, resizing and currency settings. Existing chart widgets and the independent OWL 4.5 widget retain their behavior.
 
 ## Interface language (1.6.2)
 

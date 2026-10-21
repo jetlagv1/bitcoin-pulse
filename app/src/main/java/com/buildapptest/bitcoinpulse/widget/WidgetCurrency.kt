@@ -11,8 +11,11 @@ object WidgetCurrency {
     fun read(context: Context,id: Int,fallback: String): String =
         context.getSharedPreferences("widget-options",0).getString("currency-$id",fallback).let { if(it=="USD")"USD" else "EUR" }
     fun toggle(context: Context,id: Int,fallback: String): Boolean {
-        if(id !in ids(context) && id !in ids(context,true)) return false
-        context.getSharedPreferences("widget-options",0).edit().putString("currency-$id",if(read(context,id,fallback)=="EUR")"USD" else "EUR").apply()
+        return set(context,id,if(read(context,id,fallback)=="EUR")"USD" else "EUR")
+    }
+    fun set(context: Context,id: Int,currency: String): Boolean {
+        if(currency !in listOf("EUR","USD") || (id !in ids(context) && id !in ids(context,true) && id !in MiniWidget.ids(context))) return false
+        context.getSharedPreferences("widget-options",0).edit().putString("currency-$id",currency).apply()
         return true
     }
     fun required(context: Context,fallback: String) = (listOf(fallback)+ids(context).map { read(context,it,fallback) }).toSet()

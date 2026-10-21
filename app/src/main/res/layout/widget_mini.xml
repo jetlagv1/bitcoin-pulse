@@ -1,0 +1,9 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mini_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center_vertical" android:padding="6dp"
+    android:background="@drawable/widget_mini_background" android:contentDescription="@string/mini_description">
+    <TextView android:id="@+id/mini_label" style="@style/WidgetLabel" android:layout_width="match_parent" android:text="Blok" android:textSize="10sp"/>
+    <TextView android:id="@+id/mini_height" style="@style/WidgetNumber" android:layout_width="match_parent" android:layout_marginTop="2dp" android:text="—" android:textSize="15sp" android:textColor="#49CFFF"/>
+    <TextView android:id="@+id/mini_fee" style="@style/WidgetNumber" android:layout_width="match_parent" android:layout_marginTop="2dp" android:text="— sat/vB" android:textSize="12sp" android:textColor="#FF8A1F"/>
+    <TextView android:id="@+id/mini_price" style="@style/WidgetNumber" android:layout_width="match_parent" android:layout_marginTop="2dp" android:text="€ —" android:textSize="12sp"/>
+</LinearLayout>

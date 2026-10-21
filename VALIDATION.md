@@ -1,3 +1,15 @@
+# Bitcoin Pulse 1.7.0 / versionCode 20
+
+Verified on 21 October 2026.
+
+- Added a standard 1×1 miniwidget with full block height, next-block fee estimate in sat/vB and a compact EUR/USD BTC price when space permits. Each added instance has independent, persistent currency controls in the app's Widgets tab. Adding another widget does not alter existing widgets or the app currency; deleting one clears only its own preferences.
+- 60 Android JVM/Robolectric tests passed, with no failures or skipped tests. Four new tests exercise actual RemoteViews geometry, independent currencies/deletion, unique activity intents and real Compose currency buttons for two instances. Geometry covers 40×40, 56×56, 64×64, 80×72, 80×88 and 120×120 dp, larger system letters, seven-digit block heights, fractional fees, missing values and stale data. Rendered layouts and app settings were visually inspected; screenshots are in docs/design/miniwidget-*.png.
+- Release lint: zero errors and 178 warnings, without new suppressions. The miniwidget adds nine warnings for small caption text, initial-layout strings, API-31 preview/cell attributes and a KTX style suggestion. Older launchers use the 40dp minimum dimensions instead of API-31 cell attributes.
+- APK and RSA upload-signed AAB built for 1.7.0 / 20. Official bundletool 1.18.3 validated version/API levels, signature, universal APK generation and 16KB bundle/ZIP/ELF alignment.
+- The existing OWL 4.5 asset is byte-for-byte unchanged; no reimport is required. Existing chart widget behavior is retained. No physical-device/full-launcher test or Play Console upload/publication was performed.
+
+## Historical verification
+
 # Bitcoin Pulse 1.6.2 / versionCode 19
 
 Verified on 20 October 2026.

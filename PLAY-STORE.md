@@ -60,3 +60,12 @@ Op een andere computer kun je je eigen uploadsleutel gebruiken en vóór `gradle
 - [16 KB-paginagrootte](https://developer.android.com/guide/practices/page-sizes)
 - [Gebruikersgegevens en privacybeleid](https://support.google.com/googleplay/android-developer/answer/10144311)
 - [Testvereisten voor nieuwe persoonlijke accounts](https://support.google.com/googleplay/android-developer/answer/14151465)
+
+
+## Release-optimalisatie vanaf 1.8.2
+
+De release gebruikt R8 met codeverkleining, optimalisatie, naamverhulling en resourceverkleining. De AAB bevat de mapping voor Play Console. De verifier controleert daadwerkelijk hernoemde klassen, afwezigheid van optimizer-uitschakelopties, alle OWL-assets en de behouden WorkManager-klassenaam voor reeds geplande taken.
+
+Upload Bitcoin-Pulse-1.8.2-vc24-release.aab eerst naar de interne testtrack. Controleer daarna bij de nieuwe versie in App Bundle Explorer de door Google gemeten DEX-grootte en optimalisatiepercentages. De waarschuwing op de screenshot betreft versie 23; de lokale build kan Google's meting voor die reeds geüploade versie niet wijzigen. Een lokale DEX-grootte of percentage hernoemde mappingregels is niet hetzelfde als Google's eigen optimalisatiemetriek.
+
+De aparte geoptimaliseerde localRelease-APK gebruikt de eerdere Dropbox-ondertekening om rechtstreeks geïnstalleerde APK's te kunnen bijwerken. De AAB blijft met de uploadkey ondertekend. De emulator was op de build-pc niet bruikbaar; daarom zijn functietests van de geoptimaliseerde release op een echte telefoon/interne Play-test nog nodig vóór productie.

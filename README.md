@@ -4,13 +4,19 @@ Native Android Bitcoin dashboard and home-screen widget.
 
 ## Build the current source
 
-Current version: **1.8.1**, versionCode **23**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
+Current version: **1.8.2**, versionCode **24**. Open this repository in Android Studio with Java 17 and Android SDK 36 installed, or configure your SDK path in a local `local.properties` and run:
 
 ```sh
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
 On Windows, use `gradlew.bat`. Release bundles require your own upload key and the `PULSE_UPLOAD_*` environment variables described in [PLAY-STORE.md](PLAY-STORE.md). Signing keys, passwords, SDK paths, build caches, generated APK/AAB files, and private design context are excluded from Git. Store-asset export helpers in `tools/` are optional and are not needed to build the Android app.
+
+## Optimized releases (1.8.2)
+
+Release builds now enable R8 code optimization, shrinking, obfuscation and resource shrinking using the standard optimized Android rules and dependency consumer rules. No broad application keep rules or optimizer-disabling flags are added. Existing scheduled worker names remain stable for upgrades. The AAB includes the R8 mapping metadata for Play.
+
+`tools/build-play-release.ps1` builds the upload-signed AAB and an optimized `localRelease` APK signed with the existing direct-install certificate. The latter updates APKs previously shared through Dropbox; both variants are non-debuggable and use the same optimization settings. Do not use an ordinary debug APK to assess release optimization. See VALIDATION.md for measured DEX size and testing limits. Play's own percentages must be checked on the new upload in App Bundle Explorer.
 
 ## Mini tap (1.8.1)
 

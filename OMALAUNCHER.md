@@ -6,6 +6,8 @@ Alle drie de startformaten gebruiken nu **OWL 5.1** en groeien automatisch van m
 
 **Vervang oude geïmporteerde OWL-widgets één keer** om dit gedrag te krijgen. Omalauncher bewaart zelfstandige kopieën; alleen de APK bijwerken vervangt die niet. Je kunt onderaan het tabblad Widgets kiezen uit network, compact en mini als startformaat. Daarna schaalt elk exemplaar in beide richtingen mee.
 
+Versie **1.8.2** wijzigt alleen de Android-releaseoptimalisatie. De drie OWL-bronnen blijven byte-voor-byte gelijk aan 5.1. Heb je die versie al geïmporteerd, dan hoef je voor deze update niet opnieuw te importeren.
+
 ## Mini 1×1 toevoegen
 
 1. Open Bitcoin Pulse → **Widgets** en ga naar het onderdeel **Omalauncher** onderaan.
@@ -22,7 +24,7 @@ De gegevensbronnen worden ongeveer elke minuut opgevraagd wanneer Omalauncher de
 
 ## Installeren
 
-1. Installeer of update Omalauncher en Bitcoin Pulse **1.8.1 (versionCode 23)**.
+1. Installeer of update Omalauncher en Bitcoin Pulse **1.8.2 (versionCode 24)**.
 2. Heb je de oude widget al toegevoegd? Verwijder die eerst uit Omalauncher. Een app-update vervangt Omalaunchers eigen kopie niet automatisch.
 3. Open Bitcoin Pulse → **Widgets**, kies één of twee grafieken en tik op **Toevoegen aan Omalauncher**.
 4. Lees Omalaunchers importcontrole en bevestig het toevoegen.

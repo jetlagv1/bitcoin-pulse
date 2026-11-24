@@ -11,8 +11,8 @@ android {
         applicationId = "com.buildapptest.bitcoinpulse"
         minSdk = 26
         targetSdk = 36
-        versionCode = 23
-        versionName = "1.8.1"
+        versionCode = 24
+        versionName = "1.8.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true }
@@ -31,9 +31,18 @@ android {
     }
     buildTypes { release {
         isDebuggable = false
-        isMinifyEnabled = false
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         if (uploadStore != null) signingConfig = signingConfigs.getByName("playUpload")
-    } }
+    }
+        // Exercise the same optimizer while preserving updates of the APK shared via Dropbox.
+        create("localRelease") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+        }
+    }
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.all { it.systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2") }

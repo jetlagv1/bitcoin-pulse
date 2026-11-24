@@ -1,6 +1,6 @@
 # Install Bitcoin Pulse
 
-1. Open **Dropbox → Bitcoin Pulse → Bitcoin-Pulse-1.8.1-debug.apk** on your phone, or transfer it from deliverables. Install it as an update of the directly installed APK to retain preferences.
+1. Open **Dropbox → Bitcoin Pulse → Bitcoin-Pulse-1.8.2-optimized.apk** on your phone, or transfer it from deliverables. Install it as an update of the directly installed APK to retain preferences.
 2. Open the APK on Android 8.0 or newer. If prompted, allow your browser or file manager to install this APK.
 3. Open Bitcoin Pulse with an internet connection. Prices come from Kraken; blockchain and fee data come from mempool.space.
 4. In **Widgets**, choose network, compact or mini as the starting size. Confirm placement in your launcher, or use the launcher's widget picker. Mini settings are below compact settings. Mini currency is selected per instance in the app; compact/network offer their own currency controls.
@@ -13,7 +13,7 @@ Latest-block details include transaction count, recognized mining pool, median p
 
 The app refreshes prices/network data about every 30 seconds while visible. Candle responses are cached for 90 seconds and difficulty for five minutes. Widgets request updates every 15 minutes, subject to Android battery restrictions. Tap refresh to request an update (the same short cache windows apply), or tap the main surface to open the app. Cached data stays visible if a source fails, with its original retrieval timestamp. The widget footer uses the oldest retrieval time of its displayed sources. The block age in a widget is calculated at render time, with that clock time next to it; it is not a continuously running timer. The app recomputes age every second from the latest known block, with source freshness shown separately.
 
-This APK is a debug-signed testing build. It is not published on Google Play. Installing updates requires the same signing key; a build made on another computer may require uninstalling this version first, which clears its local settings and cache.
+This APK is an R8-optimized, non-debuggable localRelease build, signed with the existing direct-install certificate. It is not published on Google Play. Installing updates requires the same signing key; a build made on another computer may require uninstalling this version first, which clears its local settings and cache.
 
 No account or API key is required. The app has internet and network-state permissions, accesses public data, and stores only its currency preference, cached public responses, and refresh status locally. It has no wallet access or analytics.
 

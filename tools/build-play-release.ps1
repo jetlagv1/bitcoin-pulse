@@ -12,7 +12,7 @@ try {
     $env:PULSE_UPLOAD_STORE_PASSWORD = $pulseSigning.password
     $env:PULSE_UPLOAD_KEY_ALIAS = $pulseSigning.keyAlias
     $env:PULSE_UPLOAD_KEY_PASSWORD = $pulseSigning.password
-    $pulseArguments = @(':app:bundleRelease', ':app:testDebugUnitTest', ':app:lintRelease', '--console=plain')
+    $pulseArguments = @(':app:bundleRelease', ':app:assembleLocalRelease', ':app:testDebugUnitTest', ':app:lintRelease', '--console=plain')
     if ($Offline) { $pulseArguments += '--offline' }
     Push-Location $pulseProjectRoot
     try {

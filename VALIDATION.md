@@ -1,3 +1,16 @@
+# Bitcoin Pulse 1.8.2 / versionCode 24
+
+Verified on 24 November 2026.
+
+- Enabled R8 optimization, code shrinking, obfuscation and resource shrinking for release, using proguard-android-optimize.txt and the libraries' consumer rules. No broad custom keep rules were introduced. The effective configuration contains no -dontobfuscate, -dontoptimize or -dontshrink. WorkManager's consumer keepnames rule preserves the existing PulseWorker name and reflective constructor so previously scheduled jobs remain compatible.
+- AAB DEX bytes fell from 43,236,044 (1.8.1) to 2,048,448 (1.8.2), a roughly 95.3% size reduction. This is local uncompressed DEX size, not Google's optimization/obfuscation percentages. The R8 map contains 3,040 class entries, including 2,952 renamed entries, and is embedded in BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map. Final Play Console percentages remain unmeasured until upload.
+- Built a non-debuggable, optimized localRelease APK for direct updates as well as the upload-signed AAB. The direct APK contains 2,048,252 DEX bytes and is 1,283,524 bytes total. Its certificate matches the previous 1.8.1 Dropbox APK. It has the same optimizer settings as release, but its DEX is not byte-identical to the AAB variant; no claim of binary equivalence is made.
+- 65 ordinary JVM/Robolectric tests passed with no failures/errors. These tests exercise the debug test variant, not optimized DEX execution. Release lint: zero errors and 183 warnings. R8 and resource-shrinking build tasks completed successfully for release and localRelease.
+- Official bundletool 1.18.3 validated the 1.8.2 / 24 AAB, API 26/36, RSA upload signature, universal APK generation and 16KB bundle/ZIP/ELF alignment. Both optimized APKs pass ZIP alignment; direct APK signature and upgrade-certificate compatibility were checked with apksigner. All three OWL assets in the AAB and direct APK exactly match the unchanged 5.1 sources; Omalauncher does not need reimporting for this app-only build change.
+- Device test unavailable: no attached devices were found, no emulator hypervisor driver was installed, and two isolated headless software-emulator attempts could not start (fallback exited with Windows code -1073741819). The optimized app has not been run on a physical device or working emulator. Test the new AAB through Play internal testing before production. No Play Console upload/publication was performed.
+
+## Historical verification
+
 # Bitcoin Pulse 1.8.1 / versionCode 23
 
 Verified on 21 October 2026.
